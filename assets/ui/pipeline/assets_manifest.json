@@ -1,0 +1,174 @@
+{
+  "version": 1,
+  "basePath": "./runtime/",
+  "targetViewport": {
+    "width": 390,
+    "height": 844
+  },
+  "assets": {
+    "button.primary.normal": {
+      "file": "button-primary-normal.9.png",
+      "type": "nineSlice",
+      "width": 384,
+      "height": 128,
+      "transparent": true,
+      "nineSlice": { "top": 32, "right": 32, "bottom": 32, "left": 32 },
+      "frames": 1,
+      "use": "Main CTA normal state"
+    },
+    "button.primary.pressed": {
+      "file": "button-primary-pressed.9.png",
+      "type": "nineSlice",
+      "width": 384,
+      "height": 128,
+      "transparent": true,
+      "nineSlice": { "top": 32, "right": 32, "bottom": 32, "left": 32 },
+      "frames": 1,
+      "use": "Main CTA pressed state"
+    },
+    "button.primary.disabled": {
+      "file": "button-primary-disabled.9.png",
+      "type": "nineSlice",
+      "width": 384,
+      "height": 128,
+      "transparent": true,
+      "nineSlice": { "top": 32, "right": 32, "bottom": 32, "left": 32 },
+      "frames": 1,
+      "use": "Main CTA disabled state"
+    },
+    "panel.cream": {
+      "file": "panel-cream.9.png",
+      "type": "nineSlice",
+      "width": 512,
+      "height": 256,
+      "transparent": true,
+      "nineSlice": { "top": 40, "right": 40, "bottom": 40, "left": 40 },
+      "frames": 1,
+      "use": "Reward card and information panel background"
+    },
+    "tile.number.normal": {
+      "file": "number-tile-normal.png",
+      "type": "sprite",
+      "width": 128,
+      "height": 128,
+      "transparent": true,
+      "nineSlice": null,
+      "frames": 1,
+      "use": "Board number tile default state"
+    },
+    "tile.number.selected": {
+      "file": "number-tile-selected.png",
+      "type": "sprite",
+      "width": 128,
+      "height": 128,
+      "transparent": true,
+      "nineSlice": null,
+      "frames": 1,
+      "use": "Board number tile selected state"
+    },
+    "tile.number.locked": {
+      "file": "number-tile-locked.png",
+      "type": "sprite",
+      "width": 128,
+      "height": 128,
+      "transparent": true,
+      "nineSlice": null,
+      "frames": 1,
+      "use": "Board number tile locked state"
+    },
+    "enemy.idle": {
+      "file": "enemy-idle-3x3.png",
+      "type": "spriteSheet",
+      "width": 768,
+      "height": 768,
+      "transparent": true,
+      "nineSlice": null,
+      "frames": 9,
+      "grid": { "columns": 3, "rows": 3, "frameWidth": 256, "frameHeight": 256 },
+      "fps": 8,
+      "use": "Enemy idle animation"
+    },
+    "effect.skill": {
+      "file": "skill-effect-3x3.png",
+      "type": "spriteSheet",
+      "width": 768,
+      "height": 768,
+      "transparent": true,
+      "nineSlice": null,
+      "frames": 9,
+      "grid": { "columns": 3, "rows": 3, "frameWidth": 256, "frameHeight": 256 },
+      "fps": 12,
+      "use": "Skill cast or board effect animation"
+    },
+    "icon.coin": {
+      "file": "icon-coin.png",
+      "type": "sprite",
+      "width": 128,
+      "height": 128,
+      "transparent": true,
+      "nineSlice": null,
+      "frames": 1,
+      "use": "Coin reward icon"
+    },
+    "icon.star": {
+      "file": "icon-star.png",
+      "type": "sprite",
+      "width": 128,
+      "height": 128,
+      "transparent": true,
+      "nineSlice": null,
+      "frames": 1,
+      "use": "Star progress icon"
+    },
+    "icon.chest": {
+      "file": "icon-chest.png",
+      "type": "sprite",
+      "width": 128,
+      "height": 128,
+      "transparent": true,
+      "nineSlice": null,
+      "frames": 1,
+      "use": "Chest reward icon"
+    },
+    "icon.egg": {
+      "file": "icon-egg.png",
+      "type": "sprite",
+      "width": 128,
+      "height": 128,
+      "transparent": true,
+      "nineSlice": null,
+      "frames": 1,
+      "use": "Egg reward icon"
+    },
+    "icon.settings": {
+      "file": "icon-settings.png",
+      "type": "sprite",
+      "width": 128,
+      "height": 128,
+      "transparent": true,
+      "nineSlice": null,
+      "frames": 1,
+      "use": "Quest settings button icon"
+    },
+    "button.arrow.left": {
+      "file": "button-arrow-left.png",
+      "type": "sprite",
+      "width": 128,
+      "height": 128,
+      "transparent": true,
+      "nineSlice": null,
+      "frames": 1,
+      "use": "Quest previous stage arrow button"
+    },
+    "button.arrow.right": {
+      "file": "button-arrow-right.png",
+      "type": "sprite",
+      "width": 128,
+      "height": 128,
+      "transparent": true,
+      "nineSlice": null,
+      "frames": 1,
+      "use": "Quest next stage arrow button"
+    }
+  }
+}

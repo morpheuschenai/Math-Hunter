@@ -1,0 +1,2303 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>數字獵人 v10</title>
+<style>
+  /* === 視覺 token（Codex 可在此調整外觀，不影響玩法邏輯）=== */
+  :root {
+    --combo-c1:#ffec99;   /* 無連擊 / 基本傷害 */
+    --combo-c2:#9fd0ff;   /* combo 2-3 */
+    --combo-c3:#ff9bf2;   /* combo 4-5 */
+    --combo-c4:#ffd84d;   /* combo 6+  */
+    --combo-size-base:24px; --combo-size-3:30px; --combo-size-4:38px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { height:100%; overscroll-behavior:none; overflow:hidden; }
+  body {
+    background: linear-gradient(180deg,#1a1f3c 0%,#2b1f4d 60%,#3c2456 100%);
+    color:#fff; font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif;
+    display:flex; flex-direction:column; align-items:center;
+    user-select:none; -webkit-user-select:none; touch-action:none;
+    min-height:100dvh;
+  }
+  body.jr { background: linear-gradient(180deg,#1d4e89 0%,#2a6f97 55%,#3c8dad 100%); }
+  #app { width:min(100vw,440px); height:100dvh; max-height:100dvh; overflow:hidden;
+    padding:6px 8px calc(6px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:4px; }
+  #boardWrap { flex:1 1 auto; min-height:0; display:flex; align-items:center; justify-content:center; position:relative; }
+
+  #topRow { display:flex; justify-content:space-between; align-items:center; font-size:12px; opacity:.85; }
+  #stageName { font-weight:700; }
+  #voiceBtn { background:none; border:none; color:#fff; font-size:16px; cursor:pointer; }
+  #exitBtn { background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.3); border-radius:8px;
+    color:#fff; font-size:11px; padding:3px 8px; cursor:pointer; margin-right:6px; }
+
+  #enemyZone { text-align:center; position:relative; }
+  #app { position:relative; }
+  #dmgPop { position:absolute; left:50%; top:40%; transform:translate(-50%,-50%); z-index:6;
+    font-size:44px; font-weight:900; color:#ffec99; text-shadow:0 2px 0 #b8531f,0 0 14px rgba(255,180,60,.7);
+    pointer-events:none; transition:transform .08s; -webkit-text-stroke:1px #7a3410; }
+  #dmgPop.big { transform:translate(-50%,-50%) scale(1.42); }
+  /* 傷害數字依連擊層級變色（data-tier 由邏輯設定，顏色由此處決定）*/
+  #dmgPop[data-tier="2"] { color:var(--combo-c2); }
+  #dmgPop[data-tier="3"] { color:var(--combo-c3); }
+  #dmgPop[data-tier="4"] { color:var(--combo-c4); }
+  #comboMeter { position:absolute; left:50%; top:4%; transform:translateX(-50%) scale(1); z-index:7;
+    font-weight:900; font-size:var(--combo-size-base); color:var(--combo-c2);
+    text-shadow:0 2px 8px rgba(0,0,0,.65); pointer-events:none;
+    white-space:nowrap; transition:transform .12s ease-out; -webkit-text-stroke:1px rgba(0,0,0,.35); }
+  #comboMeter[data-tier="3"] { color:var(--combo-c3); font-size:var(--combo-size-3); }
+  #comboMeter[data-tier="4"] { color:var(--combo-c4); font-size:var(--combo-size-4); }
+  #comboMeter.punch { transform:translateX(-50%) scale(1.45); }
+  .pngChar { display:block; width:100%; height:100%; position:relative; }
+  .pngChar img { width:100%; height:100%; object-fit:contain; display:block; -webkit-user-drag:none; user-select:none; }
+  .spriteChar { display:block; width:100%; height:100%; position:relative; }
+  .spriteChar img { width:100%; height:100%; object-fit:contain; display:block; user-select:none; -webkit-user-drag:none; transform-origin:50% 72%; }
+  .spriteChar .crown { position:absolute; top:-8%; left:50%; transform:translateX(-50%); font-size:42%; line-height:1; }
+  .motion-idle img { animation:spriteIdle 2.1s ease-in-out infinite; }
+  .motion-think img { animation:spriteThink 1.6s ease-in-out infinite; }
+  .motion-happy img { animation:spriteHappy .75s cubic-bezier(.2,1.5,.24,1); }
+  .motion-attack img { animation:spriteAttack .62s cubic-bezier(.18,1.45,.2,1); }
+  .motion-hurt img { animation:spriteHurt .52s ease-in-out; }
+  .motion-miss img { animation:spriteMiss .7s ease-in-out; }
+  .motion-surprise img { animation:spriteSurprise .85s cubic-bezier(.2,1.6,.2,1); }
+  .motion-enraged img { animation:spriteEnraged .42s ease-in-out infinite; filter:drop-shadow(0 0 16px rgba(255,36,76,.35)); }
+  @keyframes spriteIdle { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-6px) scale(1.01,.99)} }
+  @keyframes spriteThink { 0%,100%{transform:translateX(-3px) rotate(-1deg)} 50%{transform:translateX(4px) rotate(1deg)} }
+  @keyframes spriteHappy { 0%,100%{transform:translateY(0) scale(1)} 42%{transform:translateY(-18px) scale(1.05,.95)} 72%{transform:translateY(2px) scale(.98,1.02)} }
+  @keyframes spriteAttack { 0%,100%{transform:translateX(0) scale(1)} 38%{transform:translateX(34px) scale(1.06,.96) rotate(1deg)} 54%{transform:translateX(22px) scale(.98,1.02)} }
+  @keyframes spriteHurt { 0%,100%{transform:translateX(0) scale(1)} 30%{transform:translateX(-10px) scale(1.08,.84)} 62%{transform:translateX(7px) scale(.96,1.04)} }
+  @keyframes spriteMiss { 0%,100%{transform:translateX(0) rotate(0)} 25%{transform:translateX(-10px) rotate(-3deg)} 70%{transform:translateX(10px) rotate(3deg)} }
+  @keyframes spriteSurprise { 0%{transform:scale(.6);opacity:.2} 45%{transform:scale(1.1,.9);opacity:1} 72%,100%{transform:scale(1)} }
+  @keyframes spriteEnraged { 0%,100%{transform:translateX(-2px) scale(1.02)} 50%{transform:translateX(2px) scale(1.06,.96)} }
+  .pngChar .crown { position:absolute; top:-8%; left:50%; transform:translateX(-50%); font-size:42%; line-height:1; }
+  #enemyArt { width:clamp(110px,21vh,185px); height:clamp(110px,21vh,185px); margin:-4px auto -2px; animation:idle 2.2s ease-in-out infinite; transition:transform .1s; }
+  #enemyArt.corrupted { filter:saturate(.5) brightness(.72) drop-shadow(0 0 9px rgba(160,64,255,.85)); }
+  #enemyArt.hit { transform:scale(.85) rotate(-8deg); filter:brightness(2); }
+  @keyframes idle { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+  #enemyArt.boss { width:clamp(150px,30vh,250px); height:clamp(150px,30vh,250px); filter:drop-shadow(0 0 14px rgba(255,77,77,.65)); }
+  #enemyArt.boss.enraged { animation:idle 1.1s ease-in-out infinite, bossPulse .7s linear infinite; }
+  @keyframes bossPulse { 0%,100%{filter:drop-shadow(0 0 10px rgba(255,77,77,.5))} 50%{filter:drop-shadow(0 0 22px rgba(255,40,40,.95))} }
+  #enemyZone.enraged { background:radial-gradient(ellipse at center, rgba(255,40,40,.14), transparent 70%); border-radius:16px; }
+  #flash { position:fixed; inset:0; background:#fff; opacity:0; pointer-events:none; z-index:25; transition:opacity .09s; }
+  #bossBanner { position:fixed; top:34%; left:0; right:0; z-index:26; text-align:center;
+    background:rgba(120,10,20,.85); padding:18px 0; font-size:24px; font-weight:800; letter-spacing:4px;
+    transform:scaleY(0); transition:transform .25s; pointer-events:none; }
+  #bossBanner.on { transform:scaleY(1); }
+  #bossBanner small { display:block; font-size:12px; letter-spacing:2px; opacity:.8; margin-top:4px; }
+  #enemyName { display:none; }   /* 關卡中不顯示敵人名字，把空間讓給放大的角色 */
+  #gimBadge { font-size:12px; margin-top:2px; min-height:15px; color:#ffd0a0; }
+  #captainChip { font-size:11px; min-height:14px; opacity:.9; margin:1px 0 2px; }
+  .barWrap { background:rgba(0,0,0,.45); border-radius:8px; height:12px; overflow:hidden; margin-top:3px; }
+  .barFill { height:100%; border-radius:8px; transition:width .25s; }
+  #enemyHpFill { background:linear-gradient(90deg,#ff5a5a,#ff9b3d); width:100%; }
+  #playerHpFill { background:linear-gradient(90deg,#3ddc84,#7be3ff); width:100%; }
+  #countdown { position:absolute; right:2px; top:2px; background:rgba(255,80,80,.22); border:1px solid rgba(255,120,120,.6);
+    border-radius:10px; padding:3px 8px; font-size:11px; }
+  #countdown b { font-size:14px; color:#ffb0b0; }
+  body.jr #countdown { background:rgba(255,200,80,.22); border-color:rgba(255,220,120,.6); }
+  body.jr #countdown b { color:#ffe9a8; }
+
+  #targetRow { display:flex; justify-content:center; align-items:baseline; gap:13px;
+    background:rgba(255,255,255,.07); border-radius:12px; padding:4px 10px; }
+  .tLabel { font-size:12px; opacity:.7; }
+  #targetVal { font-size:27px; font-weight:800; color:#ffd84d; }
+  body.jr #targetVal { font-size:34px; }
+  #curSum { font-size:21px; font-weight:700; color:#9ecbff; min-width:32px; text-align:center; }
+  body.jr #curSum { font-size:27px; }
+  #curSum.over { color:#ff7a7a; }
+  #curSum.exact { color:#5dff9d; }
+  #curSum.short { color:#ffb35e; }
+  #chainInfo { font-size:13px; color:#d8b4ff; min-width:48px; text-align:center; }
+
+  #board { display:block; border-radius:14px; touch-action:none; margin:0 auto; }
+  #board.targeting { outline:3px solid rgba(255,216,77,.8); outline-offset:-3px; }
+
+  #skillRow { display:flex; gap:8px; justify-content:center; }
+  .skillBtn { position:relative; flex:1; max-width:150px; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.3);
+    border-radius:12px; color:#fff; padding:5px 4px; font-size:11px; cursor:pointer; text-align:center;
+    display:flex; align-items:center; gap:6px; justify-content:center; }
+  .skillBtn .mini { width:30px; height:30px; flex:none; }
+  .skillBtn .lbl b { display:block; font-size:12px; }
+  .skillBtn.armed { background:rgba(255,216,77,.25); border-color:#ffd84d; }
+  .skillBtn.cooling { opacity:.45; }
+  .skillBtn .cd { position:absolute; right:6px; top:3px; font-size:13px; font-weight:800; color:#ffb0b0; }
+
+  #playerRow { display:flex; align-items:center; gap:8px; font-size:13px; }
+  #playerRow .barWrap { flex:1; margin-top:0; }
+  #shieldIc { display:none; }
+  #shieldIc.on { display:inline; }
+  body.jr #playerRow { display:none; }
+
+  .overlay { position:fixed; inset:0; background:rgba(10,8,25,.94); display:flex; flex-direction:column;
+    justify-content:flex-start; align-items:center; gap:12px; z-index:10; text-align:center; padding:26px 18px; overflow-y:auto; }
+  .overlay.center { justify-content:center; }
+  .overlay h1 { font-size:25px; }
+  .overlay p { font-size:14px; line-height:1.7; opacity:.92; max-width:340px; }
+  .btn { background:linear-gradient(135deg,#ffd84d,#ff9b3d); color:#3a2400; font-weight:800; font-size:17px;
+    border:none; border-radius:14px; padding:12px 36px; cursor:pointer; box-shadow:0 4px 18px rgba(255,180,60,.35); }
+  .btn:active { transform:scale(.96); }
+  .btnBig { display:flex; align-items:center; gap:12px; width:270px; text-align:left; font-size:16px; padding:14px 20px; }
+  .btnBig small { display:block; font-weight:400; font-size:12px; opacity:.75; }
+  .btnJr { background:linear-gradient(135deg,#7be3ff,#3ddc84); }
+  .btnGhost { background:rgba(255,255,255,.12); color:#fff; font-size:14px; border:1px solid rgba(255,255,255,.3);
+    border-radius:12px; padding:10px 22px; cursor:pointer; }
+  .hidden { display:none !important; }
+
+  #mapZones { width:100%; max-width:360px; display:flex; flex-direction:column; gap:10px; }
+  .zone { border-radius:16px; padding:8px 12px; text-align:left; }
+  .zoneHead { width:100%; background:none; border:none; color:#fff; font-size:15px; font-weight:700;
+    display:flex; align-items:center; justify-content:space-between; cursor:pointer; padding:4px 0; }
+  .zoneHead .zStars { font-size:12px; font-weight:400; color:#ffd84d; opacity:.9; }
+  .zone .stageRow { display:flex; gap:10px; margin-top:8px; }
+  #mapActions { position:sticky; bottom:-26px; width:100%; max-width:360px; display:flex; gap:8px;
+    flex-wrap:wrap; justify-content:center; padding:10px 0 4px; margin-top:4px;
+    background:linear-gradient(to top, rgba(10,8,25,.98) 70%, rgba(10,8,25,0)); }
+  .stageBtn { flex:1; background:rgba(0,0,0,.3); border:1px solid rgba(255,255,255,.3); border-radius:12px;
+    color:#fff; padding:9px 6px; font-size:13px; cursor:pointer; }
+  .stageBtn .stars { display:block; font-size:12px; margin-top:2px; letter-spacing:2px; }
+  .stageBtn.locked { opacity:.35; }
+  .z0 { background:linear-gradient(135deg,#2e7d4f88,#79c06955); }
+  .z1 { background:linear-gradient(135deg,#1b5e2088,#388e3c55); }
+  .z2 { background:linear-gradient(135deg,#37474f88,#546e7a55); }
+  .z3 { background:linear-gradient(135deg,#8e242488,#e2575755); }
+  .z4 { background:linear-gradient(135deg,#b06a0088,#ffae3d55); }
+  .z5 { background:linear-gradient(135deg,#0a6e8c88,#3fd0ff55); }
+  .svGroup { margin:8px 0; }
+  .svQ { font-size:14px; color:#cfe; margin-bottom:6px; }
+  .svOpts { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+  .svOpt { font-size:15px; padding:8px 14px; border-radius:12px; border:1px solid #2a3550; background:#16203a; color:#e8eefc; cursor:pointer; }
+  .svOpt.sel { background:#3a6df0; border-color:#7aa2ff; font-weight:700; }
+  .zj { background:linear-gradient(135deg,#1d6fa888,#7be3ff55); }
+
+  #teamGrid { display:flex; flex-direction:column; gap:12px; width:100%; max-width:380px; }
+  .spiritGrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%; }
+  .sCard { position:relative; background:rgba(255,255,255,.07); border:2px solid rgba(255,255,255,.18);
+    border-radius:16px; padding:8px 8px 10px; text-align:center; cursor:pointer; }
+  .sCard.equipped { border-color:#ffd84d; background:rgba(255,216,77,.12); }
+  .sCard .art { width:88px; height:88px; margin:0 auto; }
+  .sCard .nm { font-size:15px; font-weight:700; margin-top:1px; }
+  .sCard .sk { font-size:11px; text-align:left; margin-top:5px; line-height:1.4; }
+  .sCard .tag { position:absolute; top:6px; right:7px; font-size:10px; padding:2px 7px; border-radius:8px; }
+  .sCard .tag.cap { background:#ffd84d; color:#3a2400; font-weight:700; }
+  .sCard .tag.on { background:#3a6df0; color:#fff; }
+  .lockSec { width:100%; text-align:center; margin-top:4px; }
+  .lockHead { font-size:13px; color:#ffd84d; margin-bottom:9px; }
+  .lockRow { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+  .lockChip { width:56px; position:relative; }
+  .lockChip .sil { width:52px; height:52px; margin:0 auto; filter:brightness(0) opacity(.42); }
+  .lockChip .qn { position:absolute; inset:0 0 14px 0; display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:800; color:#aab; }
+  .lockChip .dot { display:block; width:8px; height:8px; border-radius:50%; margin:2px auto 0; }
+  .pCard { background:rgba(255,255,255,.08); border:2px solid rgba(255,255,255,.2); border-radius:14px;
+    padding:6px 2px 5px; cursor:pointer; position:relative; }
+  .pCard .art { width:54px; height:54px; margin:0 auto; }
+  .pCard .nm { font-size:11px; margin-top:2px; }
+  .pCard .lv { font-size:10px; opacity:.7; }
+  .pCard.equipped { border-color:#ffd84d; background:rgba(255,216,77,.15); }
+  .pCard.unowned { opacity:.4; }
+  .pCard .attrDot { position:absolute; left:6px; top:6px; width:10px; height:10px; border-radius:50%; }
+  .attr-odd { background:#ff9b3d; } .attr-even { background:#5b8def; }
+  .attr-prime { background:#b07ce8; } .attr-multi { background:#57b85e; }
+
+  #eggBox { cursor:pointer; }
+  #eggBox .art { width:90px; height:90px; margin:0 auto; animation:wobble 1s ease-in-out infinite; }
+  @keyframes wobble { 0%,100%{transform:rotate(-5deg)} 50%{transform:rotate(5deg)} }
+  #hatchReveal .art { width:110px; height:110px; margin:0 auto; animation:pop .4s ease-out; }
+  @keyframes pop { 0%{transform:scale(.2)} 70%{transform:scale(1.15)} 100%{transform:scale(1)} }
+  #gachaArt .art { width:120px; height:120px; margin:0 auto; }
+  #gachaArt .wob { animation:wobble 1s ease-in-out infinite; }
+  #gachaArt .pop { animation:pop .45s ease-out; }
+  .btn.disabled { opacity:.45; filter:grayscale(.6); }
+
+  #splitChoices { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-width:300px; }
+  .splitBtn { background:rgba(122,77,217,.35); border:1px solid #a07ce8; border-radius:12px; color:#fff;
+    font-size:18px; font-weight:700; padding:12px 18px; cursor:pointer; }
+
+  #resultStars { font-size:36px; letter-spacing:6px; }
+
+  #toast { position:fixed; top:15%; left:50%; transform:translateX(-50%); background:rgba(0,0,0,.78);
+    border-radius:12px; padding:8px 18px; font-size:14px; z-index:30; opacity:0; transition:opacity .25s; pointer-events:none; max-width:88vw; text-align:center; line-height:1.5; }
+
+  .shake { animation:shake .35s; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-7px)} 40%{transform:translateX(7px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div id="topRow"><span id="stageName">–</span><span><button id="exitBtn">↩︎ 離開</button><button id="voiceBtn" class="hidden">🔊</button> <span id="foeProgress">–</span></span></div>
+  <div id="enemyZone">
+    <div id="countdown"><span id="cdLabel">行動</span> <b id="cdVal">4</b></div>
+    <div id="enemyArt"></div>
+    <div id="enemyName">–</div>
+    <div id="gimBadge"></div>
+    <div class="barWrap"><div id="enemyHpFill" class="barFill"></div></div>
+  </div>
+  <div id="targetRow">
+    <span class="tLabel">目標</span><span id="targetVal">–</span>
+    <span class="tLabel">目前</span><span id="curSum">–</span>
+    <span id="chainInfo">鏈 ×0</span>
+  </div>
+  <div id="boardWrap">
+    <canvas id="board"></canvas>
+    <div id="comboMeter" class="hidden"></div>
+    <div id="dmgPop" class="hidden"></div>
+  </div>
+  <div id="captainChip"></div>
+  <div id="skillRow"></div>
+  <div id="playerRow">🛡️ <div class="barWrap"><div id="playerHpFill" class="barFill"></div></div><span id="playerHpText">100</span><span id="shieldIc">✨🛡️</span></div>
+</div>
+
+<div id="toast"></div>
+<div id="flash"></div>
+<div id="bossBanner">⚠️ 亂數魔王 ⚠️<small>數界的混亂之源現身了！</small></div>
+
+<div id="surveyOverlay" class="overlay center">
+  <h1>👋 開始之前</h1>
+  <p style="font-size:13px;opacity:.85">幫我們一個小忙，回答幾個小問題（給大人填也行）。<br>這些資料只用來改進遊戲 😊</p>
+  <div class="svGroup">
+    <div class="svQ">小朋友幾歲？<span style="color:#ff8da3">＊必填</span></div>
+    <div class="svOpts" id="svAge"></div>
+  </div>
+  <div class="svGroup">
+    <div class="svQ">性別</div>
+    <div class="svOpts" id="svGender">
+      <button class="svOpt" data-v="男生">男生</button>
+      <button class="svOpt" data-v="女生">女生</button>
+      <button class="svOpt" data-v="不想說">不想說</button>
+    </div>
+  </div>
+  <div class="svGroup">
+    <div class="svQ">數學程度（自己感覺就好）</div>
+    <div class="svOpts" id="svMath">
+      <button class="svOpt" data-v="剛開始學">剛開始學加減</button>
+      <button class="svOpt" data-v="還可以">加減很OK</button>
+      <button class="svOpt" data-v="會乘除">會乘法/除法</button>
+      <button class="svOpt" data-v="很拿手">數學很拿手</button>
+    </div>
+  </div>
+  <div class="svGroup">
+    <div class="svQ">暱稱／代號（可留空）</div>
+    <input id="svNick" maxlength="12" placeholder="例如：小明、A1" style="font-size:16px;padding:8px 12px;border-radius:10px;background:#16203a;color:#fff;border:1px solid #2a3550;text-align:center">
+  </div>
+  <button class="btn btnBig" id="surveyGo" style="margin-top:8px">開始遊戲 ▶</button>
+</div>
+
+<div id="startOverlay" class="overlay center hidden">
+  <h1>🔢 數字獵人</h1>
+  <p style="color:#c5a3ff">數界 Numeria 被「亂數魔王」攪亂了，<br>可愛的<b>數靈</b>全都暗化成怪物！</p>
+  <p>拖曳相鄰數字，加總等於目標數就能淨化牠們。<br><b style="color:#d8b4ff">數字越多顆，傷害倍率越高！</b></p>
+  <button class="btn btnBig btnJr" id="startJrBtn">🐣 <span>小小獵人<small>5–6 歲・小盤面・只有加法・不會輸・有語音</small></span></button>
+  <button class="btn btnBig" id="startStdBtn">⚔️ <span>數字獵人<small>7 歲以上・完整冒險・減法珠與技能</small></span></button>
+</div>
+
+<div id="selectOverlay" class="overlay hidden">
+  <h1 id="mapTitle">🗺️ 數界地圖</h1>
+  <div id="mapZones"></div>
+  <p style="font-size:11px;opacity:.5" id="starHint"></p>
+  <div id="mapActions">
+    <button class="btnGhost" id="towerBtn">🗼 無限塔</button>
+    <button class="btnGhost" id="gachaBtn">🥚 孵化所</button>
+    <button class="btnGhost" id="teamBtn">👥 我的數靈</button>
+    <button class="btnGhost" id="settingsBtn">⚙️ 設定</button>
+  </div>
+</div>
+
+<div id="towerResultOverlay" class="overlay center hidden">
+  <h1>🗼 無限塔結算</h1>
+  <p style="font-size:15px">爬到第 <b style="color:#ffd84d" id="towerFloors">0</b> 層</p>
+  <p style="font-size:14px">最高單發攻擊力 <b style="color:#ff9d2e" id="towerPeak">0</b></p>
+  <p id="towerBonusMsg" style="font-size:13px"></p>
+  <p style="font-size:15px">本次共獲得 🥚 <b style="color:#ffd84d" id="towerDraws">0</b> 次抽蛋機會！</p>
+  <button class="btn" id="towerAgainBtn">再挑戰 🗼</button>
+  <button class="btn" id="towerGachaBtn" style="background:linear-gradient(135deg,#ffcf4d,#ff9d2e)">🥚 去孵化所</button>
+  <button class="btnGhost" id="towerBackBtn">回地圖</button>
+</div>
+
+<div id="settingsOverlay" class="overlay center hidden">
+  <h1>⚙️ 設定</h1>
+  <button class="btnGhost" id="modeBtn">🔁 切換模式</button>
+  <button class="btnGhost" id="unlockBtn">🔓 全解鎖</button>
+  <button class="btnGhost" id="exportBtn">📤 匯出數據</button>
+  <button class="btnGhost" id="newTesterBtn">🧒 換一位小朋友（重填問卷）</button>
+  <button class="btnGhost" id="clearBtn" style="opacity:.7">🗑️ 刪除數據</button>
+  <button class="btn" id="settingsBack">返回</button>
+</div>
+
+<div id="teamOverlay" class="overlay hidden">
+  <h1>👥 我的數靈</h1>
+  <p style="font-size:12px;opacity:.7">點未出戰的可上場；點出戰中的可設為👑隊長；點👑隊長則卸下。最多 2 隻。</p>
+  <div id="teamCaptain" style="font-size:13px;margin:2px 0 6px;min-height:18px"></div>
+  <div id="teamGrid"></div>
+  <p style="font-size:11px;opacity:.6">
+    <span style="color:#ff9b3d">●奇數系</span>　<span style="color:#5b8def">●偶數系</span>
+    <span style="color:#b07ce8">●質數系</span>　<span style="color:#57b85e">●倍數系</span>
+  </p>
+  <button class="btnGhost" id="teamBack">回地圖</button>
+</div>
+
+<div id="splitOverlay" class="overlay center hidden">
+  <h1>✂️ 怎麼拆？</h1>
+  <p id="splitDesc"></p>
+  <div id="splitChoices"></div>
+  <button class="btnGhost" id="splitCancel">取消</button>
+</div>
+
+<div id="resultOverlay" class="overlay center hidden">
+  <h1 id="resultTitle">🎉 淨化成功！</h1>
+  <div id="resultStars">⭐⭐⭐</div>
+  <p id="resultStats"></p>
+  <p id="drawReward" style="min-height:20px"></p>
+  <button class="btn" id="gachaGoBtn" style="background:linear-gradient(135deg,#ffcf4d,#ff9d2e)">🥚 前往孵化所抽蛋</button>
+  <button class="btn" id="nextBtn">繼續</button>
+  <button class="btnGhost" id="replayBtn">重玩這關</button>
+</div>
+
+<div id="gachaOverlay" class="overlay center hidden">
+  <h1>🥚 數靈孵化所</h1>
+  <p id="gachaCount"></p>
+  <div id="gachaArt"></div>
+  <p id="gachaMsg" style="min-height:40px"></p>
+  <button class="btn" id="gachaDrawBtn" style="background:linear-gradient(135deg,#ffcf4d,#ff9d2e)">抽一次 🥚</button>
+  <button class="btnGhost" id="gachaBack">返回</button>
+</div>
+
+<div id="failOverlay" class="overlay center hidden">
+  <h1>💦 被打倒了…</h1>
+  <p id="failStats"></p>
+  <button class="btn" id="retryBtn">再試一次</button>
+  <button class="btnGhost" id="backBtn">回地圖</button>
+</div>
+
+<div id="teachOverlay" class="overlay center hidden">
+  <h1 id="teachTitle"></h1>
+  <div id="teachArt" style="font-size:40px;margin:4px 0"></div>
+  <p id="teachBody"></p>
+  <button class="btnGhost" id="teachReplay" style="font-size:14px">🔊 再聽一次</button>
+  <button class="btn" id="teachOk">我知道了！</button>
+</div>
+
+<div id="captainPickOverlay" class="overlay center hidden">
+  <h1>👑 這關誰當隊長？</h1>
+  <p style="font-size:12px;opacity:.7">隊長技整場常駐，選一隻最適合這關打法的！</p>
+  <div id="captainPickGrid" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:8px 0"></div>
+  <button class="btnGhost" id="captainPickCancel">回地圖</button>
+</div>
+
+<!-- ============ 純邏輯（盤面大小由 values.length 決定；0 = 減法珠）============ -->
+<script id="logic">
+const rnd = n => Math.floor(Math.random() * n);
+const randDigit = (max = 9) => 1 + rnd(max);
+// 0 = 減法珠；-2 = ×2 倍率珠（負值代表倍率珠，倍數 = -v）
+const randCell = (minusRate, maxDigit = 9, mulRate = 0, divRate = 0) => {
+  const r = Math.random();
+  if (r < minusRate) return 0;
+  if (r < minusRate + mulRate) return -2;                 // ×2 珠
+  if (r < minusRate + mulRate + divRate) return Math.random() < .5 ? -102 : -103;  // ÷2 / ÷3 珠
+  return randDigit(maxDigit);
+};
+
+function genBoardValues(minusRate = 0, maxDigit = 9, size = 6, mulRate = 0, divRate = 0) {
+  return Array.from({length: size}, () => Array.from({length: size}, () => randCell(minusRate, maxDigit, mulRate, divRate)));
+}
+
+/* 珠值：>0 數字；0 減法珠；<0 倍率珠(×(-v))。
+   opt: minLen, banned, needOdd(奇數盾), needRun(共鳴盾), maxLen */
+function countSolutions(values, target, opt = {}) {
+  const N = values.length;
+  const maxLen = opt.maxLen ?? 7, cap = opt.cap ?? 60;
+  const minLen = opt.minLen ?? 2, banned = opt.banned ?? 0;
+  const needOdd = opt.needOdd ?? 0, needRun = opt.needRun ?? 0, exG = opt.exactGroups ?? 0;
+  const divisor = opt.divisor ?? 0;   // 整除盾：湊出 divisor 的倍數（不看 target）
+  let count = 0, best = 0, hasMinus = false, hasMul = false, hasDiv = false;
+  for (const row of values) for (const v of row) { if (v === 0) hasMinus = true; if (v < 0 && v > -100) hasMul = true; if (v <= -100) hasDiv = true; }
+  const MX = hasMul ? 18 : 9;
+  const loose = divisor || hasDiv;    // 有除法或整除目標 → 總和不再單調，停用 sum 邊界剪枝
+  const visited = Array.from({length: N}, () => Array(N).fill(false));
+
+  function dfs(r, c, sum, digits, len, nextNeg, pMul, odd, lastVal, curRun, maxRun) {
+    if (count >= cap) return;
+    const okGroups = !exG || (digits === exG && maxRun === exG);
+    const goalHit = divisor ? (sum > 0 && sum % divisor === 0) : (sum === target);
+    if (!nextNeg && pMul === 1 && goalHit && digits >= minLen && odd >= needOdd && maxRun >= needRun && okGroups) {
+      count++; if (digits > best) best = digits;
+    }
+    if (len >= maxLen) return;
+    if (exG && digits >= exG) return;   // 不必再延長
+    const left = maxLen - len;
+    if (!loose) {
+      if (sum - MX * left > target) return;
+      if (sum + MX * left < target) return;
+      if (!hasMinus && sum > target) return;
+    }
+    if (digits + left < minLen) return;
+    if (odd + left < needOdd) return;
+    if (maxRun < needRun && curRun + left < needRun) return;
+    for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+      if (!dr && !dc) continue;
+      const nr = r + dr, nc = c + dc;
+      if (nr < 0 || nr >= N || nc < 0 || nc >= N || visited[nr][nc]) continue;
+      const v = values[nr][nc];
+      if (v === 0) {                       // 減法珠
+        if (nextNeg || pMul !== 1) continue;
+        visited[nr][nc] = true;
+        dfs(nr, nc, sum, digits, len + 1, true, 1, odd, 0, curRun, maxRun);
+        visited[nr][nc] = false;
+      } else if (v <= -100) {              // 除法珠（後置，須整除、須已有數字）
+        const d = -v - 100;
+        if (nextNeg || pMul !== 1 || digits === 0 || sum % d !== 0) continue;
+        visited[nr][nc] = true;
+        dfs(nr, nc, sum / d, digits, len + 1, false, 1, odd, 0, curRun, maxRun);
+        visited[nr][nc] = false;
+      } else if (v < 0) {                  // 倍率珠
+        if (nextNeg || pMul !== 1) continue;
+        visited[nr][nc] = true;
+        dfs(nr, nc, sum, digits, len + 1, false, -v, odd, 0, curRun, maxRun);
+        visited[nr][nc] = false;
+      } else {                            // 數字珠
+        if (v === banned) continue;
+        const val = v * pMul, nrun = (v === lastVal) ? curRun + 1 : 1;
+        visited[nr][nc] = true;
+        dfs(nr, nc, sum + (nextNeg ? -val : val), digits + 1, len + 1, false, 1,
+            odd + (v % 2), v, nrun, Math.max(maxRun, nrun));
+        visited[nr][nc] = false;
+      }
+    }
+  }
+
+  for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
+    const v = values[r][c];
+    if (v <= 0 || v === banned) continue;
+    visited[r][c] = true;
+    dfs(r, c, v, 1, 1, false, 1, v % 2, v, 1, 1);
+    visited[r][c] = false;
+  }
+  return { count, maxChain: best };
+}
+
+/* 找一條解路徑（提示用，回傳最先找到的，偏好短鏈） */
+function findSolutionPath(values, target, opt = {}) {
+  const N = values.length;
+  const maxLen = opt.maxLen ?? 7, minLen = opt.minLen ?? 2, banned = opt.banned ?? 0;
+  const needOdd = opt.needOdd ?? 0, needRun = opt.needRun ?? 0, exG = opt.exactGroups ?? 0;
+  const divisor = opt.divisor ?? 0;
+  let hasMinus = false, hasMul = false, hasDiv = false;
+  for (const row of values) for (const v of row) { if (v === 0) hasMinus = true; if (v < 0 && v > -100) hasMul = true; if (v <= -100) hasDiv = true; }
+  const MX = hasMul ? 18 : 9;
+  const loose = divisor || hasDiv;
+  const visited = Array.from({length: N}, () => Array(N).fill(false));
+  let found = null;
+
+  function dfs(r, c, sum, digits, len, nextNeg, pMul, odd, lastVal, curRun, maxRun, trail) {
+    if (found) return;
+    const okGroups = !exG || (digits === exG && maxRun === exG);
+    const goalHit = divisor ? (sum > 0 && sum % divisor === 0) : (sum === target);
+    if (!nextNeg && pMul === 1 && goalHit && digits >= minLen && odd >= needOdd && maxRun >= needRun && okGroups) { found = [...trail]; return; }
+    if (len >= maxLen) return;
+    if (exG && digits >= exG) return;
+    const left = maxLen - len;
+    if (!loose) {
+      if (sum - MX * left > target || sum + MX * left < target) return;
+      if (!hasMinus && sum > target) return;
+    }
+    if (odd + left < needOdd) return;
+    if (maxRun < needRun && curRun + left < needRun) return;
+    for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+      if (found) return;
+      if (!dr && !dc) continue;
+      const nr = r + dr, nc = c + dc;
+      if (nr < 0 || nr >= N || nc < 0 || nc >= N || visited[nr][nc]) continue;
+      const v = values[nr][nc];
+      if (v === 0) {
+        if (nextNeg || pMul !== 1) continue;
+        visited[nr][nc] = true; trail.push({r:nr,c:nc});
+        dfs(nr, nc, sum, digits, len + 1, true, 1, odd, 0, curRun, maxRun, trail);
+        trail.pop(); visited[nr][nc] = false;
+      } else if (v <= -100) {
+        const d = -v - 100;
+        if (nextNeg || pMul !== 1 || digits === 0 || sum % d !== 0) continue;
+        visited[nr][nc] = true; trail.push({r:nr,c:nc});
+        dfs(nr, nc, sum / d, digits, len + 1, false, 1, odd, 0, curRun, maxRun, trail);
+        trail.pop(); visited[nr][nc] = false;
+      } else if (v < 0) {
+        if (nextNeg || pMul !== 1) continue;
+        visited[nr][nc] = true; trail.push({r:nr,c:nc});
+        dfs(nr, nc, sum, digits, len + 1, false, -v, odd, 0, curRun, maxRun, trail);
+        trail.pop(); visited[nr][nc] = false;
+      } else {
+        if (v === banned) continue;
+        const val = v * pMul, nrun = (v === lastVal) ? curRun + 1 : 1;
+        visited[nr][nc] = true; trail.push({r:nr,c:nc});
+        dfs(nr, nc, sum + (nextNeg ? -val : val), digits + 1, len + 1, false, 1,
+            odd + (v % 2), v, nrun, Math.max(maxRun, nrun), trail);
+        trail.pop(); visited[nr][nc] = false;
+      }
+    }
+  }
+
+  for (let L = Math.max(2, minLen); L <= maxLen && !found; L++) {
+    for (let r = 0; r < N && !found; r++) for (let c = 0; c < N && !found; c++) {
+      const v = values[r][c];
+      if (v <= 0 || v === banned) continue;
+      visited[r][c] = true;
+      dfs(r, c, v, 1, 1, false, 1, v % 2, v, 1, 1, [{r,c}]);
+      visited[r][c] = false;
+    }
+    if (found && found.length > L) found = null; // 偏好短解：逐步放寬
+    if (found) break;
+  }
+  return found;
+}
+
+function pickTarget(values, lo, hi, opt = {}, minSol = 4) {
+  const ok = [];
+  for (let t = lo; t <= hi; t++) {
+    if (countSolutions(values, t, { ...opt, cap: minSol }).count >= minSol) ok.push(t);
+  }
+  return ok.length ? ok[rnd(ok.length)] : -1;
+}
+</script>
+
+<!-- ============ 數靈圖鑑（SVG）============ -->
+<script id="art">
+const svgEyes = (x1, x2, y, r = 6) => `
+  <circle cx="${x1}" cy="${y}" r="${r}" fill="#fff"/><circle cx="${x2}" cy="${y}" r="${r}" fill="#fff"/>
+  <circle cx="${x1 + 1}" cy="${y + 1}" r="${r * .55}" fill="#2b2440"/><circle cx="${x2 + 1}" cy="${y + 1}" r="${r * .55}" fill="#2b2440"/>
+  <circle cx="${x1 - 1}" cy="${y - 1.5}" r="${r * .22}" fill="#fff"/><circle cx="${x2 - 1}" cy="${y - 1.5}" r="${r * .22}" fill="#fff"/>`;
+const svgSmile = (x, y, w) => `<path d="M${x - w} ${y} q${w} ${w * .9} ${w * 2} 0" stroke="#2b2440" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
+const svgBlush = (x1, x2, y) => `<circle cx="${x1}" cy="${y}" r="4" fill="#ff8da3" opacity=".55"/><circle cx="${x2}" cy="${y}" r="4" fill="#ff8da3" opacity=".55"/>`;
+
+const CHAR_SVG = {
+  kiki: `<ellipse cx="50" cy="60" rx="29" ry="25" fill="#ff9b3d"/>
+    <path d="M50 36 q-3 -13 11 -17" stroke="#e07b1a" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <circle cx="61" cy="19" r="5" fill="#ffd84d"/>
+    <circle cx="50" cy="56" r="10" fill="#fff"/><circle cx="51" cy="57" r="5.5" fill="#2b2440"/>
+    <circle cx="48.5" cy="54.5" r="1.6" fill="#fff"/>
+    ${svgSmile(50, 70, 8)}${svgBlush(33, 67, 66)}`,
+  oo: `<circle cx="39" cy="62" r="21" fill="#5b8def"/><circle cx="61" cy="62" r="21" fill="#5b8def"/>
+    <path d="M38 42 v-9 m24 9 v-9" stroke="#3a6cd4" stroke-width="4.5" stroke-linecap="round"/>
+    <circle cx="38" cy="31" r="4" fill="#9ecbff"/><circle cx="62" cy="31" r="4" fill="#9ecbff"/>
+    ${svgEyes(39, 61, 58, 6)}${svgSmile(50, 70, 7)}${svgBlush(26, 74, 67)}`,
+  prima: `<path d="M50 12 L60 40 L90 42 L66 60 L74 90 L50 72 L26 90 L34 60 L10 42 L40 40 Z" fill="#9b5de5"/>
+    ${svgEyes(43, 58, 52, 5.5)}${svgSmile(50, 62, 6)}${svgBlush(33, 67, 58)}
+    <circle cx="78" cy="22" r="3" fill="#e3c9ff"/><circle cx="20" cy="28" r="2.2" fill="#e3c9ff"/>`,
+  swapy: `<circle cx="50" cy="40" r="16" fill="#29c4cf"/><circle cx="50" cy="70" r="20" fill="#1fa3ad"/>
+    <path d="M24 52 l6 -6 v12 Z M76 60 l-6 6 v-12 Z" fill="#bff5f9"/>
+    ${svgEyes(44, 56, 38, 5)}${svgSmile(50, 46, 5)}
+    <circle cx="44" cy="70" r="3.5" fill="#fff" opacity=".7"/><circle cx="57" cy="74" r="2.5" fill="#fff" opacity=".5"/>`,
+  starle: `<circle cx="50" cy="26" r="9" fill="none" stroke="#ffd84d" stroke-width="3"/>
+    <path d="M50 34 L58 52 L78 54 L62 66 L68 86 L50 74 L32 86 L38 66 L22 54 L42 52 Z" fill="#ff7ab8"/>
+    ${svgEyes(44, 57, 58, 5)}${svgSmile(50, 67, 5)}${svgBlush(36, 65, 63)}`,
+  guardy: `<ellipse cx="50" cy="58" rx="27" ry="26" fill="#2ec4b6"/>
+    <path d="M50 50 l13 5 v10 q0 11 -13 15 q-13 -4 -13 -15 v-10 Z" fill="#bff0ec" stroke="#15897d" stroke-width="2"/>
+    <path d="M50 56 v17 M43 63 h14" stroke="#15897d" stroke-width="2.4" stroke-linecap="round"/>
+    ${svgEyes(40, 60, 44, 5.5)}${svgSmile(50, 49, 5)}`,
+  dubdragon: `<path d="M30 30 l7 12 M70 30 l-7 12" stroke="#3f8f46" stroke-width="6" stroke-linecap="round"/>
+    <ellipse cx="50" cy="60" rx="27" ry="24" fill="#57b85e"/>
+    <path d="M20 58 q-9 -3 -8 -13 q8 2 11 8 Z M80 58 q9 -3 8 -13 q-8 2 -11 8 Z" fill="#79d381"/>
+    <path d="M73 76 q12 4 14 -6" stroke="#57b85e" stroke-width="6" fill="none" stroke-linecap="round"/>
+    ${svgEyes(41, 60, 55, 6)}${svgSmile(50, 67, 6)}
+    <text x="50" y="84" font-size="11" font-weight="800" fill="#2e6b34" text-anchor="middle">×2</text>`,
+  munchdragon: `<ellipse cx="50" cy="58" rx="30" ry="27" fill="#a3d65c"/>
+    <path d="M28 36 l5 9 M72 36 l-5 9" stroke="#7cab3a" stroke-width="5" stroke-linecap="round"/>
+    ${svgEyes(40, 61, 48, 5.5)}
+    <path d="M36 64 q14 14 28 0 q-3 12 -14 12 q-11 0 -14 -12 Z" fill="#5c3b52"/>
+    <ellipse cx="50" cy="73" rx="7" ry="4" fill="#ff8da3"/>${svgBlush(28, 72, 58)}`,
+  chaos: `<path d="M50 14 q22 -4 30 14 q14 8 6 26 q6 20 -12 26 q-8 16 -24 10 q-18 6 -24 -10 q-18 -8 -12 -26 q-8 -18 6 -26 q8 -18 30 -14 Z" fill="#3b2b52"/>
+    <circle cx="40" cy="48" r="7" fill="#ff4d4d"/><circle cx="62" cy="48" r="7" fill="#ff4d4d"/>
+    <circle cx="41" cy="49" r="3" fill="#7a0c0c"/><circle cx="63" cy="49" r="3" fill="#7a0c0c"/>
+    <path d="M38 68 q12 -8 24 0" stroke="#ff4d4d" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <text x="26" y="34" font-size="13" fill="#b07ce8" font-weight="800">?</text>
+    <text x="68" y="30" font-size="11" fill="#b07ce8" font-weight="800">?</text>
+    <text x="74" y="74" font-size="12" fill="#b07ce8" font-weight="800">?</text>`,
+};
+const CROWN_SVG = `<path d="M28 22 L35 7 L44 16 L52 4 L60 16 L69 7 L76 22 q-24 9 -48 0 Z" fill="#ffd84d" stroke="#d9a521" stroke-width="2" stroke-linejoin="round"/><circle cx="52" cy="4" r="2.5" fill="#ff7ab8"/>`;
+// 單張 PNG 角色(目前無);多表情圖角色用 SPRITE_OF 對應到 CHARACTER_ASSETS。
+const HAS_PNG = {};
+const SPRITE_OF = { kiki: 'ch01', oo: 'ch02', munchdragon: 'ch08' };   // 數靈 → 多表情圖角色
+function charSVG(id, crowned = false) {
+  if (SPRITE_OF[id]) return charSprite(SPRITE_OF[id], 'idle', crowned);
+  if (HAS_PNG[id]) {
+    return `<span class="pngChar"><img src="assets/${id}.png" alt="" draggable="false">${crowned ? '<span class="crown">👑</span>' : ''}</span>`;
+  }
+  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${CHAR_SVG[id] || ''}${crowned ? CROWN_SVG : ''}</svg>`;
+}
+// 多表情圖片角色（ch01）。新增角色把資料夾與 expressions 加進這裡即可。
+const CHAR_EXPR = ['idle', 'think', 'happy', 'attack', 'hurt', 'miss', 'surprise', 'enraged'];
+function buildExpr(folder) {
+  const o = {};
+  CHAR_EXPR.forEach(e => { o[e] = `assets/characters/${folder}/${e}.png`; });
+  return o;
+}
+const CHARACTER_ASSETS = {
+  ch01: { name: '01 橘色單眼數靈', expressions: buildExpr('ch01') },
+  ch02: { name: '02 藍色方塊數靈', expressions: buildExpr('ch02') },
+  ch08: { name: '08 紅色長方數靈', expressions: buildExpr('ch08') },
+};
+function charSprite(id, expression = 'idle', crowned = false) {
+  const asset = CHARACTER_ASSETS[id];
+  if (!asset) return charSVG(id, crowned);
+  const src = asset.expressions[expression] || asset.expressions.idle;
+  return `<span class="spriteChar motion-${expression}"><img src="${src}" alt="" draggable="false">${crowned ? '<span class="crown">👑</span>' : ''}</span>`;
+}
+function eggSVG(attrColor) {
+  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="50" cy="58" rx="26" ry="33" fill="#fdf3e3" stroke="#e8d4b8" stroke-width="2"/>
+    <circle cx="42" cy="46" r="5" fill="${attrColor}" opacity=".7"/>
+    <circle cx="60" cy="62" r="7" fill="${attrColor}" opacity=".55"/>
+    <circle cx="44" cy="74" r="4" fill="${attrColor}" opacity=".6"/></svg>`;
+}
+</script>
+
+<!-- ============ 遊戲本體 ============ -->
+<script>
+(() => {
+  // ---------- 技能定義 ----------
+  const SKILL_DEFS = {
+    plus1:  { ic:'✏️', name:'加一',  cd:3, type:'target',  tip:'點一顆珠，讓它 +1（9 會變回 1）' },
+    minus1: { ic:'➖', name:'減一',  cd:3, type:'target',  tip:'點一顆珠，讓它 −1（1 會變成 9）' },
+    reroll: { ic:'🎲', name:'重擲',  cd:2, type:'target',  tip:'點一顆珠，把它變成隨機新珠' },
+    split:  { ic:'✂️', name:'分裂',  cd:4, type:'target',  tip:'點一顆珠，把它拆成兩顆（上面那顆會被蓋掉）' },
+    swapUp: { ic:'🔄', name:'上下換', cd:2, type:'target',  tip:'點一顆珠，和上面那顆交換位置' },
+    purify: { ic:'💫', name:'淨化',  cd:4, type:'target',  tip:'點一顆珠，直接消除它' },
+    lucky:  { ic:'🍀', name:'幸運',  cd:5, type:'instant', tip:'下一條鏈傷害 ×1.5！' },
+    shield: { ic:'🛡️', name:'護盾',  cd:5, type:'instant', tip:'擋下敵人的下一次攻擊！' },
+  };
+
+  const ATTRS = { odd:{n:'奇數系',c:'#ff9b3d'}, even:{n:'偶數系',c:'#5b8def'}, prime:{n:'質數系',c:'#b07ce8'}, multi:{n:'倍數系',c:'#57b85e'} };
+  const SPECIES = [
+    { id:'kiki',        name:'奇奇',   attr:'odd',   skill:'plus1',  pool:0 },
+    { id:'oo',          name:'偶偶',   attr:'even',  skill:'minus1', pool:0 },
+    { id:'prima',       name:'質寶',   attr:'prime', skill:'reroll', pool:1 },
+    { id:'swapy',       name:'換換',   attr:'even',  skill:'swapUp', pool:1 },
+    { id:'starle',      name:'星星靈', attr:'prime', skill:'purify', pool:2 },
+    { id:'guardy',      name:'守護靈', attr:'even',  skill:'shield', pool:2 },
+    { id:'dubdragon',   name:'倍倍龍', attr:'multi', skill:'split',  pool:3 },
+    { id:'munchdragon', name:'大胃龍', attr:'multi', skill:'lucky',  pool:3 },
+  ];
+  const SP = id => SPECIES.find(s => s.id === id);
+
+  // ---------- 隊長技（常駐，只讀「路徑組成」，絕不碰總和；以此避開固定目標的矛盾）----------
+  // calc(cc) 回傳 { mult, addLen, crit, proc }：傷害倍率、額外鏈長、是否爆擊、是否觸發(給演出)
+  const CAPTAIN_DEFS = {
+    prime: { name:'質數共鳴', ic:'💠', c:'#b07ce8',
+      desc:'路徑每串 1 顆質數珠（2·3·5·7），傷害 +18%',
+      calc: cc => ({ mult: 1 + 0.18 * cc.primes, proc: cc.primes > 0, tag: cc.primes ? `質×${cc.primes}` : '' }) },
+    odd:   { name:'奇襲',     ic:'🔆', c:'#ff9b3d',
+      desc:'路徑每串 1 顆奇數珠，傷害 +12%',
+      calc: cc => ({ mult: 1 + 0.12 * cc.odds, proc: cc.odds > 0, tag: cc.odds ? `奇×${cc.odds}` : '' }) },
+    even:  { name:'偶數連動', ic:'🔗', c:'#5b8def',
+      desc:'路徑每 2 顆偶數珠，鏈長倍率 +1',
+      calc: cc => ({ addLen: Math.floor(cc.evens / 2), proc: cc.evens >= 2, tag: cc.evens >= 2 ? `偶+${Math.floor(cc.evens/2)}` : '' }) },
+    multi: { name:'倍數爆擊', ic:'⚡', c:'#57b85e',
+      desc:'鏈長是 3 的倍數時，傷害 ×2',
+      calc: cc => ({ mult: (cc.digits % 3 === 0 && cc.digits > 0) ? 2 : 1, crit: cc.digits % 3 === 0 && cc.digits > 0, proc: cc.digits % 3 === 0 && cc.digits > 0, tag: (cc.digits % 3 === 0) ? '倍數爆擊' : '' }) },
+  };
+  // 隊長 = 出戰第一隻；回傳其 attr 對應的隊長技
+  const captainAttr = () => (EQUIP[0] && SP(EQUIP[0])) ? SP(EQUIP[0]).attr : null;
+  const captainDef = () => CAPTAIN_DEFS[captainAttr()] || null;
+
+  // ---------- 關卡表 ----------
+  const STAGES_STD = [
+    { key:'1', name:'草原・一', zone:0, foesSp:['kiki','oo','kiki'], band:[10,14], minusRate:0, size:6, maxDigit:9, foes:[
+      {hp:60,atk:10,every:5},{hp:90,atk:12,every:4},{hp:120,atk:14,every:4}]},
+    { key:'2', name:'草原・二', zone:0, foesSp:['oo','kiki','oo'], band:[10,16], minusRate:0, size:6, maxDigit:9, foes:[
+      {hp:90,atk:12,every:4},{hp:120,atk:14,every:4},{hp:230,atk:14,every:4,gim:{type:'bossGentle',name:'👑 草原王・大偶偶'}}]},
+    { key:'3', name:'森林・一', zone:1, foesSp:['prima','swapy','prima'], band:[12,18], minusRate:0, size:6, maxDigit:9, foes:[
+      {hp:100,atk:14,every:4},{hp:130,atk:16,every:4},{hp:170,atk:18,every:4,gim:{type:'shell',n:3}}]},
+    { key:'4', name:'森林・二', zone:1, foesSp:['swapy','prima','swapy'], band:[12,18], minusRate:.10, intro:'minus', size:6, maxDigit:9, foes:[
+      {hp:110,atk:16,every:4},{hp:150,atk:18,every:4},{hp:280,atk:18,every:4,gim:{type:'bossShell',n:3,name:'👑 森林王・換換大公'}}]},
+    { key:'5', name:'洞窟・一', zone:2, foesSp:['starle','guardy','starle'], band:[12,20], minusRate:.08, size:6, maxDigit:9, foes:[
+      {hp:120,atk:16,every:4,gim:{type:'weakOdd',n:2}},{hp:160,atk:18,every:4,gim:{type:'ban'}},{hp:200,atk:20,every:3,gim:{type:'ban'}}]},
+    { key:'6', name:'洞窟・二', zone:2, foesSp:['guardy','starle','guardy'], band:[14,20], minusRate:.10, size:6, maxDigit:9, foes:[
+      {hp:130,atk:18,every:4,gim:{type:'ban'}},{hp:170,atk:20,every:3,gim:{type:'shell',n:4}},{hp:330,atk:20,every:4,gim:{type:'bossBan',name:'👑 洞窟王・封印守衛'}}]},
+    { key:'7', name:'火山・一', zone:3, foesSp:['dubdragon','munchdragon','dubdragon'], band:[14,22], minusRate:.10, size:6, maxDigit:9, foes:[
+      {hp:150,atk:20,every:3,gim:{type:'shell',n:4}},{hp:190,atk:22,every:3,gim:{type:'ban'}},{hp:240,atk:24,every:3,gim:{type:'shell',n:5}}]},
+    { key:'8', name:'火山・二', zone:3, foesSp:['munchdragon','dubdragon','chaos'], band:[16,24], minusRate:.12, size:6, maxDigit:9, foes:[
+      {hp:170,atk:22,every:3,gim:{type:'ban'}},{hp:220,atk:24,every:3,gim:{type:'shell',n:5}},{hp:400,atk:24,every:4,gim:{type:'boss'}}]},
+    // ===== 乘法谷（Pack 3：同數共鳴 + ×2 倍率珠）=====
+    { key:'m1', name:'乘法谷・一', zone:4, foesSp:['dubdragon','munchdragon','dubdragon'], band:[12,20], minusRate:0, size:6, maxDigit:9, foes:[
+      {hp:160,atk:18,every:4,gim:{type:'weakRun',n:2}},{hp:190,atk:20,every:4},{hp:230,atk:20,every:3,gim:{type:'weakRun',n:3}}]},
+    { key:'m2', name:'乘法谷・二', zone:4, foesSp:['munchdragon','dubdragon','munchdragon'], band:[14,22], minusRate:0, mulRate:.14, intro:'mul', size:6, maxDigit:9, foes:[
+      {hp:180,atk:20,every:4},{hp:210,atk:22,every:3},{hp:250,atk:22,every:3,gim:{type:'weakRun',n:2}}]},
+    { key:'m3', name:'乘法谷・霸主', zone:4, foesSp:['dubdragon','munchdragon','dubdragon'], band:[16,24], minusRate:0, mulRate:.10, size:6, maxDigit:9, foes:[
+      {hp:200,atk:22,every:3,gim:{type:'weakRun',n:2}},{hp:240,atk:24,every:3},{hp:420,atk:24,every:4,gim:{type:'bossRun',n:3,name:'👑 乘法谷霸主・倍倍龍王'}}]},
+    // ===== 除法谷（Pack 4：等分挑戰 = 除法）=====
+    // e1：整除盾入門（湊 N 的倍數，靈活多解）
+    { key:'e1', name:'除法谷・一', zone:5, foesSp:['prima','starle','prima'], band:[6,18], minusRate:0, size:6, maxDigit:9, foes:[
+      {hp:170,atk:18,every:4,gim:{type:'divisor',n:2}},{hp:200,atk:20,every:4,gim:{type:'divisor',n:2}},{hp:240,atk:20,every:3,gim:{type:'divisor',n:3}}]},
+    // e2：÷珠登場（先堆再除，命中固定目標）
+    { key:'e2', name:'除法谷・二', zone:5, foesSp:['starle','guardy','starle'], band:[12,24], minusRate:0, divRate:.14, intro:'div', size:6, maxDigit:9, foes:[
+      {hp:200,atk:20,every:4},{hp:230,atk:22,every:3},{hp:260,atk:22,every:3,gim:{type:'divisor',n:4}}]},
+    // e3：整除盾 + ÷珠 混合 + 霸主
+    { key:'e3', name:'除法谷・霸主', zone:5, foesSp:['starle','prima','dubdragon'], band:[12,28], minusRate:0, divRate:.10, size:6, maxDigit:9, foes:[
+      {hp:220,atk:22,every:3,gim:{type:'divisor',n:3}},{hp:250,atk:24,every:3},{hp:440,atk:24,every:4,gim:{type:'bossDivisor',n:4,name:'👑 除法谷霸主・整除守衛'}}]},
+  ];
+  const STAGES_JR = [
+    { key:'j1', name:'小小草原', zone:0, foesSp:['kiki','oo','kiki'], band:[6,9],   minusRate:0, size:5, maxDigit:5, foes:[
+      {hp:36,every:6},{hp:48,every:6},{hp:60,every:5}]},
+    { key:'j2', name:'小小花園', zone:0, foesSp:['oo','kiki','oo'],   band:[7,11],  minusRate:0, size:5, maxDigit:5, foes:[
+      {hp:48,every:6},{hp:60,every:5},{hp:120,every:5,gim:{type:'bossGentle',name:'👑 花園大王・偶偶'}}]},
+    { key:'j3', name:'小小森林', zone:1, foesSp:['prima','swapy','prima'], band:[8,13], minusRate:0, size:5, maxDigit:9, foes:[
+      {hp:60,every:5},{hp:76,every:5},{hp:90,every:5}]},
+    { key:'j4', name:'小小山丘', zone:1, foesSp:['swapy','oo','prima'], band:[10,16], minusRate:0, size:5, maxDigit:9, foes:[
+      {hp:70,every:5},{hp:90,every:5},{hp:160,every:4,gim:{type:'bossShell',n:3,name:'👑 山丘大王・質寶'}}]},
+  ];
+  const ZONES_STD = [
+    { n:'🌿 湊十草原', cls:'z0' }, { n:'🌲 進位森林', cls:'z1' },
+    { n:'🕳️ 封印洞窟', cls:'z2' }, { n:'🌋 烈焰火山', cls:'z3' },
+    { n:'✖️ 乘法谷', cls:'z4' },
+    { n:'➗ 除法谷', cls:'z5' },
+  ];
+  const ZONES_JR = [
+    { n:'🐣 小小世界・上', cls:'zj' }, { n:'🐥 小小世界・下', cls:'zj' },
+  ];
+
+  // ---------- 存檔 / 遙測 ----------
+  const store = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } };
+  const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+  let EV = store('nh5_events', []);
+  function log(t, props = {}) {
+    EV.push({ t, ts: Date.now(), mode: MODE, ...props });
+    if (EV.length > 8000) EV = EV.slice(-8000);
+    save('nh5_events', EV);
+  }
+  let STARS = store('nh5_stars', {});
+  let COLL = store('nh5_coll', { kiki: 1, prima: 1 });
+  let EQUIP = store('nh5_equip', ['kiki', 'prima']);
+  let MODE = store('nh5_mode', null);          // 'jr' | 'std'
+  let voiceOn = store('nh5_voice', true);
+
+  // ---------- 語音（junior）----------
+  function say(txt) {
+    if (MODE !== 'jr' || !voiceOn) return;
+    try {
+      const u = new SpeechSynthesisUtterance(txt);
+      u.lang = 'zh-TW'; u.rate = .95;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+
+  // ---------- 畫布（依關卡盤面大小重設）----------
+  const canvas = document.getElementById('board');
+  const ctx = canvas.getContext('2d');
+  const DPR = Math.min(window.devicePixelRatio || 1, 3);
+  let SIZE = 6, CELL = 60, BOARD_PX = 360;
+  function setupCanvas(size) {
+    SIZE = size;
+    // 棋盤大小 = 取「可用寬度」與「剩餘高度」的較小值,確保整個盤面+技能列都在畫面內
+    const wrap = canvas.parentElement;
+    const wW = wrap && wrap.clientWidth ? wrap.clientWidth : Math.min(window.innerWidth, 440) - 16;
+    const wH = wrap && wrap.clientHeight ? wrap.clientHeight : 9999;
+    const avail = Math.max(150, Math.min(wW, wH) - 4);
+    CELL = Math.floor(avail / SIZE);
+    BOARD_PX = CELL * SIZE;
+    canvas.width = BOARD_PX * DPR; canvas.height = BOARD_PX * DPR;
+    canvas.style.width = BOARD_PX + 'px'; canvas.style.height = BOARD_PX + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  setupCanvas(6);
+
+  // ---------- 狀態 ----------
+  let tiles = [], path = [], dragging = false, locked = false;
+  let STAGES = STAGES_STD, stageIdx = 0, foeIdx = 0, enemy = null, player = null, target = 0;
+  let stageStat = null, boardReadyAt = 0, firstMoveLogged = false, dragT0 = 0;
+  let floaters = [];
+  let skillCd = {}, targeting = null, splitCell = null;
+  let luckyNext = false, shieldUp = false, combo = 0, resolving = false, resolveSkip = null;
+  let hintCells = null, hintT = 0, hintCd = 0;
+  let particles = [];
+  // DDA：每模式各記一個難度偏移；foeStat 記錄當前這隻怪的即時表現
+  let DDA = store('nh5_dda', { std: 0, jr: 0 });
+  let foeStat = null;
+  const ddaOff = () => DDA[isJr() ? 'jr' : 'std'] || 0;
+
+  const tileColor = v => v <= 3 ? '#3d7bd9' : v <= 6 ? '#3aa66b' : '#d97b2e';
+  const tileColorHi = v => v <= 3 ? '#6ea8ff' : v <= 6 ? '#5fd694' : '#ffae5e';
+  const isJr = () => MODE === 'jr';
+  const tierColor = n => n >= 6 ? '#ffd84d' : n >= 5 ? '#ff9bf2' : n >= 4 ? '#9ecbff' : '#d8b4ff';
+
+  function flash(color = '#fff', op = .5) {
+    const f = document.getElementById('flash');
+    f.style.background = color;
+    f.style.opacity = op;
+    setTimeout(() => f.style.opacity = 0, 90);
+  }
+  function spawnParticles(cx, cy, color, n = 6) {
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2, sp = 2 + Math.random() * 4;
+      particles.push({ x: cx, y: cy, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 2,
+        r: 2 + Math.random() * 3.5, color, t: 0, life: 32 + rnd(16) });
+    }
+    if (particles.length > 240) particles = particles.slice(-240);
+  }
+
+  // ---------- 音效 ----------
+  let AC = null;
+  function audioInit() { try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} }
+  function blip(freq, dur = .08, type = 'sine', vol = .15) {
+    if (!AC) return;
+    try {
+      const o = AC.createOscillator(), g = AC.createGain();
+      o.type = type; o.frequency.value = freq;
+      g.gain.setValueAtTime(vol, AC.currentTime);
+      g.gain.exponentialRampToValueAtTime(.001, AC.currentTime + dur);
+      o.connect(g); g.connect(AC.destination);
+      o.start(); o.stop(AC.currentTime + dur);
+    } catch (e) {}
+  }
+
+  // ---------- DOM ----------
+  const $ = id => document.getElementById(id);
+  const elTarget = $('targetVal'), elSum = $('curSum'), elChain = $('chainInfo'),
+        elArt = $('enemyArt'), elEName = $('enemyName'), elEHp = $('enemyHpFill'),
+        elPHp = $('playerHpFill'), elPHpT = $('playerHpText'), elCd = $('cdVal'),
+        elGim = $('gimBadge'), elStage = $('stageName'), elFoeP = $('foeProgress'),
+        elToast = $('toast'), elSkillRow = $('skillRow'), elShield = $('shieldIc'),
+        elCdLabel = $('cdLabel'), elVoice = $('voiceBtn'), elCap = $('captainChip');
+
+  let toastTimer;
+  function toast(msg, ms = 1800) {
+    elToast.textContent = msg; elToast.style.opacity = 1;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => elToast.style.opacity = 0, ms);
+  }
+  function addFloater(text, color, size = 22, dx = 0, dy = 0) {
+    floaters.push({ x: BOARD_PX / 2 + dx, y: BOARD_PX * .3 + dy, text, color, t: 0, size });
+  }
+  function show(id) { $(id).classList.remove('hidden'); }
+  function hide(id) { $(id).classList.add('hidden'); }
+  function showDmgPop(v, big) {
+    const d = $('dmgPop'); if (!d) return;
+    d.textContent = '-' + v; d.classList.remove('hidden');
+    d.classList.toggle('big', !!big);
+    d.dataset.tier = comboTier(combo);   // 外觀由 CSS [data-tier] 決定
+  }
+  function hideDmgPop() { const d = $('dmgPop'); if (d) d.classList.add('hidden'); }
+  // 連擊層級（純邏輯；顏色/字級在 game.css 以 [data-tier] 決定）
+  function comboTier(n) { return n >= 6 ? 4 : n >= 4 ? 3 : n >= 2 ? 2 : 1; }
+  function showCombo(n) {
+    const m = $('comboMeter'); if (!m) return;
+    m.textContent = '🔥 COMBO ' + n;
+    m.dataset.tier = comboTier(n);
+    m.classList.remove('hidden');
+    m.classList.add('punch'); setTimeout(() => m.classList.remove('punch'), 130);
+  }
+  function hideCombo() { const m = $('comboMeter'); if (m) m.classList.add('hidden'); }
+
+  // ---------- 教學對話框：每個概念只跳一次 ----------
+  let TAUGHT = store('nh5_taught', {});
+  let DRAWS = store('nh5_draws', 0);              // 累積的抽蛋機會（券）
+  let RESON = store('nh5_reson', false);          // 同數共鳴能力:進入乘法谷後才解鎖
+  let SURVEY = store('nh5_survey', null);         // 開場問卷（年齡/性別/數學程度/暱稱）
+  let UNLOCKALL = store('nh5_unlockall', false);  // 預設關閉：循序解鎖（可在設定開啟）
+  let teachQueue = [];
+  function teach(id, title, art, body) {
+    if (TAUGHT[id]) return false;
+    TAUGHT[id] = 1; save('nh5_taught', TAUGHT);
+    teachQueue.push({ id, title, art, body });
+    if (teachQueue.length === 1) showNextTeach();
+    return true;
+  }
+  // 把教學內容唸出來（小小獵人專用，照顧還不識字的孩子）。
+  // 取 HTML 的純文字、把 ×/− 換成「乘/減」、+ 換「加」、= 換「等於」，唸起來更自然。
+  function speakTeach(t) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = t.title + '。' + t.body.replace(/<br>/g, '，');
+    let txt = (tmp.textContent || '').replace(/×/g, '乘').replace(/−/g, '減')
+      .replace(/＋|\+/g, '加').replace(/＝|=/g, '等於').replace(/\s+/g, '');
+    say(txt);
+  }
+  function showNextTeach() {
+    if (!teachQueue.length) return;
+    const t = teachQueue[0];
+    locked = true;
+    $('teachTitle').textContent = t.title;
+    $('teachArt').innerHTML = t.art || '';
+    $('teachBody').innerHTML = t.body;
+    $('teachReplay').classList.toggle('hidden', !isJr());   // 只有小小獵人顯示「再聽一次」
+    show('teachOverlay');
+    if (isJr()) speakTeach(t);
+    log('teach', { id: t.id, stage: enemy ? stg().key : '-' });
+  }
+  function closeTeach() {
+    teachQueue.shift();
+    if (teachQueue.length) { showNextTeach(); }
+    else { hide('teachOverlay'); locked = false; }
+  }
+
+  // ---------- 盤面 ----------
+  function freshTiles(values, dropAnim = false) {
+    tiles = values.map((row, r) => row.map(v => ({ v, off: dropAnim ? -(r + 2) * CELL : 0, scale: 1 })));
+  }
+  const valuesOf = () => tiles.map(row => row.map(t => t.v));
+  const isMinus = t => t.v === 0;
+  const isMul = t => t.v < 0 && t.v > -100;    // 倍率珠：-2=×2、-3=×3，factor=-v
+  const mulFactor = t => -t.v;
+  const isDiv = t => t.v <= -100;              // 除法珠：-102=÷2、-103=÷3，divisor=-v-100
+  const divFactor = t => -t.v - 100;
+  const isOp = t => isMinus(t) || isMul(t) || isDiv(t);   // 運算珠（非數字）
+  // 無限塔：用 towerCfg 當「目前關卡」，沿用所有既有戰鬥邏輯（band/珠/solver/gimmick）
+  let towerMode = false, towerFloor = 1, towerCfg = null, towerPeak = 0, towerDrawsRun = 0;
+  const stg = () => towerMode ? towerCfg : STAGES[stageIdx];
+  const baseDmg = () => 12 + EQUIP.reduce((s, id) => s + (COLL[id] || 1) - 1, 0) * 2;
+
+  function solverOpt() {
+    return { minLen: enemy?.minLen ?? 2, banned: enemy?.banned ?? 0, needOdd: enemy?.needOdd ?? 0, needRun: enemy?.needRun ?? 0, exactGroups: enemy?.divN ?? 0, divisor: enemy?.divisor ?? 0, maxLen: 7 };
+  }
+
+  // DDA：把關卡 band 依難度偏移平移。提高上限讓更大的目標可能出現，
+  // 偏移為正時也微抬下限，避免一直送出太簡單的小目標。solver 仍保證有解。
+  function ddaBand() {
+    const off = ddaOff();
+    let [lo, hi] = stg().band;
+    hi = hi + off;
+    lo = lo + Math.max(0, Math.round(off * 0.4));
+    lo = Math.max(isJr() ? 4 : 6, lo);
+    hi = Math.max(lo + 2, hi);
+    return [lo, hi];
+  }
+
+  // DDA：每隻怪結束後依當下表現微調難度偏移（±1，有界限）。
+  // 表現好(失敗率低、沒用提示) → 調高；卡關(失敗率高/狂用提示) → 調降。
+  // junior 只輕微加難、容易放寬，維持零挫折原則。
+  function updateDDA(killed) {
+    if (!foeStat) return;
+    const a = foeStat.attempts, f = foeStat.fails, h = foeStat.hints;
+    const failRate = a ? f / a : 0;
+    const jr = isJr();
+    let delta = 0;
+    if (killed) {
+      if (a >= 2 && failRate <= 0.25 && h === 0) delta = +1;       // 輕鬆過 → 加難
+      else if (failRate >= 0.55 || h >= 2) delta = -1;             // 很掙扎 → 放寬
+    } else {
+      delta = -2;                                                  // 整關失敗 → 明顯放寬
+    }
+    if (jr && delta > 0) delta = 0;                                // 小小獵人不主動加難
+    if (delta === 0) return;
+    const lim = jr ? [-3, 0] : [-4, 10];
+    const key = jr ? 'jr' : 'std';
+    const before = DDA[key] || 0;
+    const after = Math.max(lim[0], Math.min(lim[1], before + delta));
+    if (after === before) return;
+    DDA[key] = after;
+    save('nh5_dda', DDA);
+    log('dda', { mode: MODE, stage: stg().key, offset: after, delta,
+      fail_rate: +failRate.toFixed(2), attempts: a, hints: h,
+      reason: killed ? 'foe_clear' : 'stage_fail' });
+  }
+
+  function setupTargetForEnemy() {
+    const [lo, hi] = ddaBand();
+    let guard = 0;
+    // 整除盾：沒有固定目標，只要盤面湊得出 divisor 的倍數即可
+    if (enemy.divisor) {
+      target = 0;
+      while (guard++ < 25) {
+        if (countSolutions(valuesOf(), 0, { ...solverOpt(), cap: 1 }).count > 0) return;
+        freshTiles(genBoardValues(stg().minusRate, stg().maxDigit, stg().size, stg().mulRate || 0, stg().divRate || 0), true);
+      }
+      return;
+    }
+    while (guard++ < 25) {
+      if (enemy.gimType === 'ban' || enemy.gimType === 'boss' || enemy.gimType === 'bossBan') {
+        const cands = [2,3,4,5,6,7,8].sort(() => Math.random() - .5);
+        for (const d of cands) {
+          enemy.banned = d;
+          const t = pickTarget(valuesOf(), lo, hi, solverOpt());
+          if (t !== -1) { target = t; return; }
+        }
+      } else {
+        const t = pickTarget(valuesOf(), lo, hi, solverOpt());
+        if (t !== -1) { target = t; return; }
+      }
+      freshTiles(genBoardValues(stg().minusRate, stg().maxDigit, stg().size, stg().mulRate || 0, stg().divRate || 0), true);
+      toast('盤面洗牌！');
+    }
+    enemy.minLen = 2; enemy.banned = 0; target = lo;
+  }
+
+  // 敵人圖渲染:kiki 暫時用 ch01 多表情圖;其餘沿用 SVG。圖片角色不套暗化濾鏡(自帶光影)。
+  function renderEnemyArt(expression = 'idle') {
+    if (!enemy) return;
+    const spId = enemy.spId;
+    const spriteId = SPRITE_OF[spId];
+    const crowned = enemy.isBoss && spId !== 'chaos';
+    if (spriteId) {
+      elArt.innerHTML = charSprite(spriteId, expression, crowned);
+      elArt.classList.remove('corrupted');   // 圖片角色自帶光影，不套暗化濾鏡
+    } else {
+      elArt.innerHTML = charSVG(spId, crowned);
+      elArt.classList.toggle('corrupted', spId !== 'chaos');
+    }
+  }
+  function spawnEnemy() {
+    const cfg = stg().foes[foeIdx];
+    const gim = cfg.gim || null;
+    const spId = stg().foesSp[foeIdx];
+    const spInfo = SP(spId) || SP('kiki');   // 防呆：未知物種退回預設，避免崩潰
+    const BOSS_TYPES = ['boss', 'bossGentle', 'bossShell', 'bossBan', 'bossRun', 'bossDiv', 'bossDivisor'];
+    const bossKind = gim && BOSS_TYPES.includes(gim.type) ? gim.type : null;
+    enemy = {
+      spId, bossKind, isBoss: !!bossKind,
+      name: bossKind ? (gim.name || '👑 亂數魔王') : `暗化．${spInfo.name}`,
+      maxHp: cfg.hp, hp: cfg.hp, atk: cfg.atk || 0, every: cfg.every, cd: cfg.every,
+      gimType: gim ? gim.type : null,
+      minLen: gim && (gim.type === 'shell' || gim.type === 'bossShell') ? gim.n
+            : (gim && gim.type === 'boss' ? 4 : 2),
+      needOdd: gim && gim.type === 'weakOdd' ? (gim.n || 2) : 0,
+      needRun: gim && (gim.type === 'weakRun' || gim.type === 'bossRun') ? (gim.n || 3) : 0,
+      divN: gim && (gim.type === 'divShare' || gim.type === 'bossDiv') ? (gim.n || 2) : 0,
+      divisor: gim && (gim.type === 'divisor' || gim.type === 'bossDivisor') ? (gim.n || 3) : 0,
+      banned: 0, enraged: false, shiftCounter: 0,
+    };
+    setupTargetForEnemy();
+    boardReadyAt = Date.now(); firstMoveLogged = false; combo = 0; hideCombo();
+    foeStat = { attempts: 0, fails: 0, hints: 0, t0: Date.now() };
+    hintCells = null; hintT = 0;
+    renderEnemyArt(enemy.enraged ? 'enraged' : 'idle');
+    elArt.classList.toggle('boss', enemy.isBoss);
+    elArt.classList.remove('enraged');
+    $('enemyZone').classList.remove('enraged');
+    if (enemy.isBoss) {
+      // 魔王登場演出
+      locked = true;
+      flash('#7a0c1c', .45);
+      blip(98, .4, 'sawtooth', .25); blip(82, .5, 'sawtooth', .25);
+      const plainName = enemy.name.replace('👑 ', '');
+      const banner = $('bossBanner');
+      banner.innerHTML = `⚠️ ${plainName} ⚠️<small>${enemy.bossKind === 'boss' ? '數界的混亂之源現身了！' : '這張地圖的霸主現身了！'}</small>`;
+      banner.classList.add('on');
+      $('app').classList.add('shake');
+      setTimeout(() => $('app').classList.remove('shake'), 400);
+      say(`${plainName}出現了！`);
+      setTimeout(() => { banner.classList.remove('on'); locked = false; }, 1600);
+    }
+    renderHud();
+    if (!enemy.isBoss) say(enemy.divisor ? `湊出 ${enemy.divisor} 的倍數` : `目標是 ${target}`);
+    // 新機制怪物登場 → 教學（每種只跳一次）
+    if (enemy.divisor) teach('divisor', '➗ 整除盾怪物！',
+      `<span style="font-size:30px;color:#6fe3ff">${enemy.divisor}·${enemy.divisor*2}·${enemy.divisor*3}…</span>`,
+      `這隻怪只怕「<b>${enemy.divisor} 的倍數</b>」。<br>你的總和只要<b>能被 ${enemy.divisor} 整除</b>就打得中——${enemy.divisor}、${enemy.divisor*2}、${enemy.divisor*3}… <b>哪個都行</b>，湊法很自由！<br><span style="font-size:12px;opacity:.75">這就是在練「哪些數能被 ${enemy.divisor} 整除」。</span>`);
+    else if (enemy.divN) teach('divShare', '➗ 等分盾怪物！',
+      '<span style="font-size:34px;color:#5ad6ff">12÷3=4</span>',
+      `這隻怪要你「<b>把目標分成 ${enemy.divN} 等份</b>」。<br>先算：<b>目標 ÷ ${enemy.divN} = 每份多少</b>，再<b>連 ${enemy.divN} 顆一樣的</b>數字！<br><span style="font-size:12px;opacity:.75">例如目標 12、分 3 份 → 12÷3=4 → 連三顆 4。</span>`);
+    else if (enemy.needRun) teach('weakRun', '🔢 共鳴盾怪物！',
+      '<span style="font-size:40px;color:#ffae3d">3+3+3</span>',
+      `這隻怪有<b>共鳴盾</b>：鏈裡要<b>連續連到 ${enemy.needRun} 顆相同的數字</b>才打得中（例如 ${enemy.needRun} 顆 3）。<br>連相同數字＝<b>乘法</b>，傷害還會暴增！`);
+    else if (enemy.needOdd) teach('weakOdd', '🔆 奇數盾怪物！',
+      '<span style="font-size:42px">🔆</span>',
+      `這隻怪有<b>奇數盾</b>：你的鏈裡必須包含 <b>${enemy.needOdd} 顆以上奇數</b>（1·3·5·7·9）才打得中。<br>總和一樣要剛好等於目標，只是<b>多了一個「要用幾顆奇數」的條件</b>。`);
+    else if (enemy.minLen > 2) teach('shell', '🛡️ 硬殼怪物！',
+      '<span style="font-size:42px">🛡️</span>',
+      `這隻怪有<b>硬殼</b>：只有 <b>${enemy.minLen} 顆以上</b>的長鏈才打得進去。短鏈會被彈開！`);
+    else if (enemy.banned) teach('ban', '🚫 封印怪物！',
+      '<span style="font-size:42px">🚫</span>',
+      `這隻怪會<b>封印一個數字</b>（變灰、不能用）。用 ✏️ 加一 / ➖ 減一 技能可以把被封的珠改成別的數字喔！`);
+  }
+
+  function gimText() {
+    const parts = [];
+    if (enemy.minLen > 2) parts.push(`🛡️ 硬殼：只吃 ${enemy.minLen} 顆以上的鏈`);
+    if (enemy.banned) parts.push(`🚫 封印：數字 ${enemy.banned} 不能用`);
+    if (enemy.needOdd) parts.push(`🔆 奇數盾：鏈裡要有 ${enemy.needOdd} 顆以上奇數`);
+    if (enemy.needRun) parts.push(`🔢 共鳴盾：要連 ${enemy.needRun} 顆相同數字`);
+    if (enemy.divN) parts.push(`➗ 等分盾：把 ${target} 分成 ${enemy.divN} 等份（連 ${enemy.divN} 顆 ${target % enemy.divN === 0 ? target / enemy.divN : '？'}）`);
+    if (enemy.divisor) parts.push(`➗ 整除盾：湊出「${enemy.divisor} 的倍數」(${enemy.divisor}、${enemy.divisor*2}、${enemy.divisor*3}…)`);
+    return parts.join('　');
+  }
+
+  function renderHud() {
+    elStage.textContent = stg().name;
+    elFoeP.textContent = towerMode ? `🗼 ${towerFloor}F　🥚×${towerDrawsRun}` : `怪物 ${foeIdx + 1} / ${stg().foes.length}`;
+    elTarget.textContent = enemy.divisor ? `${enemy.divisor}的倍數` : target;
+    elEName.textContent = enemy.name;
+    elGim.textContent = gimText();
+    elEHp.style.width = Math.max(0, enemy.hp / enemy.maxHp * 100) + '%';
+    elPHp.style.width = Math.max(0, player.hp / player.maxHp * 100) + '%';
+    elPHpT.textContent = Math.max(0, player.hp);
+    elCd.textContent = enemy.cd;
+    elCdLabel.textContent = isJr() ? '搗蛋' : '行動';
+    elShield.classList.toggle('on', shieldUp);
+    elVoice.classList.toggle('hidden', !isJr());
+    elVoice.textContent = voiceOn ? '🔊' : '🔇';
+    const capD = captainDef();
+    elCap.innerHTML = capD ? `👑 <b style="color:${capD.c}">${capD.ic} ${capD.name}</b> <span style="opacity:.7">${capD.desc}</span>` : '';
+    renderSkills();
+  }
+
+  const isPrime = v => v === 2 || v === 3 || v === 5 || v === 7;
+  function chainCalc() {
+    let sum = 0, digits = 0, nextNeg = false, pendingMul = 1, endsOnDigit = false;
+    let usedMinus = false, usedMul = false, usedDiv = false, badDiv = false;
+    let primes = 0, evens = 0, odds = 0, mult3 = 0;        // 路徑組成（隊長技與弱點用）
+    let lastVal = null, curRun = 0, maxRun = 0, runVal = 0; // 同數共鳴：最長相同連段
+    for (const p of path) {
+      const t = tiles[p.r] && tiles[p.r][p.c];
+      if (!t) continue;
+      if (isMinus(t)) { nextNeg = true; usedMinus = true; endsOnDigit = false; lastVal = null; }
+      else if (isMul(t)) { pendingMul = mulFactor(t); usedMul = true; endsOnDigit = false; lastVal = null; }
+      else if (isDiv(t)) {                       // 後置除法：把目前累積總和除下去（須整除）
+        const d = divFactor(t); usedDiv = true; lastVal = null;
+        if (!endsOnDigit || sum % d !== 0) badDiv = true; else sum = sum / d;
+      }
+      else {
+        const val = t.v * pendingMul;
+        sum += nextNeg ? -val : val;
+        if (t.v === lastVal) curRun++; else curRun = 1;
+        lastVal = t.v; if (curRun > maxRun) { maxRun = curRun; runVal = t.v; }
+        nextNeg = false; pendingMul = 1; digits++; endsOnDigit = true;
+        if (isPrime(t.v)) primes++;
+        if (t.v % 2 === 0) evens++; else odds++;
+        if (t.v % 3 === 0) mult3++;
+      }
+    }
+    return { sum, digits, endsOnDigit, usedMinus, usedMul, usedDiv, badDiv, primes, evens, odds, mult3, maxRun, runVal };
+  }
+  function chainValid() {
+    const c = chainCalc();
+    const okGroups = !enemy.divN || (c.digits === enemy.divN && c.maxRun === enemy.divN);
+    // 整除盾：湊出 N 的倍數；否則一般固定目標
+    const goalOk = enemy.divisor ? (c.sum > 0 && c.sum % enemy.divisor === 0) : (c.sum === target);
+    return c.endsOnDigit && !c.badDiv && c.digits >= 2 && c.digits >= enemy.minLen
+        && c.odds >= (enemy.needOdd || 0) && c.maxRun >= (enemy.needRun || 0)
+        && okGroups && goalOk;
+  }
+
+  function renderChainUi() {
+    const c = chainCalc();
+    elSum.textContent = path.length ? c.sum : '–';
+    elSum.className = !path.length ? ''
+      : chainValid() ? 'exact'
+      : enemy.divisor ? ''
+      : (c.sum === target && c.endsOnDigit) ? 'short'
+      : c.sum > target ? 'over' : '';
+    elChain.textContent = `鏈 ×${c.digits}${c.digits >= 5 ? ' 🔥' : ''}`;
+    elChain.style.color = c.digits >= 4 ? tierColor(c.digits) : '#d8b4ff';
+    elChain.style.fontWeight = c.digits >= 4 ? '800' : '400';
+    elChain.style.fontSize = c.digits >= 4 ? '15px' : '13px';
+  }
+
+  // ---------- 技能與提示 ----------
+  function renderSkills() {
+    elSkillRow.innerHTML = '';
+    EQUIP.forEach(spId => {
+      const sp = SP(spId), s = SKILL_DEFS[sp.skill];
+      const cd = skillCd[sp.skill] || 0;
+      const b = document.createElement('button');
+      b.className = 'skillBtn' + (cd > 0 ? ' cooling' : '') + (targeting === sp.skill ? ' armed' : '');
+      b.innerHTML = `<span class="mini">${charSVG(spId)}</span><span class="lbl"><b>${s.ic} ${s.name}</b>${sp.name} Lv${COLL[spId] || 1}</span>${cd > 0 ? `<span class="cd">${cd}</span>` : ''}`;
+      b.addEventListener('click', () => {
+        if (locked || !enemy || enemy.hp <= 0) return;
+        if ((skillCd[sp.skill] || 0) > 0) { toast(`還要 ${skillCd[sp.skill]} 條鏈才能再用`); return; }
+        if (s.type === 'instant') { applyInstant(sp.skill); return; }
+        if (targeting === sp.skill) { targeting = null; }
+        else { targeting = sp.skill; toast(s.tip); }
+        canvas.classList.toggle('targeting', !!targeting);
+        renderSkills();
+      });
+      elSkillRow.appendChild(b);
+    });
+    if (isJr()) {
+      const b = document.createElement('button');
+      b.className = 'skillBtn' + (hintCd > 0 ? ' cooling' : '');
+      b.innerHTML = `<span class="lbl"><b>💡 提示</b>找找看</span>${hintCd > 0 ? `<span class="cd">${hintCd}</span>` : ''}`;
+      b.addEventListener('click', () => {
+        if (locked || !enemy || enemy.hp <= 0) return;
+        if (hintCd > 0) { toast(`再打 ${hintCd} 條鏈就能再提示`); return; }
+        const p = findSolutionPath(valuesOf(), target, solverOpt());
+        if (!p) { toast('咦，先打一條鏈看看吧！'); return; }
+        hintCells = p; hintT = 110; hintCd = 2;
+        if (foeStat) foeStat.hints++;
+        log('hint', { stage: stg().key });
+        say('找找看，亮亮的珠珠');
+        blip(880, .12);
+        renderSkills();
+      });
+      elSkillRow.appendChild(b);
+    }
+  }
+
+  function spendSkill(id) {
+    log('skill', { skill: id, stage: stg().key, foe: foeIdx + 1 });
+    skillCd[id] = SKILL_DEFS[id].cd;
+    targeting = null;
+    canvas.classList.remove('targeting');
+    renderSkills();
+  }
+
+  function afterSkillBoardCheck() {
+    if (countSolutions(valuesOf(), target, { ...solverOpt(), cap: 1 }).count === 0) {
+      toast('找不到解，盤面洗牌！');
+      freshTiles(genBoardValues(stg().minusRate, stg().maxDigit, stg().size, stg().mulRate || 0, stg().divRate || 0), true);
+      setupTargetForEnemy();
+      renderHud();
+    }
+  }
+
+  function applyInstant(id) {
+    if (id === 'lucky') { luckyNext = true; addFloater('🍀 下一鏈 ×1.5！', '#a3d65c', 22); blip(660, .12); }
+    if (id === 'shield') { shieldUp = true; addFloater('🛡️ 護盾展開！', '#7be3ff', 22); blip(520, .15); }
+    spendSkill(id);
+    renderHud();
+  }
+
+  function removeAndRefill(removedSet) {
+    for (let c = 0; c < SIZE; c++) {
+      const col = [];
+      for (let r = SIZE - 1; r >= 0; r--) if (!removedSet.has(r * SIZE + c)) col.push({ t: tiles[r][c], r });
+      let write = SIZE - 1;
+      for (const { t, r } of col) {
+        tiles[write][c] = t;
+        if (write > r) t.off = -(write - r) * CELL;
+        write--;
+      }
+      for (let r = write; r >= 0; r--) tiles[r][c] = { v: randCell(stg().minusRate, stg().maxDigit, stg().mulRate || 0, stg().divRate || 0), off: -(r + 1.5) * CELL, scale: 1 };
+    }
+  }
+
+  function applySkill(cell) {
+    const t = tiles[cell.r][cell.c];
+    const id = targeting;
+    if (id === 'plus1') {
+      if (isOp(t)) { toast('運算珠不能加一'); return; }
+      t.v = t.v >= 9 ? 1 : t.v + 1;
+      if (t.v === 1) toast('9 轉了一圈變回 1！');
+      t.scale = .55; blip(700, .1);
+    } else if (id === 'minus1') {
+      if (isOp(t)) { toast('運算珠不能減一'); return; }
+      t.v = t.v <= 1 ? 9 : t.v - 1;
+      if (t.v === 9) toast('1 轉了一圈變成 9！');
+      t.scale = .55; blip(500, .1);
+    } else if (id === 'reroll') {
+      t.v = randCell(stg().minusRate, stg().maxDigit, stg().mulRate || 0, stg().divRate || 0); t.scale = .55; blip(440, .1, 'triangle');
+    } else if (id === 'swapUp') {
+      if (cell.r === 0) { toast('最上排沒有上面可以換！'); return; }
+      const up = tiles[cell.r - 1][cell.c];
+      const tmp = t.v; t.v = up.v; up.v = tmp;
+      t.scale = .55; up.scale = .55; blip(580, .08); blip(620, .08);
+    } else if (id === 'purify') {
+      locked = true;
+      removeAndRefill(new Set([cell.r * SIZE + cell.c]));
+      blip(740, .12); blip(880, .14);
+    } else if (id === 'split') {
+      if (isOp(t)) { toast('運算珠不能分裂'); return; }
+      if (t.v < 2) { toast('1 沒辦法再拆了！'); return; }
+      if (cell.r === 0) { toast('最上排不能分裂（上面沒有位置）'); return; }
+      splitCell = cell;
+      openSplitPicker(t.v);
+      return;
+    }
+    spendSkill(id);
+    afterSkillBoardCheck();
+  }
+
+  function openSplitPicker(v) {
+    $('splitDesc').innerHTML = `把 <b style="color:#ffd84d">${v}</b> 拆成哪兩個數？<br><span style="font-size:12px;opacity:.7">第一個數會放在原位，第二個數會蓋掉上面那顆珠</span>`;
+    const box = $('splitChoices');
+    box.innerHTML = '';
+    for (let a = 1; a <= Math.floor(v / 2); a++) {
+      const b = document.createElement('button');
+      b.className = 'splitBtn';
+      b.textContent = `${v - a} ＋ ${a}`;
+      b.addEventListener('click', () => doSplit(v - a, a));
+      box.appendChild(b);
+    }
+    show('splitOverlay');
+  }
+
+  function doSplit(a, b) {
+    hide('splitOverlay');
+    if (!splitCell) return;
+    const { r, c } = splitCell;
+    tiles[r][c].v = a; tiles[r][c].scale = .55;
+    tiles[r - 1][c].v = b; tiles[r - 1][c].scale = .55;
+    blip(600, .08); blip(800, .1);
+    splitCell = null;
+    spendSkill('split');
+    afterSkillBoardCheck();
+  }
+
+  // ---------- 繪圖 ----------
+  const inPath = (r, c) => path.some(p => p.r === r && p.c === c);
+  function roundRect(x, y, w, h, rad) {
+    w = Math.max(0, w); h = Math.max(0, h);          // 防呆：尺寸不為負
+    rad = Math.max(0, Math.min(rad, w / 2, h / 2));  // 半徑夾在 0 ~ 邊長一半，避免 arcTo 負半徑
+    ctx.beginPath();
+    ctx.moveTo(x + rad, y);
+    ctx.arcTo(x + w, y, x + w, y + h, rad);
+    ctx.arcTo(x + w, y + h, x, y + h, rad);
+    ctx.arcTo(x, y + h, x, y, rad);
+    ctx.arcTo(x, y, x + w, y, rad);
+    ctx.closePath();
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, BOARD_PX, BOARD_PX);
+    ctx.fillStyle = 'rgba(255,255,255,.05)';
+    roundRect(0, 0, BOARD_PX, BOARD_PX, 14); ctx.fill();
+    if (!tiles.length) return;
+
+    if (hintT > 0 && hintCells) {
+      const a = .25 + .25 * Math.sin(hintT * .25);
+      ctx.strokeStyle = `rgba(255,216,77,${.5 + a})`;
+      ctx.lineWidth = 3;
+      hintCells.forEach(p => {
+        if (p.r >= SIZE || p.c >= SIZE) return;
+        roundRect(p.c * CELL + 2, p.r * CELL + 2, CELL - 4, CELL - 4, 10);
+        ctx.stroke();
+      });
+    }
+
+    if (path.length > 1) {
+      const cc = chainCalc();
+      ctx.strokeStyle = chainValid() ? 'rgba(93,255,157,.85)'
+        : (cc.sum === target && cc.endsOnDigit) ? 'rgba(255,179,94,.85)'
+        : cc.sum > target ? 'rgba(255,122,122,.8)' : 'rgba(158,203,255,.8)';
+      ctx.lineWidth = CELL * Math.min(.13 + cc.digits * .015, .24);
+      if (cc.digits >= 4) { ctx.shadowColor = tierColor(cc.digits); ctx.shadowBlur = 6 + cc.digits * 2; }
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.beginPath();
+      path.forEach((p, i) => {
+        const t0 = tiles[p.r] && tiles[p.r][p.c]; if (!t0) return;
+        const x = p.c * CELL + CELL / 2, y = p.r * CELL + CELL / 2 + t0.off;
+        i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+      });
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+
+    const banned = enemy ? enemy.banned : 0;
+    for (let r = 0; r < SIZE; r++) for (let c = 0; c < SIZE; c++) {
+      const t = tiles[r][c];
+      if (t.popped) continue;          // 逐步結算中已彈出的珠不畫
+      const minus = isMinus(t);
+      const mul = isMul(t);
+      const div = isDiv(t);
+      const isBanned = !minus && !mul && !div && banned && t.v === banned;
+      const sel = inPath(r, c);
+      const pad = CELL * .07, s = t.scale;
+      const w = (CELL - pad * 2) * s;
+      const x = c * CELL + (CELL - w) / 2;
+      const y = r * CELL + (CELL - w) / 2 + t.off;
+      ctx.fillStyle = isBanned ? '#4a4a58'
+        : div ? (sel ? '#6fe3ff' : '#1f9fc4')
+        : mul ? (sel ? '#ffd36b' : '#e0951c')
+        : minus ? (sel ? '#a07ce8' : '#7a4dd9')
+        : sel ? tileColorHi(t.v) : tileColor(t.v);
+      ctx.shadowColor = sel ? 'rgba(255,255,255,.7)' : 'rgba(0,0,0,.3)';
+      ctx.shadowBlur = sel ? 14 : 4;
+      roundRect(x, y, w, w, w * .26); ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = isBanned ? 'rgba(255,255,255,.35)' : '#fff';
+      ctx.font = `800 ${CELL * (mul || div ? .34 : .42) * s}px -apple-system,sans-serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(minus ? '−' : mul ? ('×' + mulFactor(t)) : div ? ('÷' + divFactor(t)) : t.v, x + w / 2, y + w / 2 + 1);
+      if (isBanned) {
+        ctx.font = `${CELL * .22}px sans-serif`;
+        ctx.fillText('🚫', x + w * .8, y + w * .2);
+      }
+    }
+
+    particles.forEach(p => {
+      ctx.globalAlpha = Math.max(0, 1 - p.t / p.life);
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    });
+
+    floaters.forEach(f => {
+      ctx.globalAlpha = Math.max(0, 1 - f.t / 60);
+      ctx.fillStyle = f.color;
+      ctx.font = `900 ${f.size + f.t * .2}px -apple-system,sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(f.text, f.x, f.y - f.t * 1.2);
+      ctx.globalAlpha = 1;
+    });
+  }
+
+  function tick() {
+    let busy = false;
+    for (const row of tiles) for (const t of row) {
+      if (t.off < 0) { t.off = Math.min(0, t.off + CELL * .45); busy = true; }
+      if (t.scale < 1 && !t.popped) { t.scale = Math.min(1, t.scale + .12); busy = true; }
+    }
+    floaters.forEach(f => f.t++);
+    floaters = floaters.filter(f => f.t < 60);
+    particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += .28; p.t++; });
+    particles = particles.filter(p => p.t < p.life);
+    if (hintT > 0) hintT--;
+    if (!busy && locked) locked = false;
+    // draw 用 try 包住：任何一幀出錯也不會讓整個繪製迴圈死掉（盤面消失）
+    try { draw(); }
+    catch (e) {
+      if (!window.__drawErr) { window.__drawErr = e.message; console.error('draw error:', e);
+        try { toast('⚠️ 繪製錯誤：' + e.message, 8000); } catch (_) {} }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  // ---------- 輸入 ----------
+  function cellAt(px, py) {
+    const c = Math.floor(px / CELL), r = Math.floor(py / CELL);
+    if (r < 0 || r >= SIZE || c < 0 || c >= SIZE) return null;
+    const cx = c * CELL + CELL / 2, cy = r * CELL + CELL / 2;
+    if (Math.hypot(px - cx, py - cy) > CELL * .42) return null;
+    return { r, c };
+  }
+  const adjacent = (a, b) => Math.abs(a.r - b.r) <= 1 && Math.abs(a.c - b.c) <= 1 && !(a.r === b.r && a.c === b.c);
+  function pos(e) {
+    const rect = canvas.getBoundingClientRect();
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  }
+  function canAppend(cell) {
+    const t = tiles[cell.r][cell.c];
+    if (enemy.banned && !isOp(t) && t.v === enemy.banned) return false;
+    if (!path.length) return !isOp(t);              // 不能以運算珠開頭
+    const last = tiles[path[path.length - 1].r][path[path.length - 1].c];
+    if (isOp(t) && isOp(last)) return false;        // 運算珠後面不能再接運算珠
+    if (isDiv(t)) {                                  // ÷ 珠：須接在數字後、且目前總和能整除
+      const c = chainCalc();
+      if (!c.endsOnDigit || c.sum <= 0 || c.sum % divFactor(t) !== 0) return false;
+    }
+    return true;
+  }
+
+  canvas.addEventListener('pointerdown', e => {
+    if (resolving) { e.preventDefault(); if (resolveSkip) resolveSkip(); return; }   // 結算動畫中再點一下 = 快轉
+    if (locked || !enemy || enemy.hp <= 0 || !player || player.hp <= 0) return;
+    e.preventDefault();
+    canvas.setPointerCapture(e.pointerId);
+    const p = pos(e), cell = cellAt(p.x, p.y);
+    if (!cell) return;
+    if (targeting) { applySkill(cell); return; }
+    if (!canAppend(cell)) return;
+    if (!firstMoveLogged) {
+      firstMoveLogged = true;
+      log('first_move', { stage: stg().key, foe: foeIdx + 1, latency_ms: Date.now() - boardReadyAt });
+    }
+    dragging = true; dragT0 = Date.now();
+    path = [cell];
+    blip(330 + tiles[cell.r][cell.c].v * 30);
+    renderChainUi();
+  });
+
+  canvas.addEventListener('pointermove', e => {
+    if (!dragging || locked) return;
+    e.preventDefault();
+    const p = pos(e), cell = cellAt(p.x, p.y);
+    if (!cell) return;
+    const last = path[path.length - 1];
+    if (cell.r === last.r && cell.c === last.c) return;
+    if (path.length > 1 && cell.r === path[path.length - 2].r && cell.c === path[path.length - 2].c) {
+      path.pop(); blip(240, .05); renderChainUi(); return;
+    }
+    if (adjacent(cell, last) && !inPath(cell.r, cell.c) && canAppend(cell)) {
+      path.push(cell);
+      blip(330 + path.length * 60 + tiles[cell.r][cell.c].v * 10);
+      renderChainUi();
+    }
+  });
+
+  function endDrag() {
+    if (!dragging) return;
+    dragging = false;
+    const cc = chainCalc(), dragMs = Date.now() - dragT0;
+    if (cc.digits >= 2) {
+      const valid = chainValid();
+      const oddShort = cc.endsOnDigit && cc.sum === target && cc.digits >= enemy.minLen
+                    && cc.odds < (enemy.needOdd || 0);
+      const runShort = cc.endsOnDigit && cc.sum === target && cc.digits >= enemy.minLen
+                    && cc.odds >= (enemy.needOdd || 0) && cc.maxRun < (enemy.needRun || 0);
+      const goalMet = enemy.divisor ? (cc.sum > 0 && cc.sum % enemy.divisor === 0) : (cc.sum === target);
+      const divBad = enemy.divN && cc.endsOnDigit && cc.sum === target
+                    && !(cc.digits === enemy.divN && cc.maxRun === enemy.divN);
+      const divisorMiss = enemy.divisor && cc.endsOnDigit && !cc.badDiv && !goalMet;
+      if (foeStat) { foeStat.attempts++; if (!valid) foeStat.fails++; }
+      const capE = captainDef() ? captainDef().calc(cc) : {};
+      log('chain', { stage: stg().key, foe: foeIdx + 1, len: cc.digits, sum: cc.sum, target,
+        valid, used_minus: cc.usedMinus, used_mul: cc.usedMul, used_div: cc.usedDiv, odds: cc.odds, primes: cc.primes, run: cc.maxRun,
+        cap: captainAttr(), cap_mult: +(capE.mult || 1).toFixed(2), cap_addlen: capE.addLen || 0, combo: valid ? combo + 1 : combo,
+        reason: valid ? 'ok' : cc.badDiv ? 'bad_div' : !cc.endsOnDigit ? 'end_op'
+              : divisorMiss ? 'divisor_miss' : !goalMet ? 'sum'
+              : divBad ? 'div_shield' : oddShort ? 'odd_shield' : runShort ? 'run_shield' : 'short',
+        minLen: enemy.minLen, banned: enemy.banned, need_odd: enemy.needOdd || 0, need_run: enemy.needRun || 0,
+        div_n: enemy.divN || 0, divisor: enemy.divisor || 0, drag_ms: dragMs });
+      if (valid) { resolveChain(); return; }
+      if (cc.badDiv) toast('÷ 珠要整除才能用！(這個數除不盡)');
+      else if (!cc.endsOnDigit) toast('鏈不能以運算珠（−／×）結尾！');
+      else if (divisorMiss) toast(`要湊出 ${enemy.divisor} 的倍數！${cc.sum} 不是（${enemy.divisor}、${enemy.divisor*2}、${enemy.divisor*3}…）`, 2600);
+      else if (divBad) toast(`等分盾！要連剛好 ${enemy.divN} 顆「${target / enemy.divN}」（${target}÷${enemy.divN}=${target / enemy.divN}）➗`, 2600);
+      else if (oddShort) toast(`奇數盾！鏈裡要有 ${enemy.needOdd} 顆以上奇數 🔆`);
+      else if (runShort) toast(`共鳴盾！要連 ${enemy.needRun} 顆相同數字 🔢`);
+      else if (cc.sum === target) toast(`鏈太短了！這隻怪需要 ${enemy.minLen} 顆以上 🛡️`);
+      blip(160, .12, 'triangle');
+    }
+    path = []; renderChainUi();
+  }
+  canvas.addEventListener('pointerup', endDrag);
+  canvas.addEventListener('pointercancel', endDrag);
+
+  // ---------- 結算 ----------
+  function resolveChain() {
+    locked = true;
+    hintCells = null; hintT = 0;
+    const cc = chainCalc();
+    const len = cc.digits;
+    // 隊長技：只讀路徑組成，回傳傷害倍率 / 額外鏈長 / 爆擊
+    const cap = captainDef();
+    const capEff = cap ? cap.calc(cc) : {};
+    const effLen = len + (capEff.addLen || 0);
+    // 同數共鳴：連 R 顆相同數字 = 乘法，傷害 ×(1 + 0.5×(R-1))
+    // 同數共鳴只有「進入乘法谷解鎖後」才生效（之前連相同數字只是普通加總）
+    const resOn = RESON && cc.maxRun >= 2;
+    const resMult = resOn ? 1 + 0.5 * (cc.maxRun - 1) : 1;
+    // 連擊：每條有效鏈 combo+1，傷害倍率漸升（上限 ×2.5）。combo 只在敵人行動時歸零。
+    combo++;
+    const comboMult = Math.min(2.5, 1 + 0.15 * (combo - 1));
+    let dmg = Math.round(baseDmg() * effLen * (capEff.mult || 1) * resMult * comboMult);
+    if (resOn) {
+      addFloater(`🔢 ${cc.runVal}×${cc.maxRun} 共鳴！`, '#ffae3d', 24 + cc.maxRun * 3, 0, 30);
+      blip(660, .1, 'triangle', .18); blip(880, .12, 'triangle', .18);
+      teach('resonance', '✖️ 同數共鳴 = 乘法！',
+        '<span style="font-size:40px;color:#ffae3d">4+4+4</span>',
+        `你剛剛把<b>幾顆一樣的數字</b>連在一起——這就是<b>乘法</b>！<br><b style="color:#ffae3d">${cc.runVal}+${cc.runVal}+…（${cc.maxRun} 個）= ${cc.runVal}×${cc.maxRun}</b><br>連越多顆相同數字，<b>共鳴傷害越高</b>！`);
+    }
+    if (capEff.proc) {
+      addFloater(`${cap.ic} ${capEff.tag}`, cap.c, capEff.crit ? 30 : 22, -64, -18);
+      blip(capEff.crit ? 988 : 740, .12, 'triangle', .16);
+    }
+    if (luckyNext) { dmg = Math.round(dmg * 1.5); luckyNext = false; addFloater('🍀 ×1.5！', '#a3d65c', 24); }
+    if (combo >= 2) {
+      showCombo(combo);   // 持續顯示的連擊計量器（跨鏈累積）
+      blip(440 + Math.min(combo, 12) * 45, .09, 'triangle', .15);
+      if (combo >= 5) flash('#ffd84d', .18);
+      if (isJr()) say('連擊！');
+    }
+    if (combo > (stageStat.maxCombo || 0)) stageStat.maxCombo = combo;
+    if (towerMode && dmg > towerPeak) towerPeak = dmg;   // 紀錄本次塔內最高單發攻擊力
+    stageStat.chains++; stageStat.lenSum += len;
+    if (cc.usedMinus) stageStat.minusChains++;
+    if (len > stageStat.maxChain) stageStat.maxChain = len;
+    if (hintCd > 0) hintCd--;
+
+    const praise = len >= 7 ? ['傳說拆解！！！', '#ffd84d', 40]
+                 : len >= 6 ? ['超絕拆解！！', '#ffd84d', 34]
+                 : len >= 5 ? ['厲害！', '#ff9bf2', 30]
+                 : len >= 4 ? ['精彩！', '#9ecbff', 26] : null;
+    if (praise) { addFloater(praise[0], praise[1], praise[2], 0, -42); if (isJr()) say('太棒了！'); }
+    if (cc.usedMinus) addFloater('減法！', '#c5a3ff', 20, -60, -30);
+    addFloater(`×${len}`, tierColor(len), 24 + len * 5, 44, -6);
+
+    // ---- 逐步結算動畫：沿路徑一顆顆彈出、傷害一格格累加，最後砸進怪物 ----
+    const cells = path.slice();
+    path = []; renderChainUi();
+    const N = Math.max(1, cells.length);
+    // 傷害數字用「固定可讀時長」平滑累加：鏈越長、連擊越高，戲劇時間略長（即使短鏈也看得清）
+    const countDur = Math.min(1150, 480 + N * 70 + Math.min(combo, 8) * 45);
+    const stepMs = Math.max(85, Math.min(170, countDur / N));   // 每顆珠至少看得到（≥85ms）
+    const popColor = t => isDiv(t) ? '#6fe3ff' : isMul(t) ? '#ffd36b' : isMinus(t) ? '#a07ce8' : tileColorHi(t.v);
+    const nowMs = () => (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+    let popped = 0, done = false, popTimer = 0, countRAF = 0;
+    const t0 = nowMs();
+    resolving = true; showDmgPop(0);
+    // 數字累加用 rAF 平滑跑（easeOutCubic），與珠子彈出獨立，確保固定可讀時長
+    function countUp() {
+      const k = Math.min(1, (nowMs() - t0) / countDur);
+      showDmgPop(Math.round(dmg * (1 - Math.pow(1 - k, 3))));
+      if (k < 1 && !done) countRAF = requestAnimationFrame(countUp);
+    }
+    countRAF = requestAnimationFrame(countUp);
+
+    function applyResult() {
+      if (done) return; done = true; resolving = false; resolveSkip = null;
+      setTimeout(hideDmgPop, 340);   // 放大定格停留一下再消失，看得清最終傷害
+      // 擊退：鏈越長怪物被打飛越遠（暫停 idle 動畫讓位移可見）
+      const kb = Math.min(10 + len * 5, 46);
+      elArt.classList.add('hit'); elArt.style.animation = 'none';
+      elArt.style.transform = `translateX(${kb}px) scale(${Math.max(.7, .92 - len * .03)}) rotate(-${4 + len * 2}deg)`;
+      renderEnemyArt('hurt');   // 受擊表情
+      setTimeout(() => { elArt.classList.remove('hit'); elArt.style.transform = ''; elArt.style.animation = ''; }, 180 + len * 25);
+      setTimeout(() => { if (enemy && enemy.hp > 0) renderEnemyArt(enemy.enraged ? 'enraged' : 'idle'); }, 520);
+      removeAndRefill(new Set(cells.map(p => p.r * SIZE + p.c)));
+      for (const k in skillCd) if (skillCd[k] > 0) skillCd[k]--;
+      enemy.hp -= dmg;
+      enemy.cd--;
+
+    // 魔王二階段：血量過半 → 狂暴化（各魔王機制不同）
+    if (enemy.isBoss && !enemy.enraged && enemy.hp > 0 && enemy.hp <= enemy.maxHp / 2) {
+      enemy.enraged = true;
+      if (!isJr()) enemy.atk = Math.round(enemy.atk * 1.5);
+      enemy.every = Math.max(isJr() ? 3 : 2, enemy.every - 1);
+      enemy.shiftCounter = 0;
+      let msg = isJr() ? '⚠️ 大王生氣了！搗蛋會變快！' : '⚠️ 狂暴化！攻擊變強、行動變快！';
+      if (enemy.bossKind === 'bossShell') {
+        enemy.minLen = Math.min(enemy.minLen + 1, 5);
+        msg = `⚠️ 狂暴化！硬殼變更硬：需要 ${enemy.minLen} 顆以上的鏈！`;
+      } else if (enemy.bossKind === 'bossBan') {
+        msg = '⚠️ 狂暴化！封印會一直亂換！';
+      } else if (enemy.bossKind === 'bossRun') {
+        enemy.needRun = Math.min(enemy.needRun + 1, 4);
+        msg = `⚠️ 狂暴化！共鳴盾變強：要連 ${enemy.needRun} 顆相同數字！`;
+      } else if (enemy.bossKind === 'bossDiv') {
+        enemy.divN = Math.min(enemy.divN + 1, 4);
+        msg = `⚠️ 狂暴化！等分盾變強：要分成 ${enemy.divN} 等份！`;
+        setupTargetForEnemy();   // 重抽一個能被新份數整除的目標
+      } else if (enemy.bossKind === 'bossDivisor') {
+        enemy.divisor = Math.min(enemy.divisor + 1, 6);
+        msg = `⚠️ 狂暴化！整除盾變強：要湊出 ${enemy.divisor} 的倍數！`;
+      } else if (enemy.bossKind === 'boss') {
+        msg = '⚠️ 魔王狂暴化！攻擊變強、目標會一直亂變！';
+      }
+      renderEnemyArt('enraged');   // 狂暴表情
+      elArt.classList.add('enraged');
+      $('enemyZone').classList.add('enraged');
+      flash('#ff2828', .4);
+      blip(76, .5, 'sawtooth', .28); blip(64, .6, 'sawtooth', .28);
+      $('app').classList.add('shake');
+      setTimeout(() => $('app').classList.remove('shake'), 500);
+      toast(msg, 3000);
+      say(isJr() ? '大王生氣了！加油！' : '魔王生氣了！小心！');
+      log('boss_enrage', { stage: stg().key, kind: enemy.bossKind });
+      // 硬殼/共鳴盾提升後，確認盤面仍有解
+      if (enemy.bossKind === 'bossShell' || enemy.bossKind === 'bossRun' || enemy.bossKind === 'bossDiv') setTimeout(afterSkillBoardCheck, 400);
+    } else if (enemy.isBoss && enemy.enraged && enemy.hp > 0) {
+      enemy.shiftCounter++;
+      if (enemy.shiftCounter >= 2) {
+        enemy.shiftCounter = 0;
+        const [lo, hi] = ddaBand();
+        if (enemy.bossKind === 'boss') {
+          // 亂數魔王：目標亂變
+          const nt = pickTarget(valuesOf(), lo, hi, solverOpt());
+          if (nt !== -1 && nt !== target) {
+            target = nt;
+            flash('#b07ce8', .3);
+            addFloater(`亂數！目標 → ${target}`, '#b07ce8', 24, 0, 30);
+            blip(440, .08); blip(330, .1);
+            say(`目標變成 ${target}`);
+          }
+        } else if (enemy.bossKind === 'bossBan') {
+          // 洞窟王：封印的數字亂換
+          const cands = [2,3,4,5,6,7,8].filter(d => d !== enemy.banned).sort(() => Math.random() - .5);
+          for (const d of cands) {
+            const old = enemy.banned;
+            enemy.banned = d;
+            const nt = pickTarget(valuesOf(), lo, hi, solverOpt());
+            if (nt !== -1) {
+              target = nt;
+              flash('#4a4a58', .3);
+              addFloater(`封印亂換！🚫 ${d}`, '#9aa0b8', 24, 0, 30);
+              blip(300, .1); blip(240, .12);
+              say(`封印變成 ${d}`);
+              break;
+            }
+            enemy.banned = old;
+          }
+        }
+      }
+    }
+
+    if (enemy.hp <= 0) {
+      log('enemy_kill', { stage: stg().key, foe: foeIdx + 1 });
+      if (towerMode) {
+        DRAWS++; towerDrawsRun++; save('nh5_draws', DRAWS);
+        log('tower_floor', { floor: towerFloor, peak: towerPeak });
+        player.hp = Math.min(player.maxHp, player.hp + 12);
+        addFloater(`🗼 ${towerFloor}F 通過！🥚+1`, '#ffd84d', 24, 0, 30);
+        towerFloor++;
+        setTimeout(() => { buildTowerFloor(towerFloor); spawnEnemy(); }, 600);
+      } else {
+        updateDDA(true);
+        if (foeIdx + 1 >= stg().foes.length) { setTimeout(stageClear, 550); }
+        else {
+          foeIdx++;
+          player.hp = Math.min(player.maxHp, player.hp + 15);
+          toast('淨化成功！✨');
+          setTimeout(spawnEnemy, 550);
+        }
+      }
+    } else if (enemy.cd <= 0) {
+      setTimeout(() => {
+        enemy.cd = enemy.every;
+        combo = 0; hideCombo();   // 敵人行動 → 連擊中斷
+        if (isJr()) {
+          // 搗蛋：打亂幾顆珠，不傷人
+          const n = 4;
+          for (let i = 0; i < n; i++) {
+            const r = rnd(SIZE), c = rnd(SIZE);
+            tiles[r][c].v = randCell(stg().minusRate, stg().maxDigit, stg().mulRate || 0, stg().divRate || 0);
+            tiles[r][c].scale = .5;
+          }
+          addFloater('搗蛋！打亂了珠珠 🌀', '#ffd84d', 20);
+          say('哎呀，怪物搗蛋了！');
+          blip(220, .15, 'triangle');
+          afterSkillBoardCheck();
+        } else if (shieldUp) {
+          shieldUp = false;
+          addFloater('🛡️ 擋下了！', '#7be3ff', 24);
+          blip(520, .2);
+        } else {
+          player.hp -= enemy.atk;
+          log('player_hit', { stage: stg().key, dmg: enemy.atk });
+          addFloater(`受到 ${enemy.atk} 傷害！`, '#ff7a7a', 22);
+          blip(110, .25, 'sawtooth', .2);
+          $('app').classList.add('shake'); setTimeout(() => $('app').classList.remove('shake'), 400);
+        }
+        renderHud();
+        if (player.hp <= 0) { if (towerMode) towerEnd(false); else stageFail(); }
+      }, 450);
+    }
+
+    setTimeout(() => {
+      if (enemy.hp > 0 && player.hp > 0 &&
+          countSolutions(valuesOf(), target, { ...solverOpt(), cap: 1 }).count === 0) {
+        toast('找不到解，盤面洗牌！');
+        freshTiles(genBoardValues(stg().minusRate, stg().maxDigit, stg().size, stg().mulRate || 0, stg().divRate || 0), true);
+        setupTargetForEnemy();
+      }
+      renderHud();
+    }, 320);
+      renderHud();
+    }   // applyResult 結束
+
+    function bigPunch() {
+      cancelAnimationFrame(countRAF);
+      showDmgPop(dmg, true);   // 最後放大定格（combo 越高顏色越金）
+      if (combo >= 4 || len >= 5) {
+        flash(combo >= 6 ? '#ffd84d' : combo >= 4 ? '#ff9bf2' : len >= 6 ? '#ffd84d' : '#fff',
+              combo >= 6 || len >= 6 ? .4 : .28);
+        $('app').classList.add('shake');
+        setTimeout(() => $('app').classList.remove('shake'), combo >= 6 || len >= 6 ? 520 : 360);
+      }
+    }
+    function popStep() {
+      if (popped < N) {
+        const p = cells[popped];
+        const t = tiles[p.r] && tiles[p.r][p.c];
+        if (t) { spawnParticles(p.c * CELL + CELL / 2, p.r * CELL + CELL / 2, popColor(t), Math.min(4 + len * 2, 14)); t.popped = true; }
+        popped++;
+        blip(500 + Math.min(popped, 14) * 50, .07, 'triangle', .13);
+        popTimer = setTimeout(popStep, stepMs);
+      } else {
+        // 珠子彈完後，等數字也跑到底再放大定格（保證可讀時長）
+        const remain = Math.max(0, countDur - (nowMs() - t0));
+        popTimer = setTimeout(() => { bigPunch(); applyResult(); }, remain);
+      }
+    }
+    function skipPop() {
+      clearTimeout(popTimer); cancelAnimationFrame(countRAF);
+      for (; popped < N; popped++) { const p = cells[popped]; const t = tiles[p.r] && tiles[p.r][p.c]; if (t) t.popped = true; }
+      bigPunch();
+      applyResult();
+    }
+    resolveSkip = skipPop;
+    popStep();
+  }
+
+  // ---------- 蛋與孵化 ----------
+  // 抽蛋池：依玩家進度（已破關的最高區域）決定，越深入池越大
+  function curMaxPool() {
+    if (isJr()) return 1;
+    let z = 0; STAGES.forEach(s => { if ((STARS[s.key] || 0) > 0) z = Math.max(z, s.zone); });
+    return z;
+  }
+  function drawSpecies() {
+    const pool = SPECIES.filter(s => s.pool <= curMaxPool());
+    return pool[rnd(pool.length)].id;
+  }
+  // 星星 → 抽蛋機會：依「這次新拿到的星星數」給券（沒進步的重玩 30% 給 1）
+  function drawsEarned(prevStars, stars) {
+    const gain = Math.max(0, stars - prevStars);
+    return gain > 0 ? gain : (Math.random() < .3 ? 1 : 0);
+  }
+
+  // ---------- 孵化所（專屬抽蛋頁）----------
+  function openGacha() {
+    hide('resultOverlay'); hide('selectOverlay');
+    renderGacha(true);
+    show('gachaOverlay');
+  }
+  function renderGacha(idle) {
+    $('gachaCount').innerHTML = `🥚 抽蛋機會 <b style="color:#ffd84d">${DRAWS}</b> 次`;
+    $('gachaDrawBtn').classList.toggle('disabled', DRAWS <= 0);
+    $('gachaDrawBtn').textContent = DRAWS > 0 ? '抽一次 🥚' : '沒有抽蛋機會了';
+    if (idle) {
+      $('gachaArt').innerHTML = `<div class="art ${DRAWS > 0 ? 'wob' : ''}">${eggSVG(DRAWS > 0 ? '#ffd36b' : '#888')}</div>`;
+      $('gachaMsg').innerHTML = DRAWS > 0 ? '點「抽一次」孵化數靈！' : '去過關拿星星，換更多抽蛋機會吧！';
+    }
+  }
+  function drawOne() {
+    if (DRAWS <= 0) { toast('沒有抽蛋機會了，去過關拿星星！'); return; }
+    DRAWS--; save('nh5_draws', DRAWS);
+    const spId = drawSpecies(), sp = SP(spId);
+    const dup = !!COLL[spId];
+    COLL[spId] = dup ? Math.min(5, (COLL[spId] || 1) + 1) : 1;
+    save('nh5_coll', COLL);
+    log('egg_drop', { source: 'gacha', species: spId });
+    log('hatch', { species: spId, dup, level: COLL[spId] });
+    $('gachaArt').innerHTML = `<div class="art pop">${charSVG(spId)}</div>`;
+    $('gachaMsg').innerHTML = dup
+      ? `<b style="color:#ffd84d">${sp.name}</b> 升級了！Lv${COLL[spId]}（傷害提升）`
+      : `🎉 新夥伴 <b style="color:#ffd84d">${sp.name}</b>（${ATTRS[sp.attr].n}）！<br><span style="font-size:12px;opacity:.7">${SKILL_DEFS[sp.skill].ic}${SKILL_DEFS[sp.skill].name}　${CAPTAIN_DEFS[sp.attr].ic}${CAPTAIN_DEFS[sp.attr].name}</span>`;
+    renderGacha(false);
+    say(dup ? `${sp.name}升級了！` : `新夥伴${sp.name}！`);
+    blip(523, .1); blip(659, .1); blip(784, .15); blip(1046, .2);
+  }
+
+  // ---------- 開戰前選隊長 ----------
+  let pendingStage = -1;
+  function pickCaptainThenStart(i) {
+    if (EQUIP.length < 2) { startStage(i); return; }   // 只有 1 隻就不用選
+    pendingStage = i;
+    const grid = $('captainPickGrid');
+    grid.innerHTML = '';
+    EQUIP.forEach(id => {
+      const sp = SP(id), cd = CAPTAIN_DEFS[sp.attr];
+      const b = document.createElement('button');
+      b.className = 'pCard equipped';
+      b.style.cursor = 'pointer';
+      b.innerHTML = `<div class="art">${charSVG(id, true)}</div>
+        <div class="nm">${sp.name}</div>
+        <div class="lv" style="color:${cd.c}">${cd.ic}${cd.name}</div>
+        <div class="lv" style="opacity:.7;font-size:10px">${cd.desc}</div>`;
+      b.addEventListener('click', () => {
+        EQUIP = [id, ...EQUIP.filter(x => x !== id)];
+        save('nh5_equip', EQUIP);
+        hide('captainPickOverlay');
+        startStage(pendingStage);
+      });
+      grid.appendChild(b);
+    });
+    show('captainPickOverlay');
+  }
+
+  // ---------- 無限塔 ----------
+  function buildTowerFloor(floor) {
+    const lo = 10 + Math.round(floor * 1.5);
+    const hi = Math.min(58, lo + 6 + floor);
+    let gim = null;
+    if (floor >= 3) {
+      const r = floor % 4;
+      if (r === 0) gim = { type: 'shell', n: 3 + Math.min(2, Math.floor(floor / 8)) };
+      else if (r === 1) gim = { type: 'ban' };
+      else if (r === 2) gim = { type: 'weakOdd', n: 2 };
+      else gim = { type: 'weakRun', n: floor >= 10 ? 3 : 2 };
+    }
+    const sp = ['dubdragon', 'munchdragon', 'starle', 'guardy', 'prima'][floor % 5];
+    towerCfg = {
+      key: 'tower', name: `🗼 無限塔 ${floor}F`, zone: 4,
+      band: [lo, hi], minusRate: floor >= 4 ? 0.10 : 0, mulRate: floor >= 7 ? 0.10 : 0,
+      size: 6, maxDigit: 9, foesSp: [sp],
+      foes: [{ hp: 90 + floor * 45, atk: 8 + floor * 2, every: Math.max(3, 5 - Math.floor(floor / 6)), gim }],
+    };
+    foeIdx = 0;
+  }
+  function startTower() {
+    towerMode = true; towerFloor = 1; towerPeak = 0; towerDrawsRun = 0;
+    if (!RESON) { RESON = true; save('nh5_reson', RESON); }   // 無限塔屬進階內容，解鎖共鳴
+    setupCanvas(6);
+    player = { hp: 100, maxHp: 100 };
+    stageStat = { chains: 0, lenSum: 0, maxChain: 0, minusChains: 0, maxCombo: 0, t0: Date.now() };
+    skillCd = {}; EQUIP.forEach(id => skillCd[SP(id).skill] = 0);
+    targeting = null; canvas.classList.remove('targeting');
+    luckyNext = false; shieldUp = false; combo = 0; hideCombo(); resolving = false; resolveSkip = null; hideDmgPop(); path = []; dragging = false;
+    hintCells = null; hintT = 0; hintCd = 0;
+    buildTowerFloor(1);
+    freshTiles(genBoardValues(stg().minusRate, stg().maxDigit, stg().size, stg().mulRate || 0, stg().divRate || 0), true);
+    hide('selectOverlay'); hide('settingsOverlay'); hide('towerResultOverlay');
+    log('tower_start', { equip: [...EQUIP], captain: captainAttr() });
+    spawnEnemy();
+    renderChainUi();
+    teach('tower', '🗼 無限塔！',
+      '<span style="font-size:40px">🗼</span>',
+      '一層一層往上爬，怪物會越來越強！<br><b>每過一層 = 🥚 +1 次抽蛋機會</b>。<br>撐不住或想收手時按「↩︎ 離開」撤退，<b>已拿到的券都會保留</b>，還會依你打出的<b>最高一發攻擊力</b>再加碼送券！');
+  }
+  function peakBonus(p) { return p <= 0 ? 0 : p <= 100 ? 1 : p <= 1000 ? 2 : p <= 5000 ? 3 : p <= 20000 ? 4 : 5; }
+  function towerEnd(died) {
+    if (!towerMode) return;
+    towerMode = false;
+    const floors = towerFloor - 1;
+    const bonus = peakBonus(towerPeak);
+    DRAWS += bonus; save('nh5_draws', DRAWS);
+    log('tower_end', { floors, peak: towerPeak, floor_draws: towerDrawsRun, bonus, died });
+    $('towerResultOverlay').querySelector('h1').textContent = died ? '🗼 被擊倒了…' : '🗼 無限塔結算';
+    $('towerFloors').textContent = floors;
+    $('towerPeak').textContent = towerPeak;
+    $('towerBonusMsg').innerHTML = `最高單發攻擊力 <b style="color:#ff9d2e">${towerPeak}</b> → 額外 <b style="color:#ffd84d">${bonus}</b> 券`;
+    $('towerDraws').textContent = towerDrawsRun + bonus;
+    hide('teachOverlay');
+    show('towerResultOverlay');
+    say('無限塔結束了！');
+  }
+
+  // ---------- 關卡流程 ----------
+  function startStage(i) {
+    stageIdx = i; foeIdx = 0;
+    if ((stg().zone || 0) >= 4 && !RESON) { RESON = true; save('nh5_reson', RESON); }  // 進入乘法谷 → 解鎖同數共鳴
+    setupCanvas(stg().size);
+    player = { hp: 100, maxHp: 100 };
+    stageStat = { chains: 0, lenSum: 0, maxChain: 0, minusChains: 0, maxCombo: 0, t0: Date.now() };
+    skillCd = {}; EQUIP.forEach(id => skillCd[SP(id).skill] = 0);
+    targeting = null; canvas.classList.remove('targeting');
+    luckyNext = false; shieldUp = false; combo = 0; hideCombo(); resolving = false; resolveSkip = null; hideDmgPop(); path = []; dragging = false;
+    hintCells = null; hintT = 0; hintCd = 0;
+    freshTiles(genBoardValues(stg().minusRate, stg().maxDigit, stg().size, stg().mulRate || 0, stg().divRate || 0), true);
+    const capD = captainDef();
+    log('stage_start', { stage: stg().key, equip: [...EQUIP], captain: captainAttr() });
+    hide('selectOverlay'); hide('resultOverlay'); hide('failOverlay'); hide('teamOverlay');
+    spawnEnemy();
+    renderChainUi();
+    // 隊長技教學（第一次進關卡時介紹「出戰第一隻=隊長」的常駐效果）
+    if (capD) teach('captain_' + captainAttr(),
+      `${capD.ic} 隊長技：${capD.name}`,
+      `<span style="display:inline-block;width:72px;height:72px">${charSVG(EQUIP[0])}</span>`,
+      `出戰的<b>第一隻數靈是隊長</b>，牠的隊長技<b>整場常駐</b>：<br><b style="color:${capD.c}">${capD.desc}</b><br><span style="font-size:12px;opacity:.7">換不同隊長 = 換一種數學打法，試試看誰最適合你！</span>`);
+    if (stg().intro === 'minus') {
+      teach('minus', '🆕 減法珠登場！',
+        '<span style="color:#a07ce8;font-size:46px">−</span>',
+        '鏈穿過紫色 <b style="color:#c5a3ff">−</b> 珠後，<b>後面那一顆會變成減法</b>。<br>可以「先超過再減回來」：<b>8 + 7 − 3 = 12</b>！<br><span style="font-size:12px;opacity:.7">規則：不能用 − 開頭或結尾。</span>');
+    }
+    if (stg().intro === 'mul') {
+      teach('mul', '🆕 倍率珠 ×2 登場！',
+        '<span style="color:#e0951c;font-size:40px">×2</span>',
+        '鏈穿過金色 <b style="color:#ffd36b">×2</b> 珠後，<b>後面那一顆數字會變兩倍</b>！<br>例如 <b>4 + ×2 + 3 = 4 + 6 = 10</b>。<br><span style="font-size:12px;opacity:.7">規則：不能用 ×2 開頭或結尾，也不能緊接著另一顆運算珠。</span>');
+    }
+    if (stg().intro === 'div') {
+      teach('divbead', '🆕 除法珠 ÷ 登場！',
+        '<span style="color:#1f9fc4;font-size:40px">÷2</span>',
+        '鏈穿過藍色 <b style="color:#6fe3ff">÷</b> 珠時，<b>把「目前累積的總和」除下去</b>！<br>例如 <b>8 + 4 → ÷2 = 6</b>。<br><span style="font-size:12px;opacity:.7">只有<b>除得盡</b>才連得上（11 不能 ÷3）。先堆出一個大數，再除到目標！</span>');
+    }
+  }
+
+  function avgChain() { return stageStat.chains ? stageStat.lenSum / stageStat.chains : 0; }
+
+  function stageClear() {
+    const dur = Date.now() - stageStat.t0;
+    const avg = avgChain();
+    const th = isJr() ? { avg: 2.5, max: 4 } : { avg: 3, max: 5 };
+    let stars = 1;
+    if (avg >= th.avg) stars = 2;
+    if (avg >= th.avg && stageStat.maxChain >= th.max) stars = 3;
+    const key = stg().key;
+    const prevStars = STARS[key] || 0;
+    STARS[key] = Math.max(prevStars, stars);
+    save('nh5_stars', STARS);
+    log('stage_clear', { stage: key, stars, prev_stars: prevStars, dur_ms: dur,
+      avg_chain: +avg.toFixed(2), max_chain: stageStat.maxChain, max_combo: stageStat.maxCombo || 0,
+      chains: stageStat.chains, minus_chains: stageStat.minusChains });
+
+    $('resultStars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
+    $('resultStats').innerHTML =
+      `平均鏈長 <b style="color:#ffd84d">${avg.toFixed(2)}</b>　最長鏈 <b>${stageStat.maxChain}</b>` +
+      (stageStat.minusChains ? `　減法 <b style="color:#c5a3ff">${stageStat.minusChains}</b> 次` : '') + '<br>' +
+      (stars < 2 ? '<span style="color:#9ecbff">提示：用更多顆小數字湊出目標，傷害更高、星星更多！</span>'
+       : stars < 3 ? `<span style="color:#d8b4ff">差一步！打出一次 ${th.max} 鏈就能拿 3 星 💥</span>`
+       : '<span style="color:#5dff9d">完美拆解！你是數字獵人大師 👑</span>');
+    // 星星 → 抽蛋機會（券），累積到 DRAWS，去「孵化所」抽
+    const earned = drawsEarned(prevStars, stars);
+    DRAWS += earned; save('nh5_draws', DRAWS);
+    log('draws_earned', { stage: key, earned, total: DRAWS, stars, prev_stars: prevStars });
+    $('drawReward').innerHTML = earned > 0
+      ? `⭐×${stars} → 🥚 獲得 <b style="color:#ffd84d">${earned}</b> 次抽蛋機會！（共 ${DRAWS} 次）`
+        + (stars < 3 ? `<br><span style="font-size:12px;opacity:.75">拿到 3★（平均鏈長≥${th.avg} 且打出一次 ${th.max} 鏈）= 一次拿 3 券！</span>` : '')
+      : `<span style="opacity:.7">這關的 ${prevStars}★ 已經領過抽蛋券了 🥚<br><span style="font-size:12px">打出比 ${prevStars}★ 更高的星，才會有新券！</span></span>`;
+    $('gachaGoBtn').textContent = `🥚 前往孵化所抽蛋（${DRAWS}）`;
+    $('gachaGoBtn').classList.toggle('hidden', DRAWS <= 0);
+    $('nextBtn').textContent = stageIdx + 1 < STAGES.length ? '下一關' : '回地圖';
+    show('nextBtn'); show('replayBtn');
+    say('過關！太厲害了！');
+    show('resultOverlay');
+  }
+
+  function stageFail() {
+    updateDDA(false);
+    log('stage_fail', { stage: stg().key, foe: foeIdx + 1, dur_ms: Date.now() - stageStat.t0 });
+    $('failStats').innerHTML =
+      `打到第 ${foeIdx + 1} 隻怪物<br>平均鏈長 ${avgChain().toFixed(2)}<br>` +
+      `<span style="font-size:12px;opacity:.7">小訣竅：夥伴技能冷卻好就用掉，別捨不得！</span>`;
+    show('failOverlay');
+  }
+
+  // ---------- 地圖 ----------
+  function applyMode(m) {
+    MODE = m;
+    save('nh5_mode', m);
+    STAGES = m === 'jr' ? STAGES_JR : STAGES_STD;
+    document.body.classList.toggle('jr', m === 'jr');
+  }
+
+  let mapOpenZone = null;   // 地圖手風琴：目前展開的區域（null=未初始化、-1=全收起）
+  function renderMap() {
+    $('mapTitle').textContent = isJr() ? '🐣 小小世界' : '🗺️ 數界地圖';
+    const th = isJr() ? { avg: 2.5, max: 4 } : { avg: 3, max: 5 };
+    $('starHint').innerHTML = `⭐ 過關　⭐⭐ 平均鏈長 ≥ ${th.avg}　⭐⭐⭐ 再打出一次 ${th.max} 鏈<br><span style="color:#ffd84d">每拿到一顆「新星星」就抽一次蛋 🥚 (3★ 共 3 顆;進步到更高星會補發)</span>`;
+    $('modeBtn').textContent = isJr() ? '🔁 切換到 數字獵人' : '🔁 切換到 小小獵人';
+    $('unlockBtn').textContent = UNLOCKALL ? '🔓 全解鎖:開' : '🔒 全解鎖:關';
+    $('gachaBtn').textContent = DRAWS > 0 ? `🥚 孵化所 (${DRAWS})` : '🥚 孵化所';
+    const ZONES = isJr() ? ZONES_JR : ZONES_STD;
+    if (mapOpenZone !== null && mapOpenZone >= ZONES.length) mapOpenZone = null;
+    const unlockedAt = i => UNLOCKALL || i === 0 || (STARS[STAGES[i - 1].key] || 0) >= 1;
+    // 預設展開「目前該玩的區域」（第一個已解鎖但還沒滿星的關卡所在區）
+    if (mapOpenZone === null) {
+      let cz = 0;
+      for (let i = 0; i < STAGES.length; i++) {
+        if (unlockedAt(i) && (STARS[STAGES[i].key] || 0) < 3) { cz = STAGES[i].zone; break; }
+      }
+      mapOpenZone = cz;
+    }
+    const box = $('mapZones');
+    box.innerHTML = '';
+    ZONES.forEach((z, zi) => {
+      const zoneStages = STAGES.map((st, i) => ({ st, i })).filter(o => o.st.zone === zi);
+      if (!zoneStages.length) return;
+      const earned = zoneStages.reduce((a, o) => a + (STARS[o.st.key] || 0), 0);
+      const maxStars = zoneStages.length * 3;
+      const open = mapOpenZone === zi;
+      const div = document.createElement('div');
+      div.className = `zone ${z.cls}`;
+      const head = document.createElement('button');
+      head.className = 'zoneHead';
+      head.innerHTML = `<span>${open ? '▾' : '▸'} ${z.n}</span><span class="zStars">⭐ ${earned}/${maxStars}</span>`;
+      head.addEventListener('click', () => { mapOpenZone = open ? -1 : zi; renderMap(); });
+      div.appendChild(head);
+      if (open) {
+        const row = document.createElement('div');
+        row.className = 'stageRow';
+        zoneStages.forEach(({ st, i }) => {
+          const unlocked = unlockedAt(i);
+          const s = STARS[st.key] || 0;
+          const btn = document.createElement('button');
+          btn.className = 'stageBtn' + (unlocked ? '' : ' locked');
+          btn.innerHTML = `${st.name}<span class="stars">${'⭐'.repeat(s)}${'☆'.repeat(3 - s)}</span>`;
+          if (unlocked) btn.addEventListener('click', () => { audioInit(); pickCaptainThenStart(i); });
+          row.appendChild(btn);
+        });
+        div.appendChild(row);
+      }
+      box.appendChild(div);
+    });
+    show('selectOverlay');
+  }
+
+  function renderTeam() {
+    const grid = $('teamGrid');
+    grid.innerHTML = '';
+    const capD = captainDef();
+    $('teamCaptain').innerHTML = capD
+      ? `👑 隊長 <b>${SP(EQUIP[0]).name}</b>：<span style="color:${capD.c}">${capD.ic} ${capD.name} — ${capD.desc}</span>`
+      : '';
+    const owned = SPECIES.filter(sp => COLL[sp.id]);
+    const locked = SPECIES.filter(sp => !COLL[sp.id]);
+
+    // ── 已收服：2 欄大卡片，含一般技 + 隊長技 ──
+    const og = document.createElement('div');
+    og.className = 'spiritGrid';
+    owned.forEach(sp => {
+      const idx = EQUIP.indexOf(sp.id), equipped = idx >= 0, isCap = idx === 0;
+      const cd = CAPTAIN_DEFS[sp.attr], sk = SKILL_DEFS[sp.skill];
+      const card = document.createElement('div');
+      card.className = 'sCard' + (equipped ? ' equipped' : '');
+      card.innerHTML = `
+        ${isCap ? '<span class="tag cap">👑 隊長</span>' : equipped ? '<span class="tag on">出戰</span>' : ''}
+        <div class="art">${charSVG(sp.id, isCap)}</div>
+        <div class="nm">${sp.name} <span style="font-weight:400;opacity:.65;font-size:11px">Lv${COLL[sp.id]}</span></div>
+        <div class="sk">${sk.ic} <b>${sk.name}</b><br><span style="opacity:.7;font-size:10px">${sk.tip}</span></div>
+        <div class="sk" style="color:${cd.c}">${cd.ic} <b>${cd.name}</b><br><span style="opacity:.85;font-size:10px">${cd.desc}</span></div>`;
+      card.addEventListener('click', () => {
+        if (!equipped) {
+          if (EQUIP.length >= 2) { toast('最多帶 2 隻，先卸下一隻吧'); return; }
+          EQUIP.push(sp.id);
+        } else if (!isCap) {
+          EQUIP = [sp.id, ...EQUIP.filter(x => x !== sp.id)];
+          toast(`👑 ${sp.name} 成為隊長！`);
+        } else {
+          if (EQUIP.length <= 1) { toast('至少要帶一隻夥伴！'); return; }
+          EQUIP = EQUIP.filter(x => x !== sp.id);
+        }
+        save('nh5_equip', EQUIP);
+        log('equip', { team: [...EQUIP], captain: captainAttr() });
+        renderTeam();
+      });
+      og.appendChild(card);
+    });
+    grid.appendChild(og);
+
+    // ── 還沒收服：剪影 + 去孵化所 CTA ──
+    if (locked.length) {
+      const sec = document.createElement('div');
+      sec.className = 'lockSec';
+      sec.innerHTML = `<div class="lockHead">✨ 還有 ${locked.length} 隻數靈沒收服——去孵化所抽抽看！</div>`;
+      const row = document.createElement('div');
+      row.className = 'lockRow';
+      locked.forEach(sp => {
+        const chip = document.createElement('div');
+        chip.className = 'lockChip';
+        chip.innerHTML = `<div class="art sil">${charSVG(sp.id)}</div><div class="qn">？</div><span class="dot" style="background:${ATTRS[sp.attr].c}"></span>`;
+        row.appendChild(chip);
+      });
+      sec.appendChild(row);
+      const go = document.createElement('button');
+      go.className = 'btn'; go.style.cssText = 'margin-top:12px;background:linear-gradient(135deg,#ffcf4d,#ff9d2e)';
+      go.textContent = `🥚 去孵化所${DRAWS > 0 ? `（${DRAWS} 次）` : ''}`;
+      go.addEventListener('click', () => { hide('teamOverlay'); openGacha(); });
+      sec.appendChild(go);
+      grid.appendChild(sec);
+    }
+    show('teamOverlay');
+  }
+
+  // ---------- 匯出 ----------
+  function exportData() {
+    const payload = {
+      version: 'v10', exported_at: new Date().toISOString(),
+      ua: navigator.userAgent, mode: MODE, stars: STARS, collection: COLL, equip: EQUIP,
+      survey: SURVEY, dda: DDA, draws: DRAWS, event_count: EV.length, events: EV,
+    };
+    const json = JSON.stringify(payload, null, 1);
+    try {
+      const blob = new Blob([json], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `playtest-v10-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a); a.click(); a.remove();
+    } catch (e) {}
+    try { navigator.clipboard.writeText(json); } catch (e) {}
+    toast(`已匯出 ${EV.length} 筆事件（檔案＋剪貼簿）`);
+  }
+
+  // ---------- 綁定 ----------
+  $('exitBtn').addEventListener('click', () => {
+    if (towerMode) {
+      if (!confirm('要從無限塔撤退嗎？\n已拿到的抽蛋券會保留，並依最高攻擊力加碼送券。')) return;
+      targeting = null; canvas.classList.remove('targeting'); path = []; dragging = false;
+      towerEnd(false);
+      return;
+    }
+    if (!stageStat) { renderMap(); return; }
+    if (!confirm('要離開這一關回地圖嗎？（這關的進度不會保留）')) return;
+    log('stage_abort', { stage: stg().key, foe: foeIdx + 1, dur_ms: Date.now() - stageStat.t0 });
+    targeting = null; canvas.classList.remove('targeting');
+    path = []; dragging = false;
+    hide('resultOverlay'); hide('failOverlay'); hide('teamOverlay'); hide('splitOverlay');
+    renderMap();
+  });
+  $('startJrBtn').addEventListener('click', () => { audioInit(); applyMode('jr'); hide('startOverlay'); renderMap(); say('歡迎來到小小世界！'); });
+  $('startStdBtn').addEventListener('click', () => { audioInit(); applyMode('std'); hide('startOverlay'); renderMap(); });
+  $('modeBtn').addEventListener('click', () => { applyMode(isJr() ? 'std' : 'jr'); hide('settingsOverlay'); renderMap(); });
+  $('voiceBtn').addEventListener('click', () => { voiceOn = !voiceOn; save('nh5_voice', voiceOn); renderHud(); });
+  $('nextBtn').addEventListener('click', () => {
+    hide('resultOverlay');
+    if (stageIdx + 1 < STAGES.length) startStage(stageIdx + 1);
+    else renderMap();
+  });
+  $('replayBtn').addEventListener('click', () => { hide('resultOverlay'); startStage(stageIdx); });
+  $('gachaGoBtn').addEventListener('click', openGacha);
+  $('gachaBtn').addEventListener('click', openGacha);
+  $('gachaDrawBtn').addEventListener('click', drawOne);
+  $('gachaBack').addEventListener('click', () => { hide('gachaOverlay'); renderMap(); });
+  $('retryBtn').addEventListener('click', () => { hide('failOverlay'); startStage(stageIdx); });
+  $('backBtn').addEventListener('click', () => { hide('failOverlay'); renderMap(); });
+  $('teachOk').addEventListener('click', closeTeach);
+  $('teachReplay').addEventListener('click', () => { if (teachQueue.length) speakTeach(teachQueue[0]); });
+  $('captainPickCancel').addEventListener('click', () => { hide('captainPickOverlay'); renderMap(); });
+  $('unlockBtn').addEventListener('click', () => {
+    UNLOCKALL = !UNLOCKALL; save('nh5_unlockall', UNLOCKALL);
+    $('unlockBtn').textContent = UNLOCKALL ? '🔓 全解鎖：開' : '🔒 全解鎖：關';
+    toast(UNLOCKALL ? '🔓 已解鎖所有關卡' : '🔒 恢復循序解鎖');
+  });
+  $('teamBtn').addEventListener('click', () => { hide('selectOverlay'); renderTeam(); });
+  $('teamBack').addEventListener('click', () => { hide('teamOverlay'); renderMap(); });
+  $('towerBtn').addEventListener('click', startTower);
+  $('towerAgainBtn').addEventListener('click', startTower);
+  $('towerGachaBtn').addEventListener('click', () => { hide('towerResultOverlay'); openGacha(); });
+  $('towerBackBtn').addEventListener('click', () => { hide('towerResultOverlay'); renderMap(); });
+  $('settingsBtn').addEventListener('click', () => {
+    $('modeBtn').textContent = isJr() ? '🔁 切換到 數字獵人' : '🔁 切換到 小小獵人';
+    $('unlockBtn').textContent = UNLOCKALL ? '🔓 全解鎖：開' : '🔒 全解鎖：關';
+    hide('selectOverlay'); show('settingsOverlay');
+  });
+  $('settingsBack').addEventListener('click', () => { hide('settingsOverlay'); renderMap(); });
+  $('exportBtn').addEventListener('click', exportData);
+  $('clearBtn').addEventListener('click', () => {
+    if (!confirm('清除所有測試數據、星星與收集進度？')) return;
+    EV = []; STARS = {}; COLL = { kiki: 1, prima: 1 }; EQUIP = ['kiki', 'prima']; DDA = { std: 0, jr: 0 }; TAUGHT = {}; DRAWS = 0;
+    RESON = false;
+    ['nh5_events','nh5_stars','nh5_coll','nh5_equip','nh5_dda','nh5_taught','nh5_draws','nh5_reson'].forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
+    // 注意：nh5_unlockall(測試開關)刻意保留，不隨清除重置
+    hide('settingsOverlay'); renderMap(); toast('已清除');
+  });
+  $('splitCancel').addEventListener('click', () => {
+    hide('splitOverlay'); splitCell = null; targeting = null;
+    canvas.classList.remove('targeting'); renderSkills();
+  });
+
+  document.body.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+  let resizeT;
+  window.addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(() => setupCanvas(SIZE), 120); });
+
+  // ---------- 開場問卷 ----------
+  function buildSurvey() {
+    const ageBox = $('svAge'); ageBox.innerHTML = '';
+    ['5','6','7','8','9','10','11','12','13+'].forEach(a => {
+      const b = document.createElement('button'); b.className = 'svOpt'; b.dataset.v = a; b.textContent = a;
+      ageBox.appendChild(b);
+    });
+    document.querySelectorAll('#surveyOverlay .svOpts').forEach(group => {
+      group.onclick = e => {
+        const b = e.target.closest('.svOpt'); if (!b) return;
+        [...group.children].forEach(c => c.classList.remove('sel'));
+        b.classList.add('sel');
+      };
+    });
+  }
+  function readSurvey() {
+    const pick = id => { const s = $(id).querySelector('.sel'); return s ? s.dataset.v : null; };
+    return { age: pick('svAge'), gender: pick('svGender'), math: pick('svMath'),
+             nick: ($('svNick').value || '').trim(), ts: Date.now() };
+  }
+  // 依年齡決定模式：5~6 歲 → 小小獵人；7 歲以上 → 數字獵人
+  const modeByAge = age => (age === '5' || age === '6') ? 'jr' : 'std';
+  function enterByAge(age) {
+    applyMode(modeByAge(age));
+    hide('surveyOverlay'); hide('startOverlay');
+    renderMap();
+    say(isJr() ? '歡迎來到小小世界！' : '出發吧，數字獵人！');
+  }
+  $('surveyGo').addEventListener('click', () => {
+    const s = readSurvey();
+    if (!s.age) { toast('請先選小朋友的年齡（必填）🙂'); return; }
+    SURVEY = s; save('nh5_survey', SURVEY);
+    log('survey', SURVEY);
+    audioInit();
+    enterByAge(s.age);
+  });
+  $('newTesterBtn').addEventListener('click', () => {
+    if (!confirm('換一位小朋友？\n會清除「目前這位」的遊玩數據與進度並重填問卷。\n（記得先按「匯出數據」把上一位的 JSON 存下來！）')) return;
+    EV = []; STARS = {}; COLL = { kiki: 1, prima: 1 }; EQUIP = ['kiki', 'prima'];
+    DDA = { std: 0, jr: 0 }; TAUGHT = {}; DRAWS = 0; SURVEY = null; RESON = false;
+    ['nh5_events','nh5_stars','nh5_coll','nh5_equip','nh5_dda','nh5_taught','nh5_draws','nh5_survey','nh5_reson']
+      .forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
+    buildSurvey();
+    hide('settingsOverlay'); hide('startOverlay'); show('surveyOverlay');
+  });
+  buildSurvey();
+
+  log('session_start', { version: 'v10' });
+  // 已填問卷 → 依（記住的模式 or 年齡）直接進地圖；未填 → 先問卷
+  if (SURVEY) {
+    applyMode(MODE || modeByAge(SURVEY.age));
+    hide('surveyOverlay'); renderMap();
+  } else if (MODE) {
+    applyMode(MODE);
+  }
+  freshTiles(genBoardValues(0, 9, 6));
+  tick();
+})();
+</script>
+</body>
+</html>

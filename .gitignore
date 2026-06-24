@@ -1,0 +1,64 @@
+# deps / OS junk
+node_modules/
+.DS_Store
+**/.DS_Store
+*.log
+
+
+# scratch
+/tmp/
+report.html
+UNUSED_ASSETS.txt
+
+# All future experiments go here (kept local, never uploaded)
+_archive/
+
+# old prototype & demo pages (math-chain-v10.html is the frozen reference, kept)
+math-chain-prototype.html
+math-chain-playtest.html
+math-chain-v3.html
+math-chain-v4.html
+math-chain-v5.html
+math-chain-v6.html
+math-chain-v7.html
+math-chain-v8.html
+math-chain-v9.html
+character-rig-demo.html
+character-style-v2.html
+image-sprite-demo.html
+summon-ui-mockup.html
+summon-ui-mockup.png
+ui-corrected-flow-preview.html
+ui-mockups.html
+
+# character AI trials / seeds / backups / previews (official ch01/ch02/ch03/ch08 unaffected)
+assets/characters/backups/
+assets/characters/*_seed/
+assets/characters/*_expr_v1/
+assets/characters/*_ai_v*/
+assets/characters/*_backup_*/
+assets/characters/*preview*.png
+assets/characters/*_report.json
+
+# UI trial pipelines (keep icons/ and kit/)
+assets/ui/pipeline/placeholders/
+assets/ui/quest-batch/
+assets/ui/quest-final/
+
+# design mockup iterations (keep ui_final_final/ and top-level exports)
+assets/ui-final/flow-contact*/
+assets/ui-final/summon-mockups*/
+assets/ui-final/battle-mockups/
+assets/ui-final/battle-b/
+assets/ui-final/monster-batch/
+
+# design spec dumps (Figma API exports — 非執行期,保留本機不上傳)
+assets/ui/figma-spec/
+**/figma_*.json
+**/figma_*.csv
+**/latest_spec_nodes.json
+
+# Godot 引擎/範本下載快取(1.7G,放棄 Godot,絕不上傳)
+.godot-downloads/
+# UI mockup 測試迭代
+testing/

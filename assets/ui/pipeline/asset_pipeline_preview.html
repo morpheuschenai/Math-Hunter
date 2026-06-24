@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Asset Pipeline Preview</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #d8f7ff;
+      font-family: system-ui, sans-serif;
+    }
+    canvas {
+      width: min(100vw, 780px);
+      height: auto;
+      background:
+        linear-gradient(45deg, #fff 25%, transparent 25%),
+        linear-gradient(-45deg, #fff 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #fff 75%),
+        linear-gradient(-45deg, transparent 75%, #fff 75%);
+      background-color: #c9d1d9;
+      background-size: 32px 32px;
+      background-position: 0 0, 0 16px, 16px -16px, -16px 0;
+      border: 8px solid #111827;
+      border-radius: 18px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="preview" width="780" height="920"></canvas>
+  <script type="module">
+    import {
+      loadAssetManifest,
+      loadPipelineAssets,
+      drawNineSlice,
+      drawSprite,
+      drawSpriteFrame,
+      getAnimationFrame
+    } from './asset_pipeline.js';
+
+    const canvas = document.querySelector('#preview');
+    const ctx = canvas.getContext('2d');
+    const { manifest, manifestUrl } = await loadAssetManifest('./assets_manifest.json');
+    const images = await loadPipelineAssets(manifest, manifestUrl);
+
+    function label(text, x, y) {
+      ctx.font = '700 20px system-ui';
+      ctx.fillStyle = '#111827';
+      ctx.fillText(text, x, y);
+    }
+
+    function render(now) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      label('9-slice buttons and panel', 28, 42);
+      drawNineSlice(ctx, images['button.primary.normal'], manifest.assets['button.primary.normal'], 28, 58, 300, 88);
+      drawNineSlice(ctx, images['button.primary.pressed'], manifest.assets['button.primary.pressed'], 348, 58, 300, 88);
+      drawNineSlice(ctx, images['button.primary.disabled'], manifest.assets['button.primary.disabled'], 28, 166, 300, 88);
+      drawNineSlice(ctx, images['panel.cream'], manifest.assets['panel.cream'], 28, 284, 500, 168);
+
+      label('Number tiles', 28, 500);
+      drawSprite(ctx, images['tile.number.normal'], manifest.assets['tile.number.normal'], 28, 520, 86, 86);
+      drawSprite(ctx, images['tile.number.selected'], manifest.assets['tile.number.selected'], 128, 520, 86, 86);
+      drawSprite(ctx, images['tile.number.locked'], manifest.assets['tile.number.locked'], 228, 520, 86, 86);
+
+      label('Icons', 390, 500);
+      drawSprite(ctx, images['icon.coin'], manifest.assets['icon.coin'], 390, 520, 72, 72);
+      drawSprite(ctx, images['icon.star'], manifest.assets['icon.star'], 480, 520, 72, 72);
+      drawSprite(ctx, images['icon.chest'], manifest.assets['icon.chest'], 570, 520, 72, 72);
+
+      label('3x3 sprite sheets', 28, 660);
+      const enemyFrame = getAnimationFrame(manifest.assets['enemy.idle'], now);
+      const effectFrame = getAnimationFrame(manifest.assets['effect.skill'], now);
+      drawSpriteFrame(ctx, images['enemy.idle'], manifest.assets['enemy.idle'], enemyFrame, 28, 690, 180, 180);
+      drawSpriteFrame(ctx, images['effect.skill'], manifest.assets['effect.skill'], effectFrame, 248, 690, 180, 180);
+
+      requestAnimationFrame(render);
+    }
+
+    requestAnimationFrame(render);
+  </script>
+</body>
+</html>
+

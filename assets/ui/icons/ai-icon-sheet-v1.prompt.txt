@@ -1,0 +1,25 @@
+Generate a mobile game UI icon sheet. IMPORTANT: abstract UI icons only. Do NOT draw any characters, monsters, creatures, faces, mascots, dragons, animals, people, bodies, eyes, mouths, or expressions.
+
+Create exactly 16 separate game UI icons arranged in a clean 4 columns x 4 rows grid on a perfectly flat solid #ff00ff chroma-key background. No labels, no text captions, no watermark. Each icon must be centered in its own cell with generous padding and no overlap.
+
+Style reference: Cute Chunky Math Quest mobile UI mockup. Thick black outlines, rounded square toy-token shapes, hand-painted 2D bitmap, chunky casual mobile RPG asset quality, saturated colors, cream highlights, black rubber casing, bottom shadow, readable at 64px. Avoid realistic 3D, glass, web app style, thin vector style, neon gradients, AI blobs.
+
+Icons in order left to right, top to bottom:
+1 plus-one math tile icon with +1 symbol,
+2 minus-one math tile icon with -1 symbol,
+3 reroll dice/random icon,
+4 vertical swap arrows icon,
+5 divide/split math icon,
+6 purify magic star icon,
+7 lucky 7 icon,
+8 shield protection icon,
+9 hint question mark icon,
+10 spotted egg reward icon,
+11 chunky gold star reward icon,
+12 gold coin reward icon,
+13 purple gem reward icon,
+14 treasure chest reward icon,
+15 back arrow navigation icon,
+16 friends/collection icon represented by two simple toy silhouette badges, not faces.
+
+Background must be one uniform #ff00ff color. Do not use #ff00ff inside icons. No cast shadows outside icon silhouettes.

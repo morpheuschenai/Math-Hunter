@@ -1,0 +1,102 @@
+{
+  "version": "phase2-ai-v1",
+  "source": "assets/ui/icons/ai-icon-sheet-v1.png",
+  "icons": [
+    {
+      "id": "skill-plus1",
+      "file": "assets/ui/icons/skill-plus1.png",
+      "source": "ai-icon-sheet-v1",
+      "size": "96x96"
+    },
+    {
+      "id": "skill-minus1",
+      "file": "assets/ui/icons/skill-minus1.png",
+      "source": "ai-icon-sheet-v1",
+      "size": "96x96"
+    },
+    {
+      "id": "skill-reroll",
+      "file": "assets/ui/icons/skill-reroll.png",
+      "source": "ai-icon-sheet-v1",
+      "size": "96x96"
+    },
+    {
+      "id": "skill-swapUp",
+      "file": "assets/ui/icons/skill-swapUp.png",
+      "source": "ai-icon-sheet-v1",
+      "size": "96x96"
+    },
+    {
+      "id": "skill-split",
+      "file": "assets/ui/icons/skill-split.png",
+      "source": "ai-icon-sheet-v1",
+      "size": "96x96"
+    },
+    {
+      "id": "skill-purify",
+      "file": "assets/ui/icons/skill-purify.png",
+      "source": "ai-icon-sheet-v1",
+      "size": "96x96"
+    },
+    {
+      "id": "skill-lucky",
+      "file": "assets/ui/icons/skill-lucky.png",
+      "source": "ai-icon-sheet-v1",
+      "size": "96x96"
+    },
+    {
+      "id": "skill-shield",
+      "file": "assets/ui/icons/skill-shield.png",
+      "source": "ai-icon-sheet-v1",
+      "size": "96x96"
+    },
+    {
+      "id": "skill-hint",
+      "file": "assets/ui/icons/skill-hint.png",
+      "source": "ai-icon-sheet-v1",
+      "size": "96x96"
+    },
+    {
+      "id": "reward-egg",
+      "file": "assets/ui/icons/reward-egg.png",
+      "source": "ai-icon-sheet-v1",
+      "size": "96x96"
+    },
+    {
+      "id": "reward-star",
+      "file": "assets/ui/icons/reward-star.png",
+      "source": "ai-icon-sheet-v1",
+      "size": "96x96"
+    },
+    {
+      "id": "reward-coin",
+      "file": "assets/ui/icons/reward-coin.png",
+      "source": "ai-icon-sheet-v1",
+      "size": "96x96"
+    },
+    {
+      "id": "reward-gem",
+      "file": "assets/ui/icons/reward-gem.png",
+      "source": "ai-icon-sheet-v1",
+      "size": "96x96"
+    },
+    {
+      "id": "reward-chest",
+      "file": "assets/ui/icons/reward-chest.png",
+      "source": "ai-icon-sheet-v1",
+      "size": "96x96"
+    },
+    {
+      "id": "nav-back",
+      "file": "assets/ui/icons/nav-back.png",
+      "source": "ai-icon-sheet-v1",
+      "size": "96x96"
+    },
+    {
+      "id": "nav-collection",
+      "file": "assets/ui/icons/nav-collection.png",
+      "source": "ai-icon-sheet-v1",
+      "size": "96x96"
+    }
+  ]
+}

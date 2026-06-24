@@ -1,0 +1,1282 @@
+# 交接狀態 HANDOFF.md
+
+> 雙 agent 協作的動態狀態檔。**Claude 處理核心玩法/架構;Codex 處理視覺/UI/UX。**
+> 每次重要改動,改動方在此更新本區塊。設計「真相來源」見 `遊戲設計總表.md`;邊界見 `VIEW_CONTRACT.md`。
+
+## 專案目標
+數字獵人(Math Hunter):PAD 風格數學教育手遊,單一 self-contained HTML,部署 GitHub Pages。
+目標族群 6–12 歲,手機瀏覽器可玩,收集 playtest 數據賣給家長。
+
+## 目前架構(2025 拆檔後)
+- **canonical 原始碼在 `src/`**:`game.css`(Codex)、`game.logic.js`/`game.art.js`/`game.main.js`(Claude)、`index.html`(共同骨架)。
+- `node build.cjs` → 把 src/ inline 成根目錄 `index.html`(部署單檔,**勿手改**)。
+- `node qa.cjs` → 對 index.html 跑自動化遊玩回歸。
+- `math-chain-v10.html`:**拆檔前的凍結快照,請勿再編輯**(只留作對照)。
+
+## 目前階段
+development / polish。最近完成:combo 與傷害結算手感優化、視覺解耦、拆檔重構。視覺方向已收斂為 **Cute Chunky Math Quest**：整體與戰鬥採 Cute Monster Toy Math，角色質感與關卡選擇採 Chunky Dungeon。第一版 CSS theme 已落地到 `src/game.css`。
+
+---
+
+## 【交接狀態】(每次重要回覆更新)
+- 版本 / 階段:v10,**決定:放棄 Godot,主線留在 HTML/web(圖片式 UI)**(Claude + 使用者)
+- 決策理由:HTML 秒開/可貼連結收 playtest、web 訂閱抽成低、AI(Claude/Codex)文字工作流高效;質感問題已用「AI 生圖→切圖→九宮格(ui-kit)」在 HTML 解決,不需換引擎。Godot 只是實驗切片,核心玩法/關卡/遙測/家長報告全在 HTML,無重做損失。
+- 本次修改(Claude):`math-puzzle-godot/` 已移到 `_archive/`(使用者),確認**對網頁遊戲/build/qa/部署零影響**;清掉 deploy.yml 的 godot 移除步驟與 .gitignore 的 godot 規則(已無意義)。build ✅、check_ui ✅
+- 注意:`math-puzzle-godot` 在 `_archive/`(gitignore,不上傳);要徹底放棄可直接刪該資料夾(約 80MB)。「回到 css」實指**留在 HTML、UI 用圖片素材**(非 CSS 畫;CSS 畫 chrome 仍被 check_ui 擋)
+- 版本 / 階段:v10,上 GitHub 前大整理:素材路徑/未使用/文件封存(Claude)
+- 本次修改(Claude):
+  - **UI 素材搬遷重新接線**:使用者把 `ui_final_final/` 整理進 `assets/ui/{game,monster,quest,figma-spec}`;`icons/kit/pipeline` 一度被誤搬已還原;`game.css`+三 js 路徑全部改寫(不再有 ui-final),`make_kit.py` 重生 ui-kit。執行期素材根目錄 = `assets/ui/{game,monster,quest,icons,kit,pipeline}`
+  - **gitignore 擴充**:`assets/ui/figma-spec/`、`figma_*.json/csv`、`latest_spec_nodes.json`、`UNUSED_ASSETS.txt` 都不上傳(設計 spec/產生物保留本機)
+  - **未使用素材**:`scripts/find_unused_assets.py`(已強化:工具/非圖片永不誤判)+ `scripts/tidy_assets.sh`(偵測→搬 _archive→驗證沒破圖)。目前未使用=0,破圖=0
+  - **文件封存**:24 份過時/工作 md 移到 `_archive/`,只留 11 份必要:HANDOFF、VIEW_CONTRACT、UI_ASSET_GUIDE、RELEASE_PROCESS、AGENTS、遊戲設計總表、CODEX_開場指令、CODEX_任務_主按鈕素材、FIGMA_GAME_SPEC_REVIEW、CODE_REVIEW_DEBUG、CURRENT_UI_TARGET
+- 給 Codex 的提醒:
+  - 各頁 layout/asset spec(`*_FINAL_LAYOUT_SPEC`、`*_ASSET_BATCH_MANIFEST`、`VISUAL_DIRECTION`、`UI主流程架構圖` 等)已移到 `_archive/`;若要續做某頁 UI,從 `_archive/` 搬回該頁 spec 再做
+  - **勿把 `assets/ui/{icons,kit,pipeline}` 或 `make_kit.py`/`ui_manifest.json` 搬進 _archive**(工具/執行期,會破圖/壞 build);搬完素材一律跑 `bash scripts/tidy_assets.sh` 確認「破圖:無」
+- 契約變動:UI 素材根路徑改 `assets/ui/...`;gitignore 新增 spec/產生物規則
+- 測試:build ✅、check_ui ✅、破圖無、未使用 0
+- 版本 / 階段:v10,Summon slicing testing assets v1b(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `testing/summon-slicing-v1/README.md`:記錄 Summon 切圖測試流程與 v1b 分層修正
+  - 新增 `testing/summon-slicing-v1/summon_ready_hatched_mockup_v1.png`:Summon 抽蛋前/抽蛋後雙狀態 mockup
+  - 新增 `testing/summon-slicing-v1/summon_assets_contact_chroma_v1.png`
+  - 新增 `testing/summon-slicing-v1/summon_assets_contact_transparent_v1.png`
+  - 新增 `testing/summon-slicing-v1/summon_assets_contact_transparent_no_despill_v1.png`
+  - 新增 `testing/summon-slicing-v1/summon_assets_contact_separated_chroma_v1b.png`
+  - 新增 `testing/summon-slicing-v1/summon_assets_contact_separated_transparent_v1b.png`
+- 契約變動:**無**。本次只產 testing mockup / asset sheet,未修改正式遊戲 DOM / CSS / JS / assets
+- Codex 可改範圍:本次未修改 `src/` 或 `assets/`
+- 測試結果:
+  - testing 圖保存 ✅ v1b sheet `1606 x 979`;透明版 RGBA
+  - `node build.cjs` ✅ built root `index.html`
+  - `node qa.cjs` ✅ 全部通過:10 通過 / 0 失敗;全程零 JS 執行期錯誤
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - v1b 仍是 AI testing sheet,不是正式切圖 asset;使用者會在 Figma 自行切圖並回傳最終素材與 spec
+  - 透明 sheet 保留標籤方便辨識;Figma 切圖時只切標籤上方素材
+- 下一個最安全任務:
+  - 使用者確認 Summon v1b 素材分層後,再進下一頁或等待使用者提供 Figma 最終切圖/spec
+
+- 版本 / 階段:v10,UI 素材搬遷後重新接線(Claude)
+- 本次修改檔案(Claude):
+  - 使用者把 `assets/ui-final/ui_final_final/` 整理進 `assets/ui/`(新結構:`ui/game`、`ui/monster`、`ui/quest`、`ui/figma-spec`);過程中 `icons/`、`kit/`、`pipeline/` 被擠進 `_archive`,已還原
+  - 改寫 `src/game.css` + `game.main.js/art.js/logic.js` 路徑:`ui-final/ui_final_final/game/→ui/game/`、`/monster/→ui/monster/`、其餘頂層→`ui/quest/`;`make_kit.py` 重生 ui-kit
+  - 強化 `scripts/find_unused_assets.py`:工具資料夾(kit/pipeline/icons)與非圖片檔永不列為可刪,避免再次誤搬
+- 契約變動:UI 素材根路徑改為 `assets/ui/{game,monster,quest,icons,kit,pipeline}`(不再有 ui-final)
+- 測試:build ✅、check_ui ✅、qa 清關零錯誤、偵測器「破圖:無」、未使用僅 2 檔
+- 玩法邏輯變更:無
+- ⚠️ 提醒:`assets/ui/{icons,kit,pipeline}` 是工具/執行期素材,**勿搬到 _archive**(會破圖/壞 build)
+- 版本 / 階段:v10,Remaining pages high-fidelity testing mockup v6(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `testing/ui-mockups-v6/README.md`:記錄 v6 測試圖、使用者修正點與「testing 先行」規則
+  - 新增 `testing/ui-mockups-v6/remaining_pages_contact_v6_ai.png`:Summon / Instruction / Events / Monster Detail / Fail 高保真 contact sheet 測試稿
+  - 新增 `testing/ui-mockups-v6/summon_mockup_v6_ai.png`
+  - 新增 `testing/ui-mockups-v6/instruction_mockup_v6_ai.png`
+  - 新增 `testing/ui-mockups-v6/events_mockup_v6_ai.png`
+  - 新增 `testing/ui-mockups-v6/monster_detail_mockup_v6_ai.png`
+  - 新增 `testing/ui-mockups-v6/fail_mockup_v6_ai.png`
+- 契約變動:**無**。本次只產 testing mockup 圖,未修改正式遊戲 DOM / CSS / JS / assets
+- Codex 可改範圍:本次未修改 `src/` 或 `assets/`
+- 測試結果:
+  - testing 圖保存 ✅ contact sheet `1807 x 870`;單頁裁切皆 `440 x 956`
+  - `node build.cjs` ✅ built root `index.html`
+  - `node qa.cjs` 第一次 ⚠️ 除法整除盾自動玩家未清關但無 JS/draw error;第二次 ✅ 全部通過:10 通過 / 0 失敗
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - v6 是高保真測試稿,不是正式切圖 asset;文字仍需 DOM/localization
+  - Events 的 `EGGS EARNED x12` 採「最高通關層/已取得蛋數同步」語意,需使用者確認是否符合週獎勵規則
+- 下一個最安全任務:
+  - 使用者確認 v6 方向;確認後再把通過的單頁移入正式 `assets/` 或進 Figma `SPEC_` frame
+
+- 版本 / 階段:v10,Remaining pages high-fidelity testing mockup v5(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `testing/ui-mockups-v5/README.md`:記錄 testing 生成規則與 v5 審查備註
+  - 新增 `testing/ui-mockups-v5/remaining_pages_contact_v5_ai.png`:Battle / Instruction / Events / Monster Detail / Fail 高保真 contact sheet 測試稿
+  - 新增 `testing/ui-mockups-v5/battle_mockup_v5_ai.png`
+  - 新增 `testing/ui-mockups-v5/instruction_mockup_v5_ai.png`
+  - 新增 `testing/ui-mockups-v5/events_mockup_v5_ai.png`
+  - 新增 `testing/ui-mockups-v5/monster_detail_mockup_v5_ai.png`
+  - 新增 `testing/ui-mockups-v5/fail_mockup_v5_ai.png`
+  - 更新 `CURRENT_UI_TARGET.md`:新增「測試/調教生成圖片先放 `testing/`,確認後才移到 `assets/`」規則
+- 契約變動:**無**。本次只產 testing mockup 圖,未修改正式遊戲 DOM / CSS / JS
+- Codex 可改範圍:本次未修改 `src/` 或 `assets/`
+- 測試結果:
+  - testing 圖保存 ✅ contact sheet `1672 x 941`;單頁裁切皆 `440 x 956`
+  - `node build.cjs` ✅ built root `index.html`
+  - `node qa.cjs` ✅ 全部通過:10 通過 / 0 失敗;全程零 JS 執行期錯誤
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - v5 風格質感已接近 Quest / Summon / Monster,但 Battle 盤面被 AI 畫成偏 5x5,只能當高保真風格方向稿,不是 layout truth
+  - 文字為 mockup 可讀性用途,正式實作仍需 DOM/localization
+- 下一個最安全任務:
+  - 使用者確認 v5 風格質感;若接受,下一輪針對 Battle 精準 6x6 與各頁 Figma `SPEC_` frame 補齊正式版
+
+- 版本 / 階段:v10,Remaining UI mockup contact sheet v4(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `assets/ui-final/flow-contact-v4/quest_battle_monster_remaining_contact_v4.png`:Quest / Battle / Monster / Summon / Instruction / Events / Monster Detail / Fail 8 頁總覽 contact sheet
+  - 新增 `assets/ui-final/flow-contact-v4/1_quest_mockup_v4.png`
+  - 新增 `assets/ui-final/flow-contact-v4/2_battle_mockup_v4.png`
+  - 新增 `assets/ui-final/flow-contact-v4/3_monster_mockup_v4.png`
+  - 新增 `assets/ui-final/flow-contact-v4/4_summon_mockup_v4.png`
+  - 新增 `assets/ui-final/flow-contact-v4/5_instruction_mockup_v4.png`
+  - 新增 `assets/ui-final/flow-contact-v4/6_events_mockup_v4.png`
+  - 新增 `assets/ui-final/flow-contact-v4/7_monster_detail_mockup_v4.png`
+  - 新增 `assets/ui-final/flow-contact-v4/8_fail_mockup_v4.png`
+- 契約變動:**無**。本次只產 mockup 圖,未修改正式遊戲 DOM / CSS / JS
+- Codex 可改範圍:本次未修改 `src/`
+- 測試結果:
+  - mockup 尺寸檢查 ✅ 單頁皆 `440 x 956`;contact sheet `1920 x 2116`
+  - `node build.cjs` ✅ built root `index.html`
+  - `node qa.cjs` ✅ 全部通過:10 通過 / 0 失敗;全程零 JS 執行期錯誤
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - Events / Monster Detail / Fail 為 mockup 校準稿,細節尚未進 Figma `SPEC_` frame,不可直接當正式切圖 asset
+  - 本機目前先前 v1-v3 flow contact 圖已在 `_archive/`,v4 已重新輸出到正式 `assets/ui-final/flow-contact-v4/`
+- 下一個最安全任務:
+  - 使用者確認 v4 八頁整體方向;確認後針對 Events / Monster Detail / Fail 建立正式 Figma `SPEC_` frame 與 asset sheet 清單
+
+- 版本 / 階段:v10,Figma spec 檢查 + P0 字型基礎(Claude)
+- 本次修改檔案(Claude):
+  - 新增 `FIGMA_GAME_SPEC_REVIEW.md`:對照 Figma「game」frame(440×956,Baloo 2/800/大寫/行高1.6)與現況,列 11 項落差 + P0–P5 執行順序;exported 圖在 `assets/ui-final/ui_final_final/game/`
+  - P0 字型基礎:`src/index.html` head 改用 `<link>` preconnect 載入 Baloo 2 + Noto Sans TC(移除 game.css 的 `@import`);`game.css` `:root` 加 `--font-display`/`--font-cjk` + `--type-*`(16/18/36/28/22/12);`body` 基準字改 `var(--font-cjk)`(英數→Baloo 2、中文→Noto Sans TC);新增 HUD 文字工具類 `.hudLabel/.hudSkill/.hudStat/.hudCount/.hudCountSm/.hudHpNum/.hudLabel-cjk`
+- 決策:HUD 短標籤英數用 Baloo 2;中文用 Noto Sans TC(字級之後再微調)
+- 契約變動:新增字型 token 與 `.hud*` 工具類(Codex 套用即可)
+- 測試:`build.cjs` ✅、`check_ui.cjs` ✅、`qa.cjs` 加/減/乘清關零錯誤
+- 玩法邏輯變更:無(純字型/樣式基礎)
+- 下一步(給 Codex,P1):用 `battle_stat_{target,sum,chain}_normal.png` 把 `#targetRow` 重build 成三張 130×94 圖卡 + 36px 值(`.hudStat`),**保留 `#targetVal/#curSum/#chainInfo` id**
+
+- 版本 / 階段:v10,修掉 CODE_REVIEW_DEBUG 的 #1/#2/#3(Claude)
+- 本次修改檔案(Claude):
+  - `src/game.main.js`:新增 `pendingAction`(敵人延遲動作未完成時擋輸入)+ `battleEpoch`(離開/換關/死亡 +1,讓殘留 setTimeout 失效);`tick` 解鎖加 `!pendingAction`;`applyResult` 的換怪/結算/敵人攻擊/洗牌 setTimeout 全部加 epoch 守衛 + pendingAction 收尾;`startStage/startTower/exitBtn/towerEnd/stageFail` 邊界 `battleEpoch++`。修正「敵人回合輸入空窗」與「離開後殘留計時器鬼動作」
+  - `build.cjs`:url 改寫改用 regex,支援 `"`/`'`/無引號三種,避免部署版圖片 404
+  - `qa.cjs`:`__qa.play()` 改為 resolving/locked/pendingAction 任一為真就回 `busy`(不再強制解鎖),state 曝光 locked/pendingAction;當回歸測試守住 #1
+  - 產出 `CODE_REVIEW_DEBUG.md`(完整審視清單;#5/#6 待 Claude 排程,#4 為 Codex 護欄規則)
+- 契約變動:無(玩法行為等價,只修並行/計時 bug)
+- 測試:`build.cjs` ✅、syntax ✅、`check_ui.cjs` ✅、`qa.cjs` 加/減/乘清關零錯誤
+- 玩法邏輯變更:無功能變動(修 bug,結果等價且更穩)
+
+- 版本 / 階段:v10,current UI target reset note(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `CURRENT_UI_TARGET.md`:短版唯一 UI 目標紀錄,供新對話直接接續剩下頁面的 UI mockup
+- 契約變動:**無**
+- Codex 可改範圍:本次只新增文件,未修改正式遊戲
+- 測試結果:未執行,因未修改正式遊戲程式
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - 對話歷史與素材版本太多,後續必須先讀 `CURRENT_UI_TARGET.md`,避免回到舊 mockup 或低質感拼圖
+- 下一個最安全任務:
+  - 新對話先讀 `CURRENT_UI_TARGET.md`,再產 `Summon / Instruction / Events / Monster Detail / Fail` contact sheet
+
+---
+
+- 版本 / 階段:v10,Flow contact sheet v3 summon/instruction info correction(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `assets/ui-final/flow-contact-v3/quest_battle_summon_instruction_contact_v3.png`:修正 Summon 與 Instruction 資訊
+  - 新增 `assets/ui-final/flow-contact-v3/1_quest_mockup_v3.png`
+  - 新增 `assets/ui-final/flow-contact-v3/2_battle_mockup_v3.png`
+  - 新增 `assets/ui-final/flow-contact-v3/3_summon_mockup_v3.png`:移除過關結算資訊,改為 `SUMMON / EGG HATCH / HATCH CHANCE x3 / HATCH`
+  - 新增 `assets/ui-final/flow-contact-v3/4_instruction_mockup_v3.png`:優化對話框內部資訊,改成主規則 + 兩個短提示
+- 契約變動:**無**。本次只產 mockup 圖,未修改正式遊戲
+- Codex 可改範圍:本次未修改 `src/`
+- 測試結果:
+  - mockup 尺寸檢查 ✅ 單頁皆 `440 x 956`;contact sheet `1920 x 1076`
+  - 未執行 `node build.cjs` / `node qa.cjs`,因未修改正式遊戲程式
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - v3 使用高保真圖作為視覺錨點並手動覆蓋資訊;仍不是最終可切圖 asset
+  - Instruction 內文仍需依實際技能/特殊屬性逐一建立變體
+- 下一個最安全任務:
+  - 使用者確認 v3 資訊是否正確;確認後整理 Summon / Instruction 正式 Figma `SPEC_` 與 asset sheet 清單
+
+---
+
+- 版本 / 階段:v10,Flow contact sheet v2 quality alignment(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `assets/ui-final/flow-contact-v2/quest_battle_summon_instruction_contact_v2.png`:使用使用者提供的高保真四頁圖作為風格錨點,重新校準 Quest/Battle/Summon/Instruction
+  - 新增 `assets/ui-final/flow-contact-v2/1_quest_mockup_v2.png`
+  - 新增 `assets/ui-final/flow-contact-v2/2_battle_mockup_v2.png`
+  - 新增 `assets/ui-final/flow-contact-v2/3_summon_mockup_v2.png`
+  - 新增 `assets/ui-final/flow-contact-v2/4_instruction_mockup_v2.png`
+- 契約變動:**無**。本次只產 mockup 圖,未修改正式遊戲
+- Codex 可改範圍:本次未修改 `src/`
+- 測試結果:
+  - mockup 尺寸檢查 ✅ 單頁皆 `440 x 956`;contact sheet `1920 x 1076`
+  - 未執行 `node build.cjs` / `node qa.cjs`,因未修改正式遊戲程式
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - v2 是視覺質感校準圖,不是最終可切圖 asset;後續仍需 Figma frame 與 `SPEC_` 定位
+  - Instruction 對話框仍需確認 icon、文字量、按鈕是否符合實際技能/特殊屬性說明
+- 下一個最安全任務:
+  - 使用者確認 v2 風格;確認後 Codex 整理 Summon / Instruction 的正式切圖清單與 Figma `SPEC_` frame
+
+---
+
+- 版本 / 階段:v10,Quest/Battle/Summon/Instruction contact sheet(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `assets/ui-final/flow-contact/quest_battle_summon_instruction_contact_v1.png`:四頁並排風格校準圖
+  - 新增 `assets/ui-final/flow-contact/1_quest_mockup_v1.png`
+  - 新增 `assets/ui-final/flow-contact/2_battle_mockup_v1.png`
+  - 新增 `assets/ui-final/flow-contact/3_summon_mockup_v1.png`
+  - 新增 `assets/ui-final/flow-contact/4_instruction_mockup_v1.png`
+- 契約變動:**無**。本次只產 mockup 圖,未修改正式遊戲
+- Codex 可改範圍:本次未修改 `src/`
+- 測試結果:
+  - mockup 尺寸檢查 ✅ 單頁皆 `440 x 956`;contact sheet `1920 x 1076`
+  - 未執行 `node build.cjs` / `node qa.cjs`,因未修改正式遊戲程式
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - 此 contact sheet 使用現有素材可控拼圖,不是 AI 一次生成圖;優點是不跑題,缺點是視覺細節仍需在 Figma / 高保真 asset 階段重畫
+  - Summon 與 Instruction 還需使用者確認方向後,再整理 `SPEC_` 切圖清單
+- 下一個最安全任務:
+  - 使用者確認 Summon 與 Instruction 在四頁 contact sheet 中是否方向正確;確認後進入 Figma spec / asset sheet 規劃
+
+---
+
+- 版本 / 階段:v10,Summon high-fidelity option mockups(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `assets/ui-final/summon-mockups/summon_option_a_clear_hatch.png`:接近原本結算/孵蛋高保真方向
+  - 新增 `assets/ui-final/summon-mockups/summon_option_b_gacha_machine.png`:轉蛋機/抽獎台方向
+  - 新增 `assets/ui-final/summon-mockups/summon_option_c_focused_nest.png`:低資訊密度蛋巢方向
+  - 新增 `assets/ui-final/summon-mockups/summon_options_contact_sheet.png`:三方案並排圖
+  - 新增 `SUMMON_UI_OPTIONS.md`:三方案用途與後續切圖重點
+- 契約變動:**無**。本次只產 mockup 與說明,未接入正式遊戲
+- Codex 可改範圍:本次未修改 `src/`
+- 測試結果:
+  - mockup 尺寸檢查 ✅ 三張皆為 `440 x 956`;contact sheet `1448 x 1076`
+  - 未執行 `node build.cjs` / `node qa.cjs`,因未修改正式遊戲程式
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - 這三張是視覺選型 mockup,不是最終切圖 asset;選定後仍需在 Figma 排 final `summon` frame 與標 `SPEC_`
+  - 文字仍會在最後統一處理,目前 mockup 只用來決定版型與視覺方向
+- 下一個最安全任務:
+  - 使用者選 A/B/C 或混合方向;Codex 再更新 `SUMMON_FINAL_LAYOUT_SPEC.md` 並列出正式切圖清單
+
+---
+
+- 版本 / 階段:v10,Summon planning + mockup draft(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `SUMMON_FINAL_LAYOUT_SPEC.md`:Summon / 孵蛋頁 asset 規劃、Figma `SPEC_` frame 命名、layout draft、runtime states
+  - 新增 `summon-ui-mockup.html`:Summon 畫面 HTML mockup,使用現有 Quest/nav/egg 素材拼出方向
+  - 新增 `summon-ui-mockup.png`:440x956 PNG 預覽圖,方便快速檢查畫面方向
+- 契約變動:**無**。未改正式 `src/index.html` DOM,只規劃沿用既有 `#gachaOverlay/#gachaArt/#gachaCount/#gachaMsg/#gachaDrawBtn/#gachaBack`
+- Codex 可改範圍:本次只新增規格文件與 mockup,未接入正式遊戲
+- 測試結果:
+  - 未執行 `node build.cjs` / `node qa.cjs`,因本次沒有修改正式 `src/` 或遊戲流程
+  - mockup PNG 尺寸檢查 ✅ `440 x 956`
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - `summon-ui-mockup` 目前是方向圖,不是最終 Figma spec;真正實作前需要使用者在 Figma 建立 `summon` frame 並標記 `SPEC_` frame
+  - 目前使用現有 magma 背景與既有蛋素材;若想讓孵化所更有專屬感,需要新增 `summon_bg.png`、`summon_stage_panel.png`、`summon_egg_*` 動畫素材
+- 下一個最安全任務:
+  - 使用者確認 Summon mockup 的資訊架構;確認後在 Figma 排版 `summon` frame 並輸出素材/標記 `SPEC_`,Codex 再接入正式 `gachaOverlay`
+
+---
+
+- 版本 / 階段:v10,Quest CTA temporary text position repair(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `src/game.css`:修正 Quest `START CHALLENGE` CSS 文字層沉底問題;文字改為依 `SPEC_START_CHALLENGE` 比例 absolute 定位,並用 `translateY(-10%)` 補償瀏覽器字體 metrics
+  - 更新根目錄 `index.html`:由 `node build.cjs` 重新產生
+- 契約變動:**無**
+- Codex 可改範圍:本次只改 `src/game.css` 視覺與 build 產物,未改玩法 JS
+- 測試結果:
+  - `node build.cjs` ✅ built root `index.html`
+  - `node check_ui.cjs` ✅ UI 守門通過
+  - `node qa.cjs` ✅ 全部通過:10 通過 / 0 失敗
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - 這只是暫時止血;Quest CTA 文字仍是 DOM/CSS 渲染,不同瀏覽器與字體載入狀態可能和 Figma 有差異
+  - 正式解法應把 `START CHALLENGE` 文字層從 Figma export 成透明 PNG/SVG asset,接入為圖片,不要再靠 CSS text stroke 模擬
+- 下一個最安全任務:
+  - 使用者確認目前 CTA 是否至少回到可接受位置;若仍不準,請輸出 CTA 文字透明圖層,我改接 `Start_text` asset
+
+---
+
+- 版本 / 階段:v10,Figma SPEC frame source-of-truth + Battle chrome leak fix(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `assets/ui-final/ui_final_final/figma-spec/latest_spec_nodes.json`:保存本次 Figma REST 讀到的 `SPEC_CTA` 與 skill button frame 節點資料
+  - 更新 `src/game.main.js`:新增 `battleChromeBlocked()` / `syncBattleChrome()`,讓 Battle HUD 只在真正戰鬥畫面顯示;教學、結算、Monster、Summon 等 overlay 開啟時會自動移除 `battle-active`
+  - 更新 `src/game.css`:Battle skill button 依 Figma 440 基準等比縮放,使用 `146x90` frame 比例、52px icon 比例、18px label 比例,避免小螢幕被截斷
+  - 更新 `src/game.css`:Quest CTA 依 `SPEC_CTA` / `SPEC_START_CHALLENGE` frame 尺寸比例呈現,維持 Baloo 2 ExtraBold 與 6px stroke 的方向
+  - 更新根目錄 `index.html`:由 `node build.cjs` 重新產生
+- 契約變動:**無 id/class rename**。新增/使用 `#app.battle-active` 的同步邏輯仍屬視覺狀態;未改 DOM 契約
+- Codex 可改範圍:本次改 `src/game.css` 與 `src/game.main.js` 的視覺顯示狀態 hook;未改玩法公式、血量、combo、技能冷卻、關卡資料或抽蛋邏輯
+- 測試結果:
+  - Figma REST ✅ 已讀取使用者提供的 `SPEC_CTA` / skill button frame
+  - `node build.cjs` ✅ built root `index.html`
+  - `node check_ui.cjs` ✅ UI 守門通過
+  - `node qa.cjs` ✅ 全部通過:10 通過 / 0 失敗
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - 後續 Figma 尺寸必須只讀 `SPEC_` frame / component frame;不要用圖片 render bounds、群組 union box 或陰影外框
+  - Quest CTA 的文字描邊仍受瀏覽器字體渲染影響;若真機仍不像 Figma,下一步應改成文字 PNG 或 SVG text asset,不要再用一般 CSS 陰影補
+  - Battle skill button 已按 frame 比例縮放,但仍需使用者真機確認是否完全不截斷
+- 下一個最安全任務:
+  - 使用者刷新本機預覽,先確認非戰鬥頁不再露出 Battle 三卡/HP,並確認 Battle skill row 不被截斷;若 CTA 仍偏差,改走文字圖層 asset 化
+
+---
+
+- 版本 / 階段:v10,Figma auto-layout size correction + Quest CTA target(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `src/game.css`:修正上一輪誤讀 Figma group union box 的問題;Battle 技能列改回 auto-layout frame 尺寸 `146x90`,y=822,底距 44px,按鈕間距 7px
+  - 更新 `src/game.css`:隊長頭像區同步用 90px 高度,與技能列同列對齊
+  - 更新 `src/game.css`:Quest `START CHALLENGE` 以第二張 Figma 截圖為準,文字改成獨立 pseudo text,固定 `302x58`,Baloo 2 ExtraBold 36px,6px stroke,不使用 shadow 假描邊
+  - 更新根目錄 `index.html`:由 `node build.cjs` 重新產生
+- 契約變動:**無**。未新增/改名 DOM id;本次只調整 CSS final override 與 asset URL
+- Codex 可改範圍:本次只改 `src/game.css` 視覺尺寸/文字外觀;未改玩法 JS、技能資料、combo 計算、傷害公式、血量、技能冷卻或關卡資料
+- 測試結果:
+  - `node build.cjs` ✅ built root `index.html`
+  - `node check_ui.cjs` ✅ UI 守門通過
+  - `node qa.cjs` 第一次 ⚠️ 除法盾自動玩家未清關但無 JS/draw error;第二次 ✅ 全部通過:10 通過 / 0 失敗
+- 玩法邏輯變更:**無**。Combo 規則維持:有效鏈累積,敵人行動/換敵歸零,倍率 `1 + 0.15 x (combo - 1)`,上限 `x2.5`
+- 目前風險:
+  - 後續讀 Figma 尺寸必須以使用者選到的 auto-layout frame / component frame 為準,不要用 group union box 或子圖層 render bounds
+  - Quest CTA 文字現在用 fixed `302px` pseudo text 對齊 Figma;若不同裝置字型載入差異導致寬度偏差,需再用真機截圖微調
+  - 若手機仍看不到新 Act badge,需清瀏覽器快取或換新版 URL;CSS 已加 `?v=20260622b`
+  - combo burst 目前使用 impact burst 同質感重新命名,需要真機確認是否太亮或太搶畫面
+- 下一個最安全任務:
+  - 真機確認 Battle 技能列是否為 `146x90` 且不截斷;Quest CTA 是否貼近第二張 Figma 截圖
+
+---
+
+- 版本 / 階段:v10,Battle Figma auto-layout spacing sync(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `assets/ui-final/ui_final_final/game/figma_game_node_raw.json`:使用 Figma REST API 讀取新版 `game` frame (`node-id=19184:26346`)
+  - 更新 `src/game.css`:依新版 Figma spec 將 Battle 版面同步為上部區塊 / 396 盤面 / 下方 HP+技能區塊
+  - 更新 `src/game.css`:三張 stat cards row 設為 `394x80`,單卡 `130x80`,gap `2`
+  - 更新 `src/game.css`:board wrapper 設為 `404x404`,讓 `setupCanvas()` 扣 4px 後輸出實際 `396x396` canvas
+  - 更新 `src/game.css`:下方區塊設為 `170px` 基準;HP row `440x40`,技能按鈕 `146x90`
+  - 更新 `GAME_FINAL_LAYOUT_SPEC.md`:同步新版 Figma 座標與 440x956 實測尺寸
+  - 更新根目錄 `index.html`:由 `node build.cjs` 重新產生
+- 契約變動:**無**。本次只改 CSS layout 與 spec 文件,未改 DOM id/class,未改玩法邏輯
+- Codex 可改範圍:本次只改 `src/game.css` 視覺尺寸與 Battle spec 文件
+- 測試結果:
+  - Figma REST ✅ 成功讀取 `game` frame,尺寸 `440x956`
+  - 本地 asset 檢查 ✅ stat cards `260x160 @2x`,skill buttons `292x180 @2x`,FX assets 已存在
+  - Browser 實測 ✅ `#board` 為 `396x396`,位置 `x=22 y=369`;`#targetRow` 為 `394x80`;skill button 為 `146x90`
+  - `node build.cjs` ✅ built root `index.html`
+  - `node check_ui.cjs` ✅ UI 守門通過
+  - `node qa.cjs` ✅ 全部通過:10 通過 / 0 失敗
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - 文字視覺仍可能需要依真機截圖微調,尤其 stat card label/number 與技能文字描邊
+  - HP row 使用 fixed 方式對齊 Figma y=786;若未來支援高於 956 的桌面置中版面,需要再加 desktop-specific 對齊
+- 下一個最安全任務:
+  - 使用者用新版預覽檢查 Battle spacing;確認後接入拖曳 spark / slash / impact FX
+
+---
+
+- 版本 / 階段:v10,Battle board runtime 396px fix(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `src/game.css`:修正前一輪只放大寬度但未放大高度的錯誤;`setupCanvas()` 會取 `#boardWrap` 寬高較小值,所以 440px 寬畫面仍可能因 board row 高度不足退回 `354px`
+  - 更新 `src/game.css`:Battle grid row 改為 `6.695% 18.9% 9.75% minmax(0,1fr) 15.9%`,先壓縮敵人區/三卡區/技能區,釋放盤面高度
+  - 更新 `src/game.css`:`#boardWrap` 同時設定寬高基準:寬度 `min(calc(90% + 8px),404px)`,高度 `min(calc(90vw + 8px),404px)`,對應 440 設計寬下的 runtime `396px` canvas 目標
+  - 更新根目錄 `index.html`:由 `node build.cjs` 重新產生
+- 契約變動:**無**。本次只改 CSS layout,未改 DOM id/class,未改玩法邏輯
+- Codex 可改範圍:本次只改 `src/game.css` 視覺尺寸
+- 測試結果:
+  - `node build.cjs` ✅ built root `index.html`
+  - `node check_ui.cjs` ✅ UI 守門通過
+  - `node qa.cjs` ✅ 全部通過:10 通過 / 0 失敗
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - 為了讓 440px 寬畫面真的得到 `396px` 盤面,目前先壓縮上下 UI 區域;使用者後續會在 Figma 手動調整上下素材高度,屆時需再同步精準位置
+  - 若仍看到 `354px`,代表預覽不是新版 build 或實際 CSS viewport 寬度不是 440px
+- 下一個最安全任務:
+  - 使用者用新版網址檢查 440px 寬預覽;確認盤面後再依 Figma 更新同步上下素材與 FX
+
+---
+
+- 版本 / 階段:v10,Battle board size aligned to Figma 396 baseline(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `src/game.css`:Battle grid 底部 skill row 從 `19.665%` 微縮到 `18.665%`,釋放盤面高度
+  - 更新 `src/game.css`:`#boardWrap` 改為 `min(calc(90% + 8px), 404px)` 並置中,對應 Figma `440px` 設計寬中的 `396px` 盤面;`+8px` 用來抵消 `setupCanvas()` 內部扣除與 6 格整除取整
+  - 更新根目錄 `index.html`:由 `node build.cjs` 重新產生
+- 契約變動:**無**。本次只改 CSS layout,未改 DOM id/class,未改 canvas 尺寸邏輯或玩法
+- Codex 可改範圍:本次只改 `src/game.css` 視覺尺寸
+- 測試結果:
+  - `node build.cjs` ✅ built root `index.html`
+  - `node check_ui.cjs` ✅ UI 守門通過
+  - `node qa.cjs` ✅ 全部通過:10 通過 / 0 失敗
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - 390px 手機寬下,因 canvas 必須平均切成 6 格,無法剛好顯示 `351px`;目前會取最接近且偏大的 `354px`。Figma 440 基準仍是 `396px`
+  - 盤面變大後上下素材高度需要使用者依 Figma 視覺再微調,尤其 HP row 與 skill panel 的間距
+- 下一個最安全任務:
+  - 使用者依 `396x396` board / `66x66` cell / `@2x 132x132` FX cell 切圖;Codex 等 Figma 更新後再同步上下素材與 FX 接入
+
+---
+
+- 版本 / 階段:v10,Battle stat text/captain/HP proportion polish(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `src/game.css`:Battle 小字/數字描邊降到 1px shadow 等級,改善 ACT 數字與 shield 數字破碎/過粗問題
+  - 更新 `src/game.css`:Target/SUM/CHAIN 三張卡統一數字底部定位與 label 定位,以 Target 數字排版作為基準
+  - 更新 `src/game.css`:`#captainChip` 內所有動畫/transition 關閉,避免隊長頭像上下浮動
+  - 更新 `src/game.css`:我方 HP row 改為 Figma 座標式 absolute layout,血條寬度固定為畫面寬 `62.273%`,避免 flex 壓扁
+  - 更新根目錄 `index.html`:由 `node build.cjs` 重新產生
+- 契約變動:**無**
+- Codex 可改範圍:本次只改 CSS 視覺
+- 測試結果:
+  - `node build.cjs` ✅ built root `index.html`
+  - `node check_ui.cjs` ✅ UI 守門通過
+  - `node qa.cjs` ✅ 全部通過:10 通過 / 0 失敗
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - 文字目前改為較薄描邊,需真機截圖確認是否已接近 Figma;若仍糊,下一步可能需要把特定文字改成 PNG text asset 或 canvas text
+- 下一個最安全任務:
+  - 使用者用 `/index.html?v=text-hp-polish2` 檢查 Battle;依截圖再微調字重/位置
+
+---
+
+- 版本 / 階段:v10,Battle mobile text outline and HP position polish(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `src/game.css`:Battle 文字描邊從 `-webkit-text-stroke` 改為多方向 `text-shadow` 描邊,避免手機上 Baloo 2 出現破碎殘影
+  - 更新 `src/game.css`:HP row 往下調回 Figma 比例位置 (`bottom:13.625dvh`),HP label/數字改用同一套穩定白字黑邊
+  - 更新根目錄 `index.html`:由 `node build.cjs` 重新產生
+- 契約變動:**無**
+- Codex 可改範圍:本次只改 CSS 視覺
+- 測試結果:
+  - `node build.cjs` ✅ built root `index.html`
+  - `node check_ui.cjs` ✅ UI 守門通過
+  - `node qa.cjs` ✅ 全部通過:10 通過 / 0 失敗
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - 文字已避開 stroke 渲染問題,但最終字重/描邊厚度仍需使用者真機視覺確認
+- 下一個最安全任務:
+  - 使用者用 `/index.html?v=text-hp-polish1` 檢查 Battle 文字與 HP;依截圖再微調字級/位置
+
+---
+
+- 版本 / 階段:v10,Battle active cache/failsafe fix(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `src/game.main.js`:在 `renderHud()` 也加上 `#app.battle-active`,作為進入戰鬥後 HUD 顯示的第二道保險;`startStage()` / `startTower()` 仍保留原本顯示開關,`renderMap()` 移除開關
+  - 更新根目錄 `index.html`:由 `node build.cjs` 重新產生,內含最新 CSS/JS,建議真機暫時改看 build 單檔以避開 `src/game.main.js` 快取
+- 契約變動:**無 id/class rename**。沿用上一輪新增的 `#app.battle-active` 視覺狀態 class
+- Codex 可改範圍:本次只補視覺狀態防呆,不改玩法判定
+- 測試結果:
+  - `node build.cjs` ✅ built root `index.html`
+  - `node check_ui.cjs` ✅ UI 守門通過
+  - `node qa.cjs` ✅ 全部通過:10 通過 / 0 失敗
+  - `curl -I http://127.0.0.1:4177/index.html?v=battleactive3` ✅ 200 OK
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - 手機若繼續開 `src/index.html`,外部 `game.main.js` 可能仍被瀏覽器快取;目前建議改開 build 單檔 `/index.html?v=battleactive3`
+- 下一個最安全任務:
+  - 使用者用 `/index.html?v=battleactive3` 檢查 Battle 頁;若正常,再回到文字/HP 視覺微調
+
+---
+
+- 版本 / 階段:v10,Battle HUD scoped to combat only(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `src/game.css`:新增 `#app:not(.battle-active)` 時隱藏 Battle sections (`battleHeader/enemyPanel/mathHud/boardPanel/skillPanel`),避免 Quest/Monster/Summon/Events 顯示 Battle HP 與三張 stat panels
+  - 更新 `src/game.main.js`:在 `startStage()` / `startTower()` 加上 `#app.battle-active`;在 `renderMap()` 移除 `battle-active`
+  - 更新根目錄 `index.html`:由 `node build.cjs` 重新產生
+- 契約變動:**無 id/class rename**。新增狀態 class `#app.battle-active` 作為純視覺顯示開關
+- Codex 可改範圍:本次為 CSS 與視覺狀態 hook,不改玩法判定
+- 測試結果:
+  - `node build.cjs` ✅ built root `index.html`
+  - `node check_ui.cjs` ✅ UI 守門通過
+  - `node qa.cjs` ✅ 全部通過:10 通過 / 0 失敗
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - 若未來有其他非 `renderMap()` 的路徑離開戰鬥,需確認也會移除 `battle-active`;目前主要回地圖路徑皆會走 `renderMap()`
+- 下一個最安全任務:
+  - 使用者刷新 Quest 頁確認 Battle HUD 已消失;再繼續修 Battle 文字/HP 細節
+
+---
+
+- 版本 / 階段:v10,Battle HP row shield removal and z-index fix(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `src/index.html`:將 `#playerRow` 內原本無法用 CSS 精準隱藏的文字節點 `🛡️` 移除,改成 `.hpHeart` + `.hpLabel` + 既有 `#playerHpFill/#playerHpText/#shieldIc`;保留 `#shieldIc` id 以免 JS 查找失敗
+  - 更新 `src/game.css`:Battle HP row 改用真實 `.hpHeart/.hpLabel`,強制 `#shieldIc` 隱藏;提高 `.mathHud` z-index 並關閉 pointer events,避免 HP row 被 board/skill overlay 蓋住
+  - 更新 `src/game.css`:加入 Baloo 2 Google font import,降低手機端掉字體造成的文字比例/描邊偏差
+  - 更新根目錄 `index.html`:由 `node build.cjs` 重新產生
+- 契約變動:**視覺 DOM 微調,既有 id 保留**。`#playerRow` 內新增 `.hpHeart` / `.hpLabel`,`#shieldIc` 保留但目前 Battle 視覺強制隱藏
+- Codex 可改範圍:本次為 `src/index.html` visual DOM micro-adjust + CSS 視覺修正
+- 測試結果:
+  - `node build.cjs` ✅ built root `index.html`
+  - `node check_ui.cjs` ✅ UI 守門通過
+  - 未執行截圖重試:依使用者要求,避免無效截圖循環;等待真機刷新回報
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - Baloo 2 透過 Google Fonts 載入;若真機網路阻擋 Google Fonts,字體仍可能 fallback
+  - `#shieldIc` 在 Battle 視覺被隱藏;若之後要顯示護盾狀態,需改為放到 shield/status badge,不要放在我方 HP row
+- 下一個最安全任務:
+  - 使用者刷新手機預覽並回傳最新截圖;Codex 再只針對截圖做下一輪微調
+
+---
+
+- 版本 / 階段:v10,Battle UI text/HP/captain visual correction(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `src/game.css`:Battle 文字改回 Figma 的 Baloo 2 尺寸/粗細比例;ACT 數字降為 Figma 28px 比例;WAVE/EXIT/Target/SUM/CHAIN/技能文字描邊收斂
+  - 更新 `src/game.css`:隊長技能區移除底部藍色 panel,只保留隊長怪物頭像;移除頭像位移感
+  - 更新 `src/game.css`:我方 HP row 改為「愛心 + HP + 血條 + 數字」,拉高到技能 panel 上方,避免被底部暗層蓋住
+  - 更新根目錄 `index.html`:由 `node build.cjs` 重新產生
+- 契約變動:**無**。未改 DOM id/class,未改玩法;HP 的 `HP` label 由 CSS pseudo element 呈現
+- Codex 可改範圍:本次只改 CSS 視覺與 build 產物
+- 測試結果:
+  - `node build.cjs` ✅ built root `index.html`
+  - `node check_ui.cjs` ✅ UI 守門通過
+  - Playwright screenshot ⚠️ 停止:本地預覽網址 `http://127.0.0.1:4177/src/index.html` 回 `ERR_EMPTY_RESPONSE`;依使用者規則不再重試截圖,等待真機截圖
+  - 未執行 `node qa.cjs`,因本輪依使用者要求在截圖失敗後停止驗證循環
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - 需要使用者提供最新真機截圖,確認 HP row 是否仍被 overlay/底部暗層蓋住
+  - 預覽 server 目前可能已失效或卡住,下一輪可先重新啟動預覽 server,但需避免反覆截圖試錯
+- 下一個最安全任務:
+  - 使用者提供最新真機截圖;Codex 只根據該截圖做下一輪精準修正
+
+---
+
+- 版本 / 階段:v10,Battle/Game formal UI first integration(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `src/game.css`:依 Figma `game` frame 接入 Battle 正式 UI 第一版;上方敵人區、WAVE/EXIT/ACT/Shield、敵我血條、Target/Sum/Chain 卡、6x6 盤面區、底部技能 panel 改為使用 `assets/ui-final/ui_final_final/game/**` PNG 素材
+  - 更新 `src/game.main.js`:只新增/調整純視覺輸出 hook;`#comboMeter` 增加 `data-combo-text`, `#chainInfo` 增加 `data-chain-num`, `#captainChip` 內輸出 `.mini` 頭像與 `.capText`
+  - 更新 `GAME_FINAL_LAYOUT_SPEC.md`:補上 Battle 底部復用 nav area 作技能 panel、目前 390x844 實測 board/cell/bead 尺寸、FX 切圖基準
+  - 更新根目錄 `index.html`:由 `node build.cjs` 重新產生
+  - 新增/更新 `artifacts/battle_final_390_v9.png`:390x844 Battle 第一版截圖
+- 契約變動:**無 id/class rename**。但本輪有新增純視覺資料 hook: `data-combo-text`, `data-chain-num`, `.capText`;既有 DOM id 與玩法事件不變
+- Codex 可改範圍:本次依 `VIEW_CONTRACT.md` 的 CSS 與視覺 hook 範圍修改;未改玩法判定、傷害、血量、技能冷卻或關卡資料
+- 測試結果:
+  - `node build.cjs` ✅ built root `index.html`
+  - `node check_ui.cjs` ✅ UI 守門通過
+  - `node qa.cjs` ✅ 全部通過:10 通過 / 0 失敗
+  - Playwright mobile screenshot ✅ `artifacts/battle_final_390_v9.png`,無 visible overlay,board `354x354`,cell `58px`,bead body 約 `54.29px`
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - Battle 的 `WAVE 2` 與 shield 數字目前仍是視覺佔位,後續若要完全動態需由 Claude 或契約新增資料 hook
+  - 我方血條已可見,但仍需要真機視覺確認是否要再提高亮度或調整與技能 panel 的距離
+  - FX sheet 尚未切入 runtime;目前只保留 canvas 盤面與既有路徑手感
+- 下一個最安全任務:
+  - 使用者真機檢查 `http://192.168.0.147:4177/src/index.html` 的 Battle 第一版;確認後再接入 FX sheet 或修 Battle 動態 hook
+
+---
+
+- 版本 / 階段:v10,Game/Battle Figma spec and board FX sheet v1(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `GAME_FINAL_LAYOUT_SPEC.md`:依 Figma `game` frame (`440x956`) 建立 Battle/Game layout spec,記錄 HP/stat/skill/FX runtime 規則
+  - 新增 `assets/ui-final/ui_final_final/game/figma_game_node_raw.json`:Figma REST API 讀取的 `game` frame raw data
+  - 新增 `assets/ui-final/ui_final_final/game/figma_game_layers.csv`:Figma layer 座標表
+  - 新增 `assets/ui-final/ui_final_final/game/figma_game_layers_flat.json`:Figma layer 扁平化 JSON
+  - 新增 `assets/ui-final/ui_final_final/game/game_assets_contact.png`:目前 `game` 匯出 PNG 的 contact sheet
+  - 新增 `assets/ui-final/ui_final_final/game/fx/board_fx_sheet_v1_chroma.png`:轉珠特效 sheet 洋紅底來源
+  - 新增 `assets/ui-final/ui_final_final/game/fx/board_fx_sheet_v1_transparent.png`:轉珠特效透明 PNG,供 Figma/後續切圖
+  - 新增 `assets/ui-final/ui_final_final/game/fx/board_fx_sheet_v1_preview.png`:轉珠特效棋盤格預覽
+- 契約變動:**無**。本輪只讀 Figma spec、整理文件、產出 board FX assets,未改 DOM/CSS/JS,未接入遊戲
+- Codex 可改範圍:本次新增 `GAME_FINAL_LAYOUT_SPEC.md` 與 `assets/ui-final/ui_final_final/game/**` 衍生檢查/FX 檔案
+- 測試結果:
+  - Figma REST 讀取 ✅ `game` frame 成功,raw JSON 約 84KB
+  - PNG 尺寸檢查 ✅ `battle_skill_icon_minus.png` 已存在;主要 state groups 尺寸一致
+  - 透明檢查 ✅ `board_fx_sheet_v1_transparent.png` 為 RGBA,尺寸 `1536x1024`,四角 alpha 0
+  - 未執行 `build.cjs` / `check_ui.cjs` / `qa.cjs`,因未改遊戲 runtime
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - `board_fx_sheet_v1_transparent.png` 是 FX sheet,還需要使用者/Figma 或後處理切成單獨 sprite frames
+  - Figma layer 中 navbar/root reserved area 仍存在於 y=826 之後;接入 Battle 頁時需確認底部是技能列、nav,或兩者如何共存
+  - 隊長 ring 已依使用者指示暫不使用;若之後恢復隊長技能 UI,需另補規格
+- 下一個最安全任務:
+  - 使用者檢查 `game_assets_contact.png` 與 `board_fx_sheet_v1_preview.png`;確認後切 FX sprites 或開始依 `GAME_FINAL_LAYOUT_SPEC.md` 接入 Battle 頁正式 UI
+
+---
+
+- 版本 / 階段:v10,Battle final UI combo/path mockup v1(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `assets/ui-final/battle-b/mockups/battle_b_final_ui_combo_path_mockup_v1.png`:使用 Battle B chrome/FX 方向組成的完整戰鬥畫面 mockup,包含 enemy HUD、math cards、6x6 board、路徑 glow、combo badge、damage pop、player HP 與技能列
+- 契約變動:**無**。本輪只產出視覺確認 mockup,未改 DOM/CSS/JS,未接入遊戲
+- Codex 可改範圍:本次新增 `assets/ui-final/battle-b/mockups/**`
+- 測試結果:
+  - 視覺檢查 ✅ mockup 包含使用者指定的 path/combo/damage/slash 細節與 Battle B chrome 語言
+  - 未執行 `build.cjs` / `check_ui.cjs` / `qa.cjs`,因未改遊戲 runtime
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - 此圖是高保真方向確認圖,不是可直接切入遊戲的精準 layout spec;文字、數字與 board tile 最終仍應由 runtime/canvas 渲染
+  - 實作時需將 combo badge/damage pop/FX 切成獨立 PNG/sprite,board 路徑仍建議 canvas 畫出
+- 下一個最安全任務:
+  - 使用者確認 Battle mockup 方向;若接受,下一步切出 combo/damage/slash FX 或建立 Battle runtime layout spec
+
+---
+
+- 版本 / 階段:v10,Battle chrome hi-fi mini sheets v1(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `assets/ui-final/battle-b/chrome-hi-fi-v1/source/battle_chrome_top_status_v1_chroma.png`
+  - 新增 `assets/ui-final/battle-b/chrome-hi-fi-v1/source/battle_chrome_top_status_v1_transparent.png`
+  - 新增 `assets/ui-final/battle-b/chrome-hi-fi-v1/source/battle_chrome_top_status_v1_preview.png`
+  - 新增 `assets/ui-final/battle-b/chrome-hi-fi-v1/source/battle_chrome_hp_stats_v1_chroma.png`
+  - 新增 `assets/ui-final/battle-b/chrome-hi-fi-v1/source/battle_chrome_hp_stats_v1_transparent.png`
+  - 新增 `assets/ui-final/battle-b/chrome-hi-fi-v1/source/battle_chrome_hp_stats_v1_preview.png`
+  - 新增 `assets/ui-final/battle-b/chrome-hi-fi-v1/source/battle_chrome_skills_v1_chroma.png`
+  - 新增 `assets/ui-final/battle-b/chrome-hi-fi-v1/source/battle_chrome_skills_v1_transparent.png`
+  - 新增 `assets/ui-final/battle-b/chrome-hi-fi-v1/source/battle_chrome_skills_v1_preview.png`
+  - 新增 `assets/ui-final/battle-b/chrome-hi-fi-v1/source/battle_chrome_skill_purple_buttons_v1_chroma.png`
+  - 新增 `assets/ui-final/battle-b/chrome-hi-fi-v1/source/battle_chrome_skill_purple_buttons_v1_transparent.png`
+  - 新增 `assets/ui-final/battle-b/chrome-hi-fi-v1/source/battle_chrome_skill_purple_buttons_v1_preview.png`
+  - 更新 `BATTLE_B_STYLE_ASSET_LIST.md`:補上 Battle chrome hi-fi mini sheet 路徑與用途
+- 契約變動:**無**。本輪只產出 Battle chrome assets 與更新素材規格文件,未改 DOM/CSS/JS,未接入遊戲
+- Codex 可改範圍:本次新增 `assets/ui-final/battle-b/chrome-hi-fi-v1/source/**` 並更新 planning 文件
+- 測試結果:
+  - 透明檢查 ✅ 4 張 `*_transparent.png` 皆為 RGBA,四角 alpha 0
+  - 視覺檢查 ✅ Top/status 與 HP/stat sheet 可用;skills sheet 的紫色按鈕跑灰,已用 `battle_chrome_skill_purple_buttons_v1_transparent.png` 補正
+  - 未執行 `build.cjs` / `check_ui.cjs` / `qa.cjs`,因未改遊戲 runtime
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - AI sheet 仍需由使用者/Figma 依 bounding box 精切成單獨 PNG;同類狀態切圖時需確認 final bbox 一致
+  - Skills 主 sheet 中紫色按鈕不要使用,請改用 purple fix sheet
+- 下一個最安全任務:
+  - 使用者檢查 mini sheets;確認後在 Figma 切成單獨 Battle chrome PNG,或繼續重生缺失小批次
+
+---
+
+- 版本 / 階段:v10,Battle B chrome/FX sheets v1(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `assets/ui-final/battle-b/source/battle_b_chrome_sheet_v1_transparent.png`:Battle B chrome 結構版透明 sheet,供 Figma/後續切圖
+  - 新增 `assets/ui-final/battle-b/source/battle_b_chrome_sheet_v1_preview.png`:Battle B chrome 棋盤格預覽
+  - 新增 `assets/ui-final/battle-b/source/battle_b_chrome_sheet_v1_chroma.png`:Battle B chrome 洋紅/檢查用來源
+  - 新增 `assets/ui-final/battle-b/source/battle_b_fx_sheet_v1_transparent.png`:Battle B combo/damage/slash/shield break/spark FX 透明 sheet
+  - 新增 `assets/ui-final/battle-b/source/battle_b_fx_sheet_v1_preview.png`:Battle B FX 棋盤格預覽
+  - 更新 `BATTLE_B_STYLE_ASSET_LIST.md`:補上 v1 產出檔案、用途與透明/預覽區分
+- 契約變動:**無**。本輪只產出 Battle assets 與更新素材規格文件,未改 DOM/CSS/JS,未接入遊戲
+- Codex 可改範圍:本次新增 `assets/ui-final/battle-b/source/**` 並更新 planning 文件
+- 測試結果:
+  - 透明檢查 ✅ `battle_b_chrome_sheet_v1_transparent.png` 與 `battle_b_fx_sheet_v1_transparent.png` 皆為 RGBA,尺寸 `1536x1024`,四角 alpha 0
+  - 視覺檢查 ✅ FX sheet 符合 B. Arcade Punch 的 combo/damage/slash 方向
+  - 未執行 `build.cjs` / `check_ui.cjs` / `qa.cjs`,因未改遊戲 runtime
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - Chrome sheet v1 是 layout-safe 結構版,不是最終高保真 AI texture;若要接近 UI mockup,建議下一步拆小批重生或由 Figma 精修後再切圖
+  - FX sheet 尚未切成單獨 sprite frames,需要 Figma 或後處理切圖後再接入 runtime
+- 下一個最安全任務:
+  - 使用者檢查 Battle chrome/FX sheets;若接受,下一步切 FX sprite frames 或拆小批重生 chrome 高保真版本
+
+---
+
+- 版本 / 階段:v10,Battle B-style asset list after user selection(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `BATTLE_B_STYLE_ASSET_LIST.md`:依使用者選定的 B. Arcade Punch 方向,列出 battle/game 頁完整素材、狀態、檔名與 canvas/PNG 分工
+  - 更新 `GAME_ASSET_BATCH_MANIFEST.md`:標記 FX direction 已選 B,並連到 B-style 詳細清單
+- 契約變動:**無**。本輪只新增/更新素材規格文件,未改 DOM/CSS/JS,未接入遊戲
+- Codex 可改範圍:本次只新增/更新 planning 文件
+- 測試結果:
+  - 未執行 `build.cjs` / `check_ui.cjs` / `qa.cjs`,因未改遊戲 runtime
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - B 方案可以用 canvas 做出流暢 path/glow/particle,但若特效太多可能影響低階手機;需控制粒子數與 glow 半徑
+  - heavy FX 建議用少量 PNG/sprite sheet 疊加,不要把整個盤面改成 DOM/PNG
+- 下一個最安全任務:
+  - 依 `BATTLE_B_STYLE_ASSET_LIST.md` 產 Battle B UI chrome sheet 或先產 combo/damage/slash FX sprite sheet
+
+---
+
+- 版本 / 階段:v10,Battle combo/board FX direction mockup v1(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `assets/ui-final/battle-mockups/battle_combo_board_fx_options_v1.png`:三套 Battle board / combo / damage / path FX 視覺方向 mockup
+  - 更新 `GAME_ASSET_BATCH_MANIFEST.md`:記錄 v1 mockup 路徑與 A/B/C 方向
+- 契約變動:**無**。本輪只產出選方向用 mockup 與更新素材規格文件,未改 DOM/CSS/JS,未接入遊戲
+- Codex 可改範圍:本次新增 battle mockup 圖與更新 planning 文件
+- 測試結果:
+  - 未執行 `build.cjs` / `check_ui.cjs` / `qa.cjs`,因未改遊戲 runtime
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - mockup 圖僅供選方向,不是可直接切入遊戲的 final asset
+  - 珠子/路徑仍建議保留 canvas 實作;選定方向後應轉成 canvas visual token 或少量 FX sprite/PNG
+- 下一個最安全任務:
+  - 使用者選 A/B/C 或指定混合方向;接著產 Battle UI chrome asset sheet 或把選定珠子/路徑風格落到 canvas 視覺層
+
+---
+
+- 版本 / 階段:v10,Game/Battle asset manifest from annotated bounding boxes(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `GAME_ASSET_BATCH_MANIFEST.md`:依使用者標示的 battle/game 頁 bounding box 建立素材清單、檔名、狀態與實作建議
+- 契約變動:**無**。本輪只新增素材規格文件,未改 DOM/CSS/JS,未接入遊戲
+- Codex 可改範圍:本次只新增 planning 文件
+- 測試結果:
+  - 未執行 `build.cjs` / `check_ui.cjs` / `qa.cjs`,因未改遊戲 runtime
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - Battle 頁尚未改成 440x956 frame;目前只是素材規格
+  - 珠子/路徑建議保留 canvas 動態繪製,不要切成大量 PNG,但需要後續產一張 board visual mockup 給使用者確認風格
+  - combo/damage FX 需要先做 UI mockup 方向,使用者選定後再切圖/做 sprite sheet
+- 下一個最安全任務:
+  - 使用者確認 `GAME_ASSET_BATCH_MANIFEST.md`;接著產 Battle UI asset sheet 或先產 2-3 套 combo/board FX mockup
+
+---
+
+- 版本 / 階段:v10,Monster UI Figma fidelity pass 2(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `src/game.css`:Monster 頁文字字級依 Figma layer 調整;slot label 單行;角色縮小;nav label 分層顯示;overlay 兩側補深色遮罩避免看到背後戰鬥畫面
+  - 更新 `src/game.main.js`:locked cards 直接接在 owned cards 後方同一 3 欄 grid;locked card 不再額外疊剪影,直接使用 `monster_card_locked.png`;captain/member badge 補回 DOM 文字
+  - 重新 build 根目錄 `index.html`
+  - 新增 `artifacts/monster_390_v4.png`, `artifacts/monster_390_v5.png`:本輪 Monster 手機截圖驗證
+- 契約變動:**無新增**。沿用上一輪新增的 Monster 視覺 DOM hook,本輪只調整輸出與 CSS
+- Codex 可改範圍:本次改 `src/game.css`;`src/game.main.js` 為 Monster 視覺輸出微調,已在此 handoff 註明
+- 測試結果:
+  - `node build.cjs` ✅
+  - `node check_ui.cjs` ✅
+  - Playwright screenshot ✅ `390x844`:slot label 單行;locked 第 3 張接續排列;nav labels 顯示;背景不再漏出背後戰鬥畫面
+  - `node qa.cjs` ✅ 10 通過 / 0 失敗
+- 玩法邏輯變更:**無**。裝備規則未改
+- 目前風險:
+  - Monster 頁仍使用目前角色 SVG/PNG 混合輸出,最終角色頭像統一後需要再微調縮放
+  - Battle 畫面尚未改成 440x956 final frame;目前只有 Quest/Monster overlay 走 440x956
+  - Nav bar 已在 Monster 頁使用同一組 root nav assets;其他有 nav 的頁面需逐頁接同一套 tab/label 規格
+- 下一個最安全任務:
+  - 使用者真機檢查 Monster pass 2;若接受,下一步把 Summon 頁或 Events 頁依同樣 Figma spec 接入,並抽出共用 nav CSS
+
+---
+
+- 版本 / 階段:v10,Monster final UI first integration from Figma spec(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `MONSTER_FINAL_LAYOUT_SPEC.md`:依 Figma `monsters` frame (`440x956`) 建立 Monster 頁 layout/spec 對照
+  - 新增 `assets/ui-final/ui_final_final/monster/figma_monsters_node_raw.json`:Figma REST API 讀取的 monsters node raw data
+  - 新增 `assets/ui-final/ui_final_final/monster/figma_monsters_layers.csv`:Figma layer 座標表
+  - 新增 `assets/ui-final/ui_final_final/monster/figma_monsters_layers_flat.json`:Figma layer 扁平化 JSON
+  - 更新 `src/index.html`:在 `teamOverlay` 增加 `teamSlots` 與 `teamNav` 視覺容器;保留既有 `teamOverlay/teamGrid/teamBack` hook
+  - 更新 `src/game.main.js`:`renderTeam()` 改輸出 Monster card 分層結構(背景、角色、overlay、LV、attack badge、team badge);底部 Monster nav 接上既有 Quest/Summon/Events 流程
+  - 更新 `src/game.css`:依 Figma `440x956` 比例接入 Monster final UI 第一版,使用 `assets/ui-final/ui_final_final/monster/**` 圖片素材
+  - 重新 build 根目錄 `index.html`
+  - 新增 `artifacts/monster_390_v1.png`, `artifacts/monster_390_v2.png`, `artifacts/monster_390_v3.png`:Monster 手機截圖驗證
+- 契約變動:**有,視覺 DOM 擴充**。新增 `#teamSlots`, `#teamCaptainSlot`, `#teamMemberSlot`, `#teamNav`, `#teamQuestTab`, `#teamMonsterTab`, `#teamSummonTab`, `#teamEventsTab`;既有 gameplay id 未改名/刪除
+- Codex 可改範圍:本次改 `src/game.css`;`src/index.html` 與 `src/game.main.js` 為 Monster 視覺 DOM/輸出微調,已在此 handoff 註明
+- 測試結果:
+  - `node build.cjs` ✅
+  - `node check_ui.cjs` ✅
+  - Playwright screenshot ✅ `390x844`:Monster frame = `388.44 x 844`,slots/grid/nav 位置符合比例;nav 四個 tab 圖片載入
+  - `node qa.cjs` 第一次 9/10,除法整除盾未清關但無 JS 錯誤;立即重跑 ✅ 10 通過 / 0 失敗
+- 玩法邏輯變更:**無**。裝備規則仍沿用原本:點未出戰怪物上場;點已出戰非隊長升隊長;點隊長在至少 2 隻時卸下
+- 目前風險:
+  - Monster 頁目前依實際收藏資料顯示;新玩家只有 2 隻時會不像 Figma 那樣固定 6 張 owned card
+  - 角色圖在 slot/card 的尺寸仍需依最終角色 PNG 再微調
+  - locked row MVP 只顯示前三張,避免超出 Figma layout
+  - Figma MCP Plugin API 無 editor 權限,本次改用 Figma REST API 讀 spec
+- 下一個最安全任務:
+  - 使用者真機檢查 Monster 頁第一版;若接受版型,下一步微調角色縮放/卡片文字/nav label 或補 Summon 頁 Figma spec 接入
+
+---
+
+- 版本 / 階段:v10,Monster high-fidelity single-color card backgrounds AI v1(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `MONSTER_ASSET_BATCH_MANIFEST.md`:Monster card background set 改以 `card-backgrounds-ai-v1` 為目前 Figma 推薦版本;規定卡片只保留單色高保真背景,黑色 overlay 與 attack badge 由 Figma/程式另行疊加
+  - 新增 `assets/ui-final/monster-batch/card-backgrounds-ai-v1/source/monster_card_bg_ai_v1_chroma.png`
+  - 新增 `assets/ui-final/monster-batch/card-backgrounds-ai-v1/source/monster_card_bg_ai_v1_transparent.png`
+  - 新增 `assets/ui-final/monster-batch/card-backgrounds-ai-v1/cards/monster_card_bg_blue_normal.png`
+  - 新增 `assets/ui-final/monster-batch/card-backgrounds-ai-v1/cards/monster_card_bg_orange_normal.png`
+  - 新增 `assets/ui-final/monster-batch/card-backgrounds-ai-v1/cards/monster_card_bg_yellow_normal.png`
+  - 新增 `assets/ui-final/monster-batch/card-backgrounds-ai-v1/cards/monster_card_bg_green_normal.png`
+  - 新增 `assets/ui-final/monster-batch/card-backgrounds-ai-v1/cards/monster_card_bg_purple_normal.png`
+  - 新增 `assets/ui-final/monster-batch/card-backgrounds-ai-v1/cards/monster_card_bg_ai_v1_contact.png`
+- 契約變動:**無**。本輪只產出 Monster card background assets 與規格文件,未改 DOM/CSS/JS,未接入遊戲
+- Codex 可改範圍:本次新增 `assets/ui-final/monster-batch/card-backgrounds-ai-v1/**` 並更新 Monster asset planning 文件
+- 測試結果:
+  - 透明檢查 ✅ 5 色卡片皆為 RGBA,尺寸 `423x620`,四角 alpha 0
+  - 切圖檢查 ✅ 5 色卡片已切成單獨 PNG;紫色因 chroma key 接近洋紅,已用藍色高保真卡轉色修復
+  - 視覺檢查 ✅ 無黑色 overlay、無 attack badge、無文字、無角色,保留高保真 chunky card 質感
+  - 未執行 `build.cjs` / `check_ui.cjs` / `qa.cjs`,因未改遊戲 runtime
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - AI 產出的 5 色可視 bbox 有 1-2px 差異,但外層 canvas 一致;Figma 可用同尺寸 frame 對齊
+  - 黑色 overlay 與 attack badge 需要使用者在 Figma 或後續獨立 asset 疊加
+- 下一個最安全任務:
+  - 使用者檢查 AI v1 card contact sheet;確認後在 Figma 加黑色 overlay / attack badge 並排 Monster 頁
+
+---
+
+- 版本 / 階段:v10,Monster card backgrounds v4 without baked attack badge(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `MONSTER_ASSET_BATCH_MANIFEST.md`:Monster card background set 改以 `card-backgrounds-v4` 為準,明確規定 card 只包含外框、上方彩色區、下方暗色區,不烘入 attack badge
+  - 新增 `assets/ui-final/monster-batch/card-backgrounds-v4/monster_card_bg_orange_normal.png`
+  - 新增 `assets/ui-final/monster-batch/card-backgrounds-v4/monster_card_bg_blue_normal.png`
+  - 新增 `assets/ui-final/monster-batch/card-backgrounds-v4/monster_card_bg_green_normal.png`
+  - 新增 `assets/ui-final/monster-batch/card-backgrounds-v4/monster_card_bg_red_normal.png`
+  - 新增 `assets/ui-final/monster-batch/card-backgrounds-v4/monster_card_bg_purple_normal.png`
+  - 新增 `assets/ui-final/monster-batch/card-backgrounds-v4/monster_card_bg_cyan_normal.png`
+  - 新增 `assets/ui-final/monster-batch/card-backgrounds-v4/monster_card_bg_gray_normal.png`
+  - 新增 `assets/ui-final/monster-batch/card-backgrounds-v4/monster_card_bg_v4_contact.png`
+- 契約變動:**無**。本輪只產出 Monster card background assets 與規格文件,未改 DOM/CSS/JS,未接入遊戲
+- Codex 可改範圍:本次新增 `assets/ui-final/monster-batch/card-backgrounds-v4/**` 並更新 Monster asset planning 文件
+- 測試結果:
+  - 透明檢查 ✅ 7 色卡片皆為 RGBA,尺寸 `278x340`,四角 alpha 0
+  - 對齊檢查 ✅ 7 色卡片 alpha bbox 皆為 `(6, 6, 278, 338)`,可在同一 grid 中替換
+  - 視覺檢查 ✅ 無 baked attack badge;只有外框、上方彩色區、下方暗色資訊區
+  - 未執行 `build.cjs` / `check_ui.cjs` / `qa.cjs`,因未改遊戲 runtime
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - v4 是乾淨背景版,attack badge 需要另用獨立 asset 疊加
+  - 若使用者希望更接近 AI mockup 的繪製細節,可在 Figma 上以 v4 為固定尺寸底稿再精修
+- 下一個最安全任務:
+  - 使用者檢查 v4 contact sheet;確認後補獨立 attack badge 或進 Figma 排 Monster 頁
+
+---
+
+- 版本 / 階段:v10,Monster multicolor owned card assets(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `MONSTER_ASSET_BATCH_MANIFEST.md`:新增 Monster owned card 多色 normal set,記錄固定尺寸與暗色等級字區規則
+  - 新增 `assets/ui-final/monster-batch/cards-multicolor/monster_card_owned_orange_normal.png`
+  - 新增 `assets/ui-final/monster-batch/cards-multicolor/monster_card_owned_blue_normal.png`
+  - 新增 `assets/ui-final/monster-batch/cards-multicolor/monster_card_owned_green_normal.png`
+  - 新增 `assets/ui-final/monster-batch/cards-multicolor/monster_card_owned_red_normal.png`
+  - 新增 `assets/ui-final/monster-batch/cards-multicolor/monster_card_owned_purple_normal.png`
+  - 新增 `assets/ui-final/monster-batch/cards-multicolor/monster_card_owned_cyan_normal.png`
+  - 新增 `assets/ui-final/monster-batch/cards-multicolor/monster_card_owned_gray_normal.png`
+  - 新增 `assets/ui-final/monster-batch/cards-multicolor/monster_card_owned_multicolor_contact.png`
+- 契約變動:**無**。本輪只產出 Monster card assets 與規格文件,未改 DOM/CSS/JS,未接入遊戲
+- Codex 可改範圍:本次新增 `assets/ui-final/monster-batch/cards-multicolor/**` 並更新 Monster asset planning 文件
+- 測試結果:
+  - 透明檢查 ✅ 7 色卡片皆為 RGBA,尺寸 `278x340`,四角 alpha 0
+  - 對齊檢查 ✅ 7 色卡片 alpha bbox 皆為 `(6, 6, 271, 334)`,可在同一 grid 中替換
+  - 視覺檢查 ✅ 每張卡片都有暗色等級字區與底部綠色攻擊資訊條
+  - 未執行 `build.cjs` / `check_ui.cjs` / `qa.cjs`,因未改遊戲 runtime
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - 目前只產出 `normal` 狀態;pressed/selected 可先用程式暗化/外框,或之後再補同尺寸 PNG
+  - 多色卡片由 M2 母版色相轉換產生,若使用者希望每色有不同細節,需另做 Figma/AI 精修
+- 下一個最安全任務:
+  - 使用者檢查多色卡片 contact sheet;確認後可進 Figma 排 Monster 頁或補 pressed/selected 狀態
+
+---
+
+- 版本 / 階段:v10,Monster M2 sheet regenerated from latest bounding-box list(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `MONSTER_ASSET_BATCH_MANIFEST.md`:新增 Sheet M2 清單,標記 M2 取代 M1 作為目前 Monster 頁 Figma 切圖候選;補上透明版/標示版用途
+  - 新增 `assets/ui-final/monster-batch/source/monster-cards-sheet-m2-v1-chroma.png`:Monster M2 洋紅底原圖
+  - 新增 `assets/ui-final/monster-batch/source/monster-cards-sheet-m2-v1-transparent.png`:Monster M2 去背透明 PNG,供 Figma 切圖
+  - 新增 `assets/ui-final/monster-batch/source/monster-cards-sheet-m2-v1-preview.png`:Monster M2 棋盤格透明檢查預覽
+  - 新增 `assets/ui-final/monster-batch/source/monster-cards-sheet-m2-v1-annotated.png`:Monster M2 bounding-box 標示檢查圖,不可作為切圖來源
+- 契約變動:**無**。本輪只產出 Monster asset sheet 與規格文件,未改 DOM/CSS/JS,未接入遊戲
+- Codex 可改範圍:本次新增 `assets/ui-final/monster-batch/source/**` 並更新 Monster asset planning 文件
+- 測試結果:
+  - 透明檢查 ✅ `monster-cards-sheet-m2-v1-transparent.png` = RGBA,尺寸 `1536x1024`,四角 alpha 0
+  - 視覺檢查 ✅ 包含新版清單元件:slot empty/filled、captain/member badge、owned/pressed/selected card、locked/pressed card、stat strip、plus/lock/silhouette
+  - 未執行 `build.cjs` / `check_ui.cjs` / `qa.cjs`,因未改遊戲 runtime
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - M2 是 AI sheet 候選,仍需使用者在 Figma 檢查與切圖;若需要更精準尺寸,以 Figma 手動修正後的輸出為 runtime truth
+  - 標示版只供核對 bounding box,不能拿去切圖
+- 下一個最安全任務:
+  - 使用者檢查 M2 透明版與標示版;確認後在 Figma 切出 Monster final assets,再提供 Figma spec 給 Codex 接入 Monster 頁
+
+---
+
+- 版本 / 階段:v10,Monster asset manifest revised + IPv4 preview(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `MONSTER_ASSET_BATCH_MANIFEST.md`:依使用者標註調整 Monster asset 切圖規格;slot empty/filled 分離;captain/member 改為獨立 badge overlay;locked 共用一張 silhouette;卡片固定 grid size
+  - 啟動 IPv4 預覽伺服器 `0.0.0.0:4177`,用於手機真機確認
+- 契約變動:**無**。本輪只更新 Monster asset planning 文件與預覽方式,未接入 Monster 頁
+- Codex 可改範圍:本次只更新 planning 文件
+- 測試結果:
+  - `curl -I http://127.0.0.1:4177/` ✅ HTTP 200
+  - `lsof` ✅ Python 正在 IPv4 `*:4177` 監聽
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - 若手機仍無法連 `192.168.0.147:4177`,多半是 macOS 防火牆、路由器 AP isolation、或手機/電腦其實不在同一子網
+  - Monster final UI 尚未生成新版 sheet;目前只是修正切圖清單
+- 下一個最安全任務:
+  - 使用者依更新後清單標 bounding box / Figma 切圖;若需要,我再重生符合新版清單的 Monster M2 sheet
+
+---
+
+- 版本 / 階段:v10,Quest ratio fix + Monster asset planning/sheet M1(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `src/game.css`:Quest frame 改為鎖定 `440:956` 等比例縮放,避免 settings/icon 在不同手機比例下被壓扁;左箭頭沿用 `assets/ui-final/ui_final_final/leftarrow_normal.png` 的最新版本
+  - 更新 `QUEST_FINAL_LAYOUT_SPEC.md`:補上等比例縮放公式,並標記 settings states 已修正為全 `100x100 @2x`
+  - 新增 `MONSTER_ASSET_BATCH_MANIFEST.md`:定義 Monster / My Spirits 頁面 asset pipeline 與 Sheet M1 素材範圍
+  - 新增 `assets/ui-final/monster-batch/source/monster-cards-sheet-m1-v1-chroma.png`:Monster M1 洋紅底原圖
+  - 新增 `assets/ui-final/monster-batch/source/monster-cards-sheet-m1-v1-transparent.png`:Monster M1 去背透明 PNG,供 Figma 切圖
+  - 新增 `assets/ui-final/monster-batch/source/monster-cards-sheet-m1-v1-preview.png`:Monster M1 白底/棋盤格預覽
+  - 重新 build 根目錄 `index.html`
+  - 新增 `artifacts/quest_390_ratio_fix.png`:Settings 比例修正後的手機截圖
+- 契約變動:**無**。Monster M1 僅是 Figma 切圖 sheet,未接入遊戲;Quest 只改 CSS 縮放規則
+- Codex 可改範圍:本次改 `src/game.css`;新增 UI asset planning/source files
+- 測試結果:
+  - `node build.cjs` ✅
+  - `node check_ui.cjs` ✅
+  - `node qa.cjs` 第一次 9/10,除法盾自動測試未清關但無 JS 錯誤;立即重跑 ✅ 10 通過 / 0 失敗
+  - Playwright screenshot ✅ `390x844`:settings = `44.14 x 44.14`,Quest frame = `388.44 x 844`,未壓扁
+  - Monster M1 透明檢查 ✅ RGBA,四角 alpha 0
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - Monster M1 是 AI sheet 初稿,仍需使用者在 Figma 切圖/調整後再接入
+  - Monster 頁尚未有 Figma final layout spec;下一步需由使用者排版或提供 frame 後再讀 spec
+  - Quest boss 仍是暫代圖
+- 下一個最安全任務:
+  - 使用者真機刷新確認 Quest settings/left arrow;同時檢查 Monster M1 sheet 是否可切,若可用就進 Figma 排 Monster 頁
+
+---
+
+- 版本 / 階段:v10,Quest final UI integrated from Figma spec(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `src/game.css`:依 `QUEST_FINAL_LAYOUT_SPEC.md` 把 Quest 主畫面接成 440x956 Figma 座標式 layout;接入 `assets/ui-final/ui_final_final` 的 bg、settings、badges、arrows、rewards、eggs、stars、CTA、navbar、tabs
+  - 更新 `src/game.main.js`:只在 `rewardEgg()` 補上 `slot-1/2/3` class 與 image star 標記,方便 CSS 對應 final egg/star PNG;未改玩法邏輯
+  - 重新 build 根目錄 `index.html`
+  - 新增/更新 `artifacts/quest_440_final_v3.png`、`artifacts/quest_390_final_v3.png`:Quest 主畫面截圖驗證
+- 契約變動:**無**。保留既有 DOM id 與 mapHero hook;僅補純視覺 class/內部 star 標記
+- Codex 可改範圍:本次改 `src/game.css`;`src/game.main.js` 為視覺 DOM 微調,已在此 handoff 註明
+- 測試結果:
+  - `node build.cjs` ✅
+  - `node check_ui.cjs` ✅
+  - `node qa.cjs` ✅ 10 通過 / 0 失敗
+  - Playwright screenshot ✅ `440x956`:hero 440x956,start y=702.27,nav y=817,bottom=956,rewards y=486.98,settings 50x49.98
+  - Playwright screenshot ✅ `390x844`:nav bottom=844,start above nav,rewards above start,未超出手機畫面
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - boss art 仍使用目前遊戲角色暫代;之後需依使用者確認尺寸再生成 final boss PNG
+  - Quest 標題目前仍使用遊戲資料文字,中文長字串可能需後續針對各關微調字級/換行
+  - `bottom dark fill` 目前用 CSS 深色 band,不是 PNG;若需要完全貼 Figma 可改成匯出圖
+- 下一個最安全任務:
+  - 使用者真機確認 Quest 主畫面後,下一步生成/替換 final boss PNG,或依同樣 Figma spec 流程接入 Monster/Summon/Events
+
+---
+
+- 版本 / 階段:v10,Figma quest spec read + ui_final_final audit(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `QUEST_FINAL_LAYOUT_SPEC.md`:依 Figma `quest` frame 讀出的 440x956 座標建立正式 Quest layout spec
+  - 新增 `assets/ui-final/quest_figma_spec_raw.json`:Figma `quest` frame 的扁平化 raw layer spec
+  - 新增 `assets/ui-final/quest_figma_spec_layers.csv`:Figma `quest` frame 的 layer 座標表
+  - 新增 `assets/ui-final/ui_final_final/_contact_sheet.png`:目前 final assets 的總覽檢查圖
+- 契約變動:**無**。本輪只讀 Figma / 盤點素材 / 建立 spec,未改 DOM/CSS/JS/manifest,未接入遊戲
+- Codex 可改範圍:本次只新增 spec 與檢查圖
+- 測試結果:
+  - Figma API ✅ 讀到 frame `quest` = 440x956, node `19150:22577`
+  - 素材掃描 ✅ `assets/ui-final/ui_final_final/*.png` 尺寸與透明度已檢查
+  - 對位檢查 ✅ 大多數素材符合 @2x:Figma 尺寸;主要異常為 settings 狀態尺寸不一致
+  - 未執行 `build.cjs` / `check_ui.cjs` / `qa.cjs`,因未改遊戲 runtime
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - `settings_normal.png` 是 100x100,但 hover/pressed/disabled 是 50x50;狀態切換會跳尺寸,接入前需統一
+  - Figma 中 boss art 位置有 spec,但 `assets/ui-final/ui_final_final/` 尚未包含 final boss transparent PNG
+  - bottom dark fill 是 Figma rectangle,尚未決定用 CSS band 或 PNG
+- 下一個最安全任務:
+  - 修正/補齊 settings states 與 boss PNG 後,依 `QUEST_FINAL_LAYOUT_SPEC.md` 開始接入 Quest 主畫面正式 UI
+
+---
+
+- 版本 / 階段:v10,ui-final asset audit(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `assets/ui-final/_contact_sheet.png`:把目前 `assets/ui-final` 的 Quest UI 切圖做成總覽檢查圖
+- 契約變動:**無**。本輪只盤點使用者切好的 assets,未改 DOM/CSS/JS/manifest,未接入遊戲
+- Codex 可改範圍:本次只新增檢查用圖片
+- 測試結果:
+  - 透明檢查 ✅ `assets/ui-final/*.png` 皆為 RGBA 且四角透明
+  - 尺寸掃描 ✅ 已列出各素材尺寸與 alpha bbox;發現狀態/命名不完整,需接入前整理
+  - 未執行 `build.cjs` / `check_ui.cjs` / `qa.cjs`,因未改遊戲 runtime
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - `assets/ui-final` 目前缺少 phone frame、scene frame、magma cave background、boss 大圖等最終接入會需要的主視覺素材
+  - 部分 nav icon 狀態命名不一致或缺漏,接入前需建立正式命名表
+- 下一個最安全任務:
+  - 先根據 Figma 標準螢幕尺寸建立 Quest layout spec,再把 `assets/ui-final` 命名與狀態整理成可接入 manifest
+
+---
+
+- 版本 / 階段:v10,Quest Frame + Background Sheet 1D v1 for Figma(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `QUEST_ASSET_BATCH_MANIFEST.md`:加入 Sheet 1D 使用者 bounding-box guidance,規定只包含 phone frame / scene frame / magma cave background,不得烘入怪物或 UI
+  - 新增 `assets/ui/quest-batch/source/quest-frame-bg-sheet-1d-v1-chroma.png`:Sheet 1D v1 洋紅底原圖來源
+  - 新增 `assets/ui/quest-batch/source/quest-frame-bg-sheet-1d-v1-transparent.png`:Sheet 1D v1 去背透明 PNG,供 Figma 切圖
+  - 新增 `assets/ui/quest-batch/source/quest-frame-bg-sheet-1d-v1-preview.png`:Sheet 1D v1 白底/棋盤格檢查預覽
+- 契約變動:**無**。本輪只產出給 Figma 切圖的 sheet 與更新規格文件,未改 DOM/CSS/JS/manifest,未接入遊戲
+- Codex 可改範圍:本次只新增 `assets/ui/quest-batch/source/**` 並更新 Quest asset planning 文件
+- 測試結果:
+  - 透明檢查 ✅ `quest-frame-bg-sheet-1d-v1-transparent.png` = RGBA,四角 alpha 0
+  - 視覺檢查 ✅ 包含 phone frame、scene frame、magma cave background;未包含怪物、文字、settings、badges、arrows、rewards、CTA、nav bar
+  - 未執行 `build.cjs` / `check_ui.cjs` / `qa.cjs`,因未改遊戲 runtime
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - 這是 Figma 切圖來源,尚不是已命名單件 PNG,也尚未接入遊戲
+  - magma cave background 是獨立長方形圖,之後在 Figma/遊戲中需依 scene frame 裁切與縮放
+- 下一個最安全任務:
+  - 等使用者確認 Sheet 1D v1;若可用,等待 Figma 切圖回填或開始補 Monster/Summon/Events 對應頁面的 asset sheet
+
+---
+
+- 版本 / 階段:v10,Quest CTA + Navigation Sheet 1C v3 for Figma(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `QUEST_ASSET_BATCH_MANIFEST.md`:記錄 Sheet 1C v1/v2 不合格原因,新增「含綠色 UI 元件時必須改用洋紅 chroma key」規則,避免 selected green tab 被去背吃掉
+  - 新增 `assets/ui/quest-batch/source/quest-cta-nav-sheet-1c-v3-chroma.png`:Sheet 1C v3 洋紅底原圖來源
+  - 新增 `assets/ui/quest-batch/source/quest-cta-nav-sheet-1c-v3-transparent.png`:Sheet 1C v3 去背透明 PNG,供 Figma 切圖
+  - 新增 `assets/ui/quest-batch/source/quest-cta-nav-sheet-1c-v3-preview.png`:Sheet 1C v3 白底/棋盤格檢查預覽
+- 契約變動:**無**。本輪只產出給 Figma 切圖的 sheet 與更新規格文件,未改 DOM/CSS/JS/manifest,未接入遊戲
+- Codex 可改範圍:本次只新增 `assets/ui/quest-batch/source/**` 並更新 Quest asset planning 文件
+- 測試結果:
+  - 透明檢查 ✅ `quest-cta-nav-sheet-1c-v3-transparent.png` = RGBA,四角 alpha 0
+  - 視覺檢查 ✅ 包含 start button 四態、nav bar、nav slot 五態、四個 tab icon 五態、左右 chevron-only arrows 四態;箭頭無黃色方形底座;selected slot 保留綠色
+  - 未執行 `build.cjs` / `check_ui.cjs` / `qa.cjs`,因未改遊戲 runtime
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - 這是 Figma 切圖來源,尚不是已命名單件 PNG,也尚未接入遊戲
+  - CTA/nav labels 與 START CHALLENGE 文字未烘進 PNG;目前遵守 dynamic text 規則,若使用者要文字版需另產 label-baked sheet
+- 下一個最安全任務:
+  - 等使用者確認 Sheet 1C v3;若可用,繼續產下一張 Quest sheet 或等待 Figma 切圖回填後再接入遊戲
+
+---
+
+- 版本 / 階段:v10,Quest Rewards Sheet 1B v1 for Figma(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `QUEST_ASSET_BATCH_MANIFEST.md`:加入使用者 bounding-box guidance,規定 reward panel 最大、蛋約 panel 內中型元件、星星為小型 milestone icon,且不烤入 REWARDS 文字
+  - 新增 `assets/ui/quest-batch/source/quest-rewards-sheet-1b-v1-chroma.png`:Sheet 1B Rewards 綠幕原圖來源
+  - 新增 `assets/ui/quest-batch/source/quest-rewards-sheet-1b-v1-transparent.png`:Sheet 1B Rewards 去背透明 PNG,供 Figma 切圖
+  - 新增 `assets/ui/quest-batch/source/quest-rewards-sheet-1b-v1-preview.png`:Sheet 1B Rewards 白底/棋盤格檢查預覽
+- 契約變動:**無**。本輪只產出給 Figma 切圖的 sheet 與更新規格文件,未改 DOM/CSS/JS/manifest,未接入遊戲
+- Codex 可改範圍:本次只新增 `assets/ui/quest-batch/source/**` 並更新 Quest asset planning 文件
+- 測試結果:
+  - 透明檢查 ✅ `quest-rewards-sheet-1b-v1-transparent.png` = RGBA,四角 alpha 0
+  - 視覺檢查 ✅ 無文字;包含 reward panel、三組 egg locked/ready/cracked、star empty/filled;比例遵守 panel 最大、蛋中型、星星小型
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - locked egg 被 AI 生為帶鎖頭的暗色蛋;若使用者希望 mockup 中沒有鎖頭,需重生 locked variants 為單純灰階/暗色蛋
+  - 這是 Figma 切圖來源,尚不是已命名單件 PNG
+- 下一個最安全任務:
+  - 等使用者確認 Sheet 1B v1;若可用,繼續產 Sheet 1C: CTA and Navigation,仍不接入遊戲
+
+---
+
+- 版本 / 階段:v10,Quest Top Chrome Sheet 1A v5 for Figma(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `QUEST_ASSET_BATCH_MANIFEST.md`:標記 Sheet 1A v4 不合格,修正尺寸校準規則為「黃色 Stage 元件必須明顯大於紫色 Boss badge」;若使用者提供 Figma 量測/框選尺寸則優先採用
+  - 新增 `assets/ui/quest-batch/source/quest-top-chrome-sheet-1a-v5-chroma.png`:Sheet 1A v5 綠幕原圖來源
+  - 新增 `assets/ui/quest-batch/source/quest-top-chrome-sheet-1a-v5-transparent.png`:Sheet 1A v5 去背透明 PNG,供 Figma 切圖
+  - 新增 `assets/ui/quest-batch/source/quest-top-chrome-sheet-1a-v5-preview.png`:Sheet 1A v5 白底/棋盤格檢查預覽
+- 契約變動:**無**。本輪只產出給 Figma 切圖的 sheet 與更新規格文件,未改 DOM/CSS/JS/manifest,未接入遊戲
+- Codex 可改範圍:本次只新增 `assets/ui/quest-batch/source/**` 並更新 Quest asset planning 文件
+- 測試結果:
+  - 透明檢查 ✅ `quest-top-chrome-sheet-1a-v5-transparent.png` = RGBA,四角 alpha 0
+  - 視覺檢查 ✅ 黃色 Stage 元件明顯大於紫色 Boss badge;無 reward label;包含 settings 四態與左右箭頭四態
+  - 未執行 `build.cjs` / `check_ui.cjs` / `qa.cjs`,因未改遊戲 runtime
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - v5 已修正黃色/紫色尺寸關係,但仍需使用者確認是否足夠接近附圖 mockup
+  - 若要杜絕比例反覆修正,最可靠方式是使用者在 Figma/mockup 上標註 bounding box 或提供每個元件約略寬高
+- 下一個最安全任務:
+  - 等使用者確認 Sheet 1A v5;若可用,繼續產 Sheet 1B: Rewards,仍不接入遊戲
+
+---
+
+- 版本 / 階段:v10,Quest Top Chrome Sheet 1A v4 for Figma(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `QUEST_ASSET_BATCH_MANIFEST.md`:把 Stage 從大型 badge 修正為 `quest.stage.indicator`,新增 Size Calibration Rules,要求 Stage 小型 indicator / Boss 大型 badge,並規定若使用者提供 Figma 量測或框選尺寸則優先採用
+  - 新增 `assets/ui/quest-batch/source/quest-top-chrome-sheet-1a-v4-chroma.png`:Sheet 1A v4 綠幕原圖來源
+  - 新增 `assets/ui/quest-batch/source/quest-top-chrome-sheet-1a-v4-transparent.png`:Sheet 1A v4 去背透明 PNG,供 Figma 切圖
+  - 新增 `assets/ui/quest-batch/source/quest-top-chrome-sheet-1a-v4-preview.png`:Sheet 1A v4 白底/棋盤格檢查預覽
+- 契約變動:**無**。本輪只產出給 Figma 切圖的 sheet 與更新規格文件,未改 DOM/CSS/JS/manifest,未接入遊戲
+- Codex 可改範圍:本次只新增 `assets/ui/quest-batch/source/**` 並更新 Quest asset planning 文件
+- 測試結果:
+  - 透明檢查 ✅ `quest-top-chrome-sheet-1a-v4-transparent.png` = RGBA,四角 alpha 0
+  - 視覺檢查 ✅ Stage indicator 小於 Boss badge;已移除 reward label;包含 settings 四態與左右箭頭四態
+  - 未執行 `build.cjs` / `check_ui.cjs` / `qa.cjs`,因未改遊戲 runtime
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - v4 已修正 Stage/Boss 同尺寸錯誤,但仍需使用者確認是否足夠接近附圖 mockup
+  - 若要杜絕比例誤差,最可靠方式是由使用者在 Figma/mockup 上標註 bounding box 或提供每個元件約略寬高
+- 下一個最安全任務:
+  - 等使用者確認 Sheet 1A v4;若可用,繼續產 Sheet 1B: Rewards,仍不接入遊戲
+
+---
+
+- 版本 / 階段:v10,Quest Top Chrome Sheet 1A v3 for Figma(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `QUEST_ASSET_BATCH_MANIFEST.md`:記錄 Sheet 1A v2 的錯誤,明確禁止 reward label 出現在 Sheet 1A,並加入 badge/settings/arrow 相對比例 guardrails
+  - 新增 `assets/ui/quest-batch/source/quest-top-chrome-sheet-1a-v3-chroma.png`:Sheet 1A v3 綠幕原圖來源
+  - 新增 `assets/ui/quest-batch/source/quest-top-chrome-sheet-1a-v3-transparent.png`:Sheet 1A v3 去背透明 PNG,供 Figma 切圖
+  - 新增 `assets/ui/quest-batch/source/quest-top-chrome-sheet-1a-v3-preview.png`:Sheet 1A v3 白底/棋盤格檢查預覽
+- 契約變動:**無**。本輪只產出給 Figma 切圖的 sheet 與更新規格文件,未改 DOM/CSS/JS/manifest,未接入遊戲
+- Codex 可改範圍:本次只新增 `assets/ui/quest-batch/source/**` 並更新 Quest asset planning 文件
+- 測試結果:
+  - 透明檢查 ✅ `quest-top-chrome-sheet-1a-v3-transparent.png` = RGBA,四角 alpha 0
+  - 視覺檢查 ✅ 已移除 reward label;stage/boss badge 明顯大於 settings;包含 settings 四態與左右箭頭四態
+  - 未執行 `build.cjs` / `check_ui.cjs` / `qa.cjs`,因未改遊戲 runtime
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - v3 解決了 v2 的比例與多餘 reward label 問題,但仍需使用者確認是否足夠接近附圖 mockup
+  - 這是 Figma 切圖來源,尚不是已命名單件 PNG
+- 下一個最安全任務:
+  - 等使用者確認 Sheet 1A v3;若可用,繼續產 Sheet 1B: Rewards,仍不接入遊戲
+
+---
+
+- 版本 / 階段:v10,Quest Top Chrome Sheet 1A v2 for Figma(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `assets/ui/quest-batch/source/quest-top-chrome-sheet-1a-v2-chroma.png`:Sheet 1A v2 綠幕原圖來源
+  - 新增 `assets/ui/quest-batch/source/quest-top-chrome-sheet-1a-v2-transparent.png`:Sheet 1A v2 去背透明 PNG,供 Figma 切圖
+  - 新增 `assets/ui/quest-batch/source/quest-top-chrome-sheet-1a-v2-preview.png`:Sheet 1A v2 白底/棋盤格檢查預覽
+- 契約變動:**無**。本輪只產出給 Figma 切圖的 sheet,未改 DOM/CSS/JS/manifest,未接入遊戲
+- Codex 可改範圍:本次只新增 `assets/ui/quest-batch/source/**`
+- 測試結果:
+  - 透明檢查 ✅ `quest-top-chrome-sheet-1a-v2-transparent.png` = RGBA,四角 alpha 0
+  - 視覺檢查 ✅ 無文字烤進 PNG;包含 stage/boss badge、settings 四態、left/right arrow 四態、reward label
+  - 未執行 `build.cjs` / `check_ui.cjs` / `qa.cjs`,因未改遊戲 runtime
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - v2 比前一張更完整且更接近 mockup,但仍需使用者確認是否足夠接近附圖高保真方向
+  - 這是 Figma 切圖來源,尚不是已命名單件 PNG
+- 下一個最安全任務:
+  - 等使用者確認 Sheet 1A v2;若可用,繼續產 Sheet 1B: Rewards,仍不接入遊戲
+
+---
+
+- 版本 / 階段:v10,Quest mockup asset inventory correction(Codex)
+- 本次修改檔案(Codex):
+  - 更新 `QUEST_ASSET_BATCH_MANIFEST.md`:依使用者最新 Quest mockup 圖重新補完整 asset inventory,包含按鈕、蛋、星星、navigation bar、每個 tab、hover/pressed/selected/disabled/locked/ready/cracked 等狀態
+  - 標記 `quest-chrome-sheet-01-transparent.png` 不符合最終 mockup 視覺,不能作為 final asset sheet
+- 契約變動:**無**。本輪只更新批次產圖規格文件,未改 DOM/CSS/JS/manifest,未接入遊戲
+- Codex 可改範圍:本次只更新 Quest asset planning 文件
+- 測試結果:
+  - 未執行 `build.cjs` / `check_ui.cjs` / `qa.cjs`,因未改遊戲 runtime
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - 目前已產出的 Sheet 1 風格偏 generic chunky,不夠接近附圖 Quest mockup
+  - Quest 頁尚未有完整 final asset sheet;需要依 1A/1B/1C/1D 分批重生,給使用者在 Figma 切圖確認後才接入
+- 下一個最安全任務:
+  - 重生 Sheet 1A: Quest Top Chrome,以附圖 mockup 為硬目標;只產圖給 Figma,不接入遊戲
+
+---
+
+- 版本 / 階段:v10,Quest Chrome Sheet 1 for Figma(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `assets/ui/quest-batch/source/quest-chrome-sheet-01-chroma.png`:Sheet 1 綠幕原圖來源
+  - 新增 `assets/ui/quest-batch/source/quest-chrome-sheet-01-transparent.png`:Sheet 1 去背透明 PNG,供 Figma 切圖
+  - 新增 `assets/ui/quest-batch/source/quest-chrome-sheet-01-preview.png`:白底/棋盤格檢查預覽
+- 契約變動:**無**。本輪只產出給 Figma 切圖的 sheet,未改 DOM/CSS/JS/manifest,未接入遊戲
+- Codex 可改範圍:本次只新增 `assets/ui/quest-batch/source/**`
+- 測試結果:
+  - 透明檢查 ✅ `quest-chrome-sheet-01-transparent.png` = RGBA,四角 alpha 0
+  - 未執行 `build.cjs` / `check_ui.cjs` / `qa.cjs`,因未改遊戲 runtime
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - 生圖實際尺寸為 1254x1254,不是 prompt 要求的 2048x2048;但透明 PNG 可直接進 Figma 切圖
+  - Sheet 1 是設計切圖來源,不是最終已命名單件 PNG;需使用者在 Figma 切成 manifest 建議檔名後再接入
+- 下一個最安全任務:
+  - 等使用者確認 Sheet 1 可切;同時可依 `QUEST_ASSET_BATCH_MANIFEST.md` 產出 Sheet 2: Rewards,仍不接入遊戲
+
+---
+
+- 版本 / 階段:v10,Quest asset batch planning(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `QUEST_ASSET_BATCH_MANIFEST.md`:整理 Quest 主頁所有需要批次產出的透明 UI 元件、建議檔名、尺寸、狀態、是否 9-slice、Figma 切圖與後續接入規則
+- 契約變動:**無**。本輪只新增規劃文件,未改 DOM/CSS/JS/素材 manifest
+- Codex 可改範圍:本次只做 Quest asset batch 規劃,未接入遊戲
+- 測試結果:
+  - 未執行 `build.cjs` / `check_ui.cjs` / `qa.cjs`,因未改遊戲 runtime
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - `button.primary` / `button.jr` 已接入遊戲,但後續 Quest asset 應先產 sheet 給使用者在 Figma 切圖確認,再接入
+  - Quest batch filenames 仍是建議命名;等使用者確認 Figma 工作流後再寫入正式 `ui_manifest.json`
+- 下一個最安全任務:
+  - 依 `QUEST_ASSET_BATCH_MANIFEST.md` 先產出 Sheet 1: Quest Chrome,只供 Figma 切圖,不接入遊戲
+
+---
+
+- 版本 / 階段:v10,UI kit button.jr true art(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `assets/ui/kit/source/button.jr.sheet.ai.v1.png`:第一版 AI 生圖來源備份(比例較短,未採用為正式 art)
+  - 新增 `assets/ui/kit/source/button.jr.sheet.ai.v2.png`:AI 生圖正式來源(三狀態表)
+  - 新增 `assets/ui/kit/source/button.jr.sheet.alpha.v2.png`:去背後的三狀態來源
+  - 新增/更新 `assets/ui/kit/source/button.jr.preview.png`:三張切片檢查圖
+  - 新增/更新 `assets/ui/kit/art/button.jr.normal.png`:384x132 透明 PNG 真圖
+  - 新增/更新 `assets/ui/kit/art/button.jr.pressed.png`:384x132 透明 PNG 真圖
+  - 新增/更新 `assets/ui/kit/art/button.jr.disabled.png`:384x132 透明 PNG 真圖
+  - 更新 `src/ui-kit.generated.css`:由 `make_kit.py` 重新產生,`.ui-button-jr` 改讀 `assets/ui/kit/art/` 真圖
+  - 重新 build 根目錄 `index.html`
+- 契約變動:**無**。未改 DOM id/class,未改 `VIEW_CONTRACT.md`,未改玩法資料
+- Codex 可改範圍:本次只新增 UI art/source 並重生 ui-kit CSS;未碰玩法 JS
+- 測試結果:
+  - `python3 assets/ui/kit/make_kit.py` ✅ 產生 12 個狀態圖規則
+  - button jr 圖片檢查 ✅ 三張皆 384x132 / RGBA / 四角透明 / 邊緣 alpha 乾淨
+  - `node build.cjs` ✅
+  - `node check_ui.cjs` ✅ `.ui-*` 元件外觀皆來自圖片素材,無 CSS 畫 chrome
+  - `node qa.cjs` ✅ 10 通過 / 0 失敗
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - `button.primary` 與 `button.jr` 已是真圖;`panel.cream`、`panel.dark`、`button.ghost`、`badge.pill`、`frame.board` 仍使用 placeholder
+  - `button.jr.sheet.ai.v1.png` 保留為過程備份,正式 art 使用 v2
+- 下一個最安全任務:
+  - 照同樣流程製作 `panel.cream` 真圖,讓開始畫面的面板底也脫離 placeholder
+
+---
+
+- 版本 / 階段:v10,UI kit button.primary true art(Codex)
+- 本次修改檔案(Codex):
+  - 新增 `assets/ui/kit/source/button.primary.sheet.ai.v2.png`:AI 生圖來源(三狀態表)
+  - 新增 `assets/ui/kit/source/button.primary.sheet.alpha.v2.png`:去背後的三狀態來源
+  - 新增/更新 `assets/ui/kit/source/button.primary.preview.png`:三張切片檢查圖
+  - 新增/更新 `assets/ui/kit/art/button.primary.normal.png`:384x132 透明 PNG 真圖
+  - 新增/更新 `assets/ui/kit/art/button.primary.pressed.png`:384x132 透明 PNG 真圖
+  - 新增/更新 `assets/ui/kit/art/button.primary.disabled.png`:384x132 透明 PNG 真圖
+  - 更新 `src/ui-kit.generated.css`:由 `make_kit.py` 重新產生,`.ui-button-primary` 改讀 `assets/ui/kit/art/` 真圖
+  - 重新 build 根目錄 `index.html`
+- 契約變動:**無**。未改 DOM id/class,未改 `VIEW_CONTRACT.md`,未改玩法資料
+- Codex 可改範圍:本次只新增 UI art/source 並重生 ui-kit CSS;未碰玩法 JS
+- 測試結果:
+  - `python3 assets/ui/kit/make_kit.py` ✅ 產生 12 個狀態圖規則
+  - button primary 圖片檢查 ✅ 三張皆 384x132 / RGBA / 四角透明 / 邊緣 alpha 乾淨
+  - `node build.cjs` ✅
+  - `node check_ui.cjs` ✅ `.ui-*` 元件外觀皆來自圖片素材,無 CSS 畫 chrome
+  - `node qa.cjs` ✅ 最終輪 10 通過 / 0 失敗
+  - 註:前兩輪 QA 的除法盾自動遊玩曾未清關,第三輪全綠;未出現 JS/runtime/draw error
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - `button.primary` 已是真圖;`button.jr`、`panel.cream`、`badge.pill` 等仍使用 placeholder
+  - AI 來源圖已清除綠幕並切片,但若要更高一致性,下一步可同流程補 `button.jr`
+- 下一個最安全任務:
+  - 照同樣流程做 `button.jr` 藍色主按鈕,讓開始畫面的「小小獵人」也變成真圖
+
+---
+
+- 版本 / 階段:v10,圖片式 UI 套件(ui-kit)+ 生圖/切圖工作流(Claude)
+- 本次修改檔案(Claude):
+  - 新增 `assets/ui/kit/ui_manifest.json`:UI 素材唯一權威清單(chrome 元件×狀態×尺寸×9-slice×生圖 prompt)
+  - 新增 `assets/ui/kit/make_kit.py`:由 manifest 產佔位 PNG + 生成 `src/ui-kit.generated.css`(border-image 九宮格 + 狀態選擇器);有真圖(`art/<id>.<state>.png`)就用真圖
+  - 新增 `src/ui-kit.generated.css`(生成物)、`assets/ui/kit/placeholders/*`(12 張佔位圖)
+  - 新增 `check_ui.cjs`:UI 守門,`.ui-*` 元件用 gradient/box-shadow/描邊 border 即 build 失敗(擋 CSS 退回)
+  - 新增 `UI_ASSET_GUIDE.md`:給 Codex 的生圖→切圖→落地 playbook
+  - 改 `src/index.html`:`#startOverlay` 改為全圖片參考實作(面板 `.ui-panel-cream` + 兩顆 `.ui-btn .ui-button-*`,零 CSS 畫);head 加 `ui-kit.generated.css`
+  - 改 `build.cjs`:inline `ui-kit.generated.css`
+  - 更新 `VIEW_CONTRACT.md`(擁有權 + build/測試流程 + 圖片式 UI 規則)
+- 契約變動:**有(新框架)**。新增 ui-kit 圖片式 UI 系統;新 build/測試步驟:`make_kit.py` → `build.cjs` → `check_ui.cjs` → `qa.cjs`
+- 給 Codex 的下一步(這是讓你接手生 UI 圖的入口):
+  - 讀 `UI_ASSET_GUIDE.md` + `assets/ui/kit/ui_manifest.json`
+  - 依每個元件的 `prompt` 生狀態圖 → 使用者切成 `assets/ui/kit/art/<id>.<state>.png` → 跑 `make_kit.py`
+  - 把更多畫面(關卡選擇、結算、孵化…)照 `#startOverlay` 範本改成 `.ui-*`,逐畫面替換
+- 測試結果:`make_kit.py` ✅ 產 12 規則;`build.cjs` ✅;`check_ui.cjs` ✅;`qa.cjs` 加/減/乘清關零錯誤
+- 玩法邏輯變更:**無**(純 UI 外觀框架)
+- 註:Codex 另有 `math-puzzle-godot/` 的 Godot 實驗(見下方上一則),與本 HTML 主線並行;ui-kit 是讓 HTML 不換引擎也能拿到專業質感的路線
+- 版本 / 階段:v10,Godot 4.7 installed + Web build running in browser(Codex)
+- 本次修改檔案(Codex):
+  - 安裝 Godot `4.7.stable.official.5b4e0cb0f` 到 `/Applications/Godot.app`
+  - 安裝 Godot Web export templates 到 `~/Library/Application Support/Godot/export_templates/4.7.stable/`
+  - 更新 `math-puzzle-godot/scripts/{GameManager,BoardManager,Board,Tile,Monster,HUD}.gd`:修正 Godot 4.7 headless import 時的 typed custom resource / custom node 解析問題
+  - 更新 `math-puzzle-godot/export_presets.cfg`:Web custom template 改為 `web_nothreads_*`,補 script export 欄位、關閉 icon export
+  - 更新 `math-puzzle-godot/builds/web/index.html`:改載入 `godot_nothreads.js`,避免瀏覽器使用舊 threaded WASM 快取
+  - 產出 `math-puzzle-godot/builds/web/{game.pck,godot_nothreads.js,godot_nothreads.wasm,godot_nothreads.audio.worklet.js,godot_nothreads.audio.position.worklet.js}`
+  - 更新 `math-puzzle-godot/scripts/Board.gd`:拖曳中改用全域 `_input` 監聽 mouse/touch move 與 release,避免 Web/手機放開事件漏接後選取卡住
+  - 產出 `math-puzzle-godot/builds/web/game_interaction_fix.pck`,並讓 `index.html` 載入此新版遊戲包以避開舊 `game.pck` 快取
+  - 更新 `HANDOFF.md`:記錄 Godot 安裝、專案匯入、Web build 100% 卡住原因與修復狀態
+- 契約變動:**無**。未改 Web DOM id/class,未改 `VIEW_CONTRACT.md`,未改玩法 JS/CSS/runtime asset
+- Codex 可改範圍:本次只改 `math-puzzle-godot/` 新 Godot 專案與交接文件;Web runtime 保持原樣
+- 測試結果:
+  - ✅ `/Applications/Godot.app/Contents/MacOS/Godot --version` 回傳 `4.7.stable.official.5b4e0cb0f`
+  - ✅ `Godot --editor --headless --path math-puzzle-godot --quit` 成功完成首次匯入
+  - ✅ `Godot --headless --path math-puzzle-godot --quit` 成功載入專案
+  - ✅ `Godot --headless --path math-puzzle-godot --export-pack Web builds/web/game.pck` 成功產出 `game.pck`
+  - ✅ 手動組裝 non-threaded Web build runtime 到 `math-puzzle-godot/builds/web/`
+  - ✅ 瀏覽器實測 `http://127.0.0.1:8067/?fresh=basename-nothreads`:Godot 4.7 啟動成功,console 顯示 `single-threaded`,畫面可見 6x6 盤面
+  - ✅ 已修復 `Loading Math Puzzle Godot... 100%` 卡住:原 threaded template 需要 `SharedArrayBuffer` / cross-origin isolation headers,且瀏覽器快取舊 `godot.wasm`;現改為 `godot_nothreads.*`
+  - ✅ `Godot --headless --path math-puzzle-godot --quit` 成功載入拖曳修正版
+  - ✅ `Godot --headless --path math-puzzle-godot --export-pack Web builds/web/game.pck` 成功重新打包,並複製為 `game_interaction_fix.pck`
+  - ⚠️ 拖曳 release 修正後未能用瀏覽器自動化重測:目前瀏覽器安全策略拒絕代理操作 `http://127.0.0.1:8067`
+  - ⚠️ `Godot --export-release Web builds/web/index.html` 仍回報 preset configuration errors,Godot CLI 未提供更細錯誤;目前以官方 template + `game.pck` 作為可測 Web build
+  - ✅ `math-puzzle-godot/` 未引用 `src/game*`、root `index.html` 或 `math-chain-v10.html`
+  - 未執行 `node build.cjs` / `node qa.cjs`,因本次沒有修改 Web runtime 或 build output
+- 玩法邏輯變更:**無**
+- 目前風險:
+  - Godot editor 已打開專案,但尚未由使用者在 GUI 中按 Play 做互動測試
+  - Web 上方中文顯示為方塊,表示尚未配置可匯出的中文字型;目前不影響拖曳結算,但需要加入正式 CJK font Resource
+  - Web full preset export 仍需在 Godot GUI 的 Export 視窗查看具體缺漏欄位;CLI 只給 generic configuration errors
+  - `builds/web/` 內仍保留舊 `godot.*` threaded 檔案;目前 `index.html` 使用的是 `godot_nothreads.*`
+  - Android APK 實際輸出仍需要本機 Godot Android export template / SDK / signing 設定
+  - 目前只支援 number tile vertical slice;特殊運算珠、技能、星等、地圖、收藏系統尚未移植
+- 下一個最安全任務:
+  - 在 Godot GUI 打開 Project > Export > Web,查看 preset configuration errors 的具體欄位;若要給 iPhone 異網測試,下一步把 `math-puzzle-godot/builds/web/` 發到 GitHub Pages / Cloudflare Pages 或用 tunnel 暫時公開
+
+## 協作規則(沿用 codex-gamestudio-skill 精神)
+1. 動手前先看現有結構與 `VIEW_CONTRACT.md`,只改自己擁有的檔。
+2. 改到契約(id/class/CSS 變數/事件)一定在本檔註明「契約變動」。
+3. 重大架構變更、破壞性檔案操作、核心玩法轉向、發布前,先問使用者確認。
+4. 每次重要回覆結尾附上上面的【交接狀態】區塊,沒改檔也誠實填。
+5. **每次完工必跑 `./release.sh "說明"`**:自動 `make_kit → build → check_ui → qa → commit → push`,GitHub Actions 隨即部署到固定 Pages 連結。不要只改檔不發版。(詳見 `RELEASE_PROCESS.md`)
+6. **實驗/試做檔放 `_archive/`**(已 gitignore,不上傳),別散在根目錄。

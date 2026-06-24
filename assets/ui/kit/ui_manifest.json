@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "title": "數字獵人 UI 素材契約(唯一權威清單)",
+  "howItWorks": "這份檔是『所有 UI chrome 圖片』的唯一清單。每個元件有尺寸、九宮格邊界(可伸縮)、需要的狀態、以及給 AI 的生圖 prompt。流程:Codex 依 prompt 生圖 → 使用者切成透明 PNG 放到 art/<id>.<state>.png → 跑 make_kit.py → 自動產生 CSS 與佔位圖。沒有真圖時用佔位圖,畫面照樣是圖片式、可組裝。",
+  "artDir": "assets/ui/kit/art",
+  "placeholderDir": "assets/ui/kit/placeholders",
+  "generatedCss": "src/ui-kit.generated.css",
+  "cssPrefix": "ui",
+  "artStyle": "Cute Chunky Math Quest:厚重黑色描邊(約 6–10px)、圓角、玩具感、扁平無寫實漸層、高彩度、輕微塑膠亮面。透明背景(去背 PNG)。風格與 assets/ui-concepts/cute-chunky-math-quest-board.png 一致。",
+  "stateMeaning": {
+    "normal": "預設",
+    "hover": "滑鼠移上(桌機;手機可省略)",
+    "pressed": "按下/點擊中",
+    "disabled": "不可用(灰階/降透明)"
+  },
+  "ninePatch": {
+    "panel.cream": {
+      "color": "#fff0c2",
+      "size": [512, 320],
+      "slice": [64, 64, 64, 64],
+      "states": ["normal"],
+      "use": "彈窗/資訊面板底(開始、結算、設定、孵化…)",
+      "prompt": "A cute chunky game UI panel, cream/parchment rounded card with thick dark outline, soft inner border, flat toy style, transparent background, 512x320, designed as a 9-slice with ~64px non-stretch corners."
+    },
+    "panel.dark": {
+      "color": "#242233",
+      "size": [512, 256],
+      "slice": [56, 56, 56, 56],
+      "states": ["normal"],
+      "use": "深色 HUD 條 / 頂列 / 盤面框底",
+      "prompt": "A dark navy chunky UI bar/panel with thick black outline and subtle top highlight, flat toy style, transparent background, 512x256, 9-slice ~56px corners."
+    },
+    "button.primary": {
+      "color": "#ffc743",
+      "size": [384, 132],
+      "slice": [40, 44, 52, 44],
+      "states": ["normal", "pressed", "disabled"],
+      "use": "主要行動按鈕(開始、下一關、抽蛋…)",
+      "prompt": "A chunky toy game button, golden-yellow rounded pill with thick black outline and thick bottom lip (3D), small top gloss. Provide three states: normal, pressed(底部變薄、整體下移、略暗), disabled(灰階). Transparent background, 384x132 each, 9-slice corners ~44px."
+    },
+    "button.jr": {
+      "color": "#48c4df",
+      "size": [384, 132],
+      "slice": [40, 44, 52, 44],
+      "states": ["normal", "pressed", "disabled"],
+      "use": "幼兒模式友善按鈕(藍色)",
+      "prompt": "Same chunky toy button as button.primary but friendly sky-blue. Three states normal/pressed/disabled. Transparent, 384x132, 9-slice ~44px."
+    },
+    "button.ghost": {
+      "color": "#c8c3e6",
+      "size": [288, 104],
+      "slice": [36, 40, 44, 40],
+      "states": ["normal", "pressed"],
+      "use": "次要按鈕(離開、取消、返回)",
+      "prompt": "A smaller secondary chunky button, muted lavender, thick dark outline, flat. normal + pressed. Transparent, 288x104, 9-slice ~40px."
+    },
+    "badge.pill": {
+      "color": "#f45a72",
+      "size": [320, 96],
+      "slice": [48, 60, 48, 60],
+      "states": ["normal"],
+      "use": "標籤膠囊(BOSS、關卡編號、機關提示)",
+      "prompt": "A chunky pill/label badge, bright pink rounded capsule with thick black outline, flat toy style. Transparent, 320x96, 9-slice with large ~60px left/right corners so it scales as a pill."
+    },
+    "frame.board": {
+      "color": "#081b2b",
+      "size": [432, 432],
+      "slice": [44, 44, 44, 44],
+      "states": ["normal"],
+      "use": "棋盤外框 / well(包住 canvas 盤面)",
+      "prompt": "A chunky toy game-board frame/tray, dark teal-navy with thick rounded outer rim and inner well shadow, hollow center (transparent middle), flat style. Transparent, 432x432, 9-slice ~44px rim."
+    }
+  },
+  "spritesNote": "單張 icon(技能/獎勵/導覽)已在 assets/ui/icons/ 並有自己的 manifest.json,沿用即可;本檔只管會伸縮的 chrome(面板/按鈕/徽章/框)。"
+}
