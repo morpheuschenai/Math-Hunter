@@ -52,6 +52,8 @@
   --board-well: #081b2b;
   --board-glow: rgba(110,228,255,.24);
   --reward-gold: #ffd45a;
+  /* z-index ladder: battle chrome/fx stay below 100; modal overlays must use 200+. */
+  --z-instruction-overlay: 240;
 
   /* === 字型 token(對齊 Figma「game」spec:Baloo 2 / 800 / 大寫 / 行高1.6 / 字距0)===
      英數用 Baloo 2;中文 fallback 到 Noto Sans TC。字級之後可再微調。 */
@@ -1039,6 +1041,217 @@ body.jr #playerRow { display:none; }
 
 #towerBonusMsg:before { background-image:url("assets/ui/icons/reward-chest.png"); }
 
+/* === Fail result: Figma frame 440 x 956, node 19307:22148 === */
+#failOverlay.overlay {
+  inset:auto;
+  top:50%;
+  left:50%;
+  width:min(100vw, calc(100dvh * 440 / 956), 440px);
+  height:min(100dvh, calc(100vw * 956 / 440), 956px);
+  max-height:none;
+  display:block;
+  padding:0 !important;
+  overflow:hidden;
+  transform:translate(-50%,-50%);
+  color:#fff;
+  background:#07121d url("assets/ui/game/result/fail_result_background.png") left top/100% 100% no-repeat;
+  border:0;
+  box-shadow:0 0 0 100vmax #07121d;
+  container-type:inline-size;
+  touch-action:manipulation;
+}
+
+#failOverlay.hidden { display:none !important; }
+
+#failOverlay > * {
+  position:absolute;
+  margin:0;
+}
+
+#failTitleRow {
+  left:6.591%;
+  top:7.427%;
+  width:89.091%;
+  height:9.1%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:1.818%;
+}
+
+#failTitleRow .failTitleWing {
+  flex:0 0 13.864%;
+  height:60%;
+  background:center/100% 100% no-repeat;
+}
+
+#failTitleRow .failTitleWingLeft {
+  background-image:url("assets/ui/game/result/fail_title_bat_wing_left.png");
+}
+
+#failTitleRow .failTitleWingRight {
+  background-image:url("assets/ui/game/result/fail_title_bat_wing_right.png");
+}
+
+#failOverlay #failTitleRow h1,
+#failOverlay h1 {
+  position:static;
+  width:auto;
+  max-width:none;
+  min-height:0;
+  display:block;
+  padding:0;
+  color:#f44431;
+  background:transparent;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  font-family:"Baloo 2","Arial Rounded MT Bold","Noto Sans TC Black",sans-serif;
+  font-size:12.273cqw;
+  font-weight:600;
+  line-height:1;
+  letter-spacing:0;
+  text-align:center;
+  text-transform:uppercase;
+  white-space:nowrap;
+  -webkit-text-stroke:1.15cqw #3c1510;
+  paint-order:stroke fill;
+  text-shadow:0 .65cqw 0 rgba(0,0,0,.4);
+}
+
+#failHeroArt {
+  left:18.523%;
+  top:20.293%;
+  width:63.182%;
+  height:31.067%;
+  background:url("assets/ui/game/result/fail_broken_math_shield.png") center/100% 100% no-repeat;
+}
+
+#failStatusBanner {
+  left:18.295%;
+  top:52.615%;
+  width:63.636%;
+  height:8.054%;
+  display:grid;
+  place-items:center;
+  padding:0;
+  background:url("assets/ui/game/result/fail_status_banner.png") center/100% 100% no-repeat;
+}
+
+#failStatusBanner span {
+  display:block;
+  color:#fff;
+  font-family:"Baloo 2","Arial Rounded MT Bold","Noto Sans TC Black",sans-serif;
+  font-size:6.364cqw;
+  font-weight:700;
+  line-height:1;
+  letter-spacing:0;
+  text-align:center;
+  text-transform:uppercase;
+  white-space:nowrap;
+  -webkit-text-stroke:.9cqw #1b0f09;
+  paint-order:stroke fill;
+}
+
+#failOverlay #failStats {
+  left:4.545%;
+  top:61.088%;
+  width:91.136%;
+  height:14.958%;
+  max-width:none;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:1.6cqw;
+  padding:0 12.727%;
+  color:rgba(0,0,0,.8);
+  background:url("assets/ui/game/result/fail_tip_panel.png") center/100% 100% no-repeat;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  font-family:"Baloo 2","Arial Rounded MT Bold","Noto Sans TC Black",sans-serif;
+  font-weight:700;
+  line-height:1.2;
+  text-align:center;
+  text-transform:uppercase;
+  letter-spacing:-.182cqw;
+}
+
+#failOverlay #failStats:before {
+  content:none;
+}
+
+#failStats strong {
+  display:block;
+  font-size:9.091cqw;
+  line-height:1;
+  white-space:nowrap;
+}
+
+#failStats span {
+  display:block;
+  font-size:5.455cqw;
+  font-weight:600;
+  line-height:1;
+  white-space:nowrap;
+}
+
+#failActions {
+  left:4.545%;
+  top:76.464%;
+  width:91.136%;
+  height:7.95%;
+  display:flex;
+  align-items:stretch;
+  justify-content:space-between;
+  gap:.227%;
+}
+
+#failActions #retryBtn,
+#failActions #backBtn {
+  position:relative;
+  width:49.875%;
+  max-width:none;
+  min-height:0;
+  height:100%;
+  display:grid;
+  place-items:center;
+  padding:0;
+  color:#fff;
+  background:center/100% 100% no-repeat !important;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  font-family:"Baloo 2","Arial Rounded MT Bold","Noto Sans TC Black",sans-serif;
+  font-size:6.364cqw;
+  font-weight:700;
+  line-height:1;
+  letter-spacing:0;
+  text-align:center;
+  text-transform:uppercase;
+  white-space:nowrap;
+  -webkit-text-stroke:.9cqw #1b0f09;
+  paint-order:stroke fill;
+  text-shadow:none;
+}
+
+#failActions #retryBtn {
+  background-image:url("assets/ui/game/result/fail_ok_button_normal.png") !important;
+}
+
+#failActions #retryBtn:active {
+  background-image:url("assets/ui/game/result/fail_ok_button_pressed.png") !important;
+}
+
+#failActions #backBtn {
+  background-image:url("assets/ui/game/result/fail_back_button_normal.png") !important;
+}
+
+#failActions #backBtn:active {
+  background-image:url("assets/ui/game/result/fail_back_button_pressed.png") !important;
+}
+
 #gachaGoBtn,
 #gachaDrawBtn,
 #towerGachaBtn {
@@ -1726,6 +1939,7 @@ body.jr #playerRow { display:none; }
   max-height:956px;
   display:block;
   margin:0 auto;
+  container-type:inline-size; /* 啟用 cqw：1cqw = container 寬 1%，對應 Figma 440px */
 }
 
 #selectOverlay .mapHero {
@@ -1798,8 +2012,8 @@ body.jr #playerRow { display:none; }
   border:0;
   border-radius:0;
   box-shadow:none;
-  font-size:clamp(13px,3.64vw,16px);
-  font-weight:1000;
+  font-size:3.636cqw;   /* Figma 16px / 440 × 100 */
+  font-weight:800;      /* Figma fw=800 */
   line-height:1;
   text-transform:uppercase;
   text-shadow:none;
@@ -1816,15 +2030,15 @@ body.jr #playerRow { display:none; }
   place-items:center;
   margin:0;
   max-width:none;
-  color:#fff8df;
-  font-size:clamp(28px,10.45vw,46px);
-  font-weight:1000;
+  color:#fff;
+  font-size:10.455cqw;        /* Figma 46px / 440 × 100 */
+  font-weight:700;             /* Figma fw=700 */
   line-height:.9;
   letter-spacing:0;
   text-transform:uppercase;
-  -webkit-text-stroke:3px #0b0910;
+  -webkit-text-stroke:12px #0b0910; /* Figma 6px 外側 × 2 = 12px CSS 居中 */
   paint-order:stroke fill;
-  text-shadow:0 4px 0 #0b0910;
+  text-shadow:none;
 }
 
 #selectOverlay .mapHeroMode {
@@ -1843,10 +2057,12 @@ body.jr #playerRow { display:none; }
   border:0;
   border-radius:0;
   box-shadow:none;
-  font-size:clamp(16px,4.36vw,19.2px);
-  font-weight:1000;
+  font-size:4.364cqw;          /* Figma 19.2px / 440 × 100 */
+  font-weight:800;              /* Figma fw=800 */
   line-height:1;
-  text-shadow:0 3px 0 #000;
+  -webkit-text-stroke:4px #000; /* Figma 1.92px 外側 × 2 ≈ 4px */
+  paint-order:stroke fill;
+  text-shadow:none;
 }
 
 #selectOverlay .mapHeroArtWrap {
@@ -1934,10 +2150,10 @@ body.jr #playerRow { display:none; }
   color:#211722;
   background:none;
   border:0;
-  font-size:clamp(16px,4.55vw,20px);
-  font-weight:1000;
+  font-size:4.545cqw;   /* Figma 20px / 440 × 100 */
+  font-weight:800;       /* Figma fw=800 */
   line-height:1;
-  text-transform:capitalize;
+  text-transform:uppercase; /* Figma case=UPPER */
   text-shadow:none;
 }
 
@@ -2004,59 +2220,43 @@ body.jr #playerRow { display:none; }
 
 #selectOverlay .mapHeroStart {
   position:absolute;
-  left:3.864%;
-  top:73.459%;
+  left:6.136%;      /* 27/440 */
+  top:73.536%;      /* 703/956 */
   z-index:6;
-  width:92.273%;
+  width:87.727%;    /* 386/440 */
+  height:11.925%;   /* 114/956 */
   min-height:0;
-  height:11.088%;
-  display:grid;
-  place-items:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   margin:0;
   padding:0;
   color:transparent;
-  background:url("assets/ui/quest/Start_normal.png") center/100% 100% no-repeat;
-  position:relative;
-  font-family:"Baloo 2","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
   font-size:0;
-  font-weight:800;
-  line-height:1;
-  letter-spacing:0;
-  text-shadow:none;
-  -webkit-text-stroke:0;
-  paint-order:stroke fill;
+  background:url("assets/ui/shared/huge_button_normal.png") center/100% 100% no-repeat;
   overflow:visible;
 }
 
 #selectOverlay .mapHeroStart:after {
-  content:"START CHALLENGE";
-  position:absolute;
-  left:13.054%;
-  top:22.77%;
-  width:74.384%;
-  height:54.475%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#fff8df;
+  content:"START";
+  color:#fff;
   font-family:"Baloo 2","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
-  font-size:min(calc(100vw * 36 / 440), 36px);
+  font-size:9.545cqw;   /* 42px / 440 × 100 */
   font-weight:800;
   line-height:1;
   letter-spacing:0;
   white-space:nowrap;
   text-shadow:none;
-  -webkit-text-stroke:min(calc(100vw * 6 / 440), 6px) #0b0910;
+  -webkit-text-stroke:6px #000;
   paint-order:stroke fill;
-  transform:translateY(-10%);
 }
 
 #selectOverlay .mapHeroStart:hover {
-  background-image:url("assets/ui/quest/Start_hover.png");
+  background-image:url("assets/ui/shared/huge_button_hoverl.png");
 }
 
 #selectOverlay .mapHeroStart:active {
-  background-image:url("assets/ui/quest/Start_pressed.png");
+  background-image:url("assets/ui/shared/huge_button_pressed.png");
   transform:translateY(3px);
 }
 
@@ -2078,6 +2278,7 @@ body.jr #playerRow { display:none; }
   background:none;
   box-shadow:none;
   transform:translateX(-50%);
+  container-type:inline-size; /* 啟用 cqw，同 #mapZones（同寬 440px） */
 }
 
 #selectOverlay #mapActions:before {
@@ -2108,11 +2309,11 @@ body.jr #playerRow { display:none; }
   border-radius:0;
   box-shadow:none;
   font-family:"Baloo 2","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
-  font-size:clamp(12px,3.64vw,16px);
-  font-weight:1000;
+  font-size:3.636cqw;           /* Figma 16px / 440 × 100 */
+  font-weight:800;               /* Figma fw=800 */
   line-height:1;
-  text-shadow:0 3px 0 #000;
-  -webkit-text-stroke:1px #0b0910;
+  text-shadow:none;
+  -webkit-text-stroke:4px #000; /* Figma 2px 外側 × 2 = 4px CSS */
   paint-order:stroke fill;
   z-index:1;
 }
@@ -2134,7 +2335,29 @@ body.jr #playerRow { display:none; }
 
 #selectOverlay #mapActions .btnGhost {
   isolation:isolate;
+  font-size:0;        /* 隱藏按鈕原始中文 emoji 文字（🗼無限塔 等） */
+  color:transparent;
 }
+
+/* 英文 tab 標籤：來自 Figma nav 設計 */
+#selectOverlay #mapActions .btnGhost::after {
+  display:block;
+  font-family:"Baloo 2","Noto Sans TC","PingFang TC",sans-serif;
+  font-size:3.636cqw;           /* Figma 16px / 440 × 100 */
+  font-weight:800;
+  color:#fff;
+  line-height:1;
+  text-transform:uppercase;
+  -webkit-text-stroke:4px #000; /* Figma 2px 外側 × 2 */
+  paint-order:stroke fill;
+  text-shadow:none;
+  pointer-events:none;
+}
+/* 各 tab 的實際文字 */
+#selectOverlay #settingsBtn::after { content:"Quests"; }
+#selectOverlay #teamBtn::after     { content:"Monster"; }
+#selectOverlay #gachaBtn::after    { content:"Summon"; }
+#selectOverlay #towerBtn::after    { content:"Events"; }
 
 #selectOverlay #settingsBtn {
   left:3.864%;
@@ -4425,6 +4648,22 @@ body:not(.jr) #gimBadge:after {
   bottom:8px;
 }
 
+body:not(.jr) #gimBadge[data-gim-kind="shell"]:before {
+  background-image:url("assets/ui/dialogue/instruction_attribute_icon_shell.png");
+}
+
+body:not(.jr) #gimBadge[data-gim-kind="odd"]:before {
+  background-image:url("assets/ui/dialogue/instruction_attribute_icon_shield.png");
+}
+
+body:not(.jr) #gimBadge[data-gim-kind="resonance"]:before {
+  background-image:url("assets/ui/dialogue/instruction_attribute_icon_resonance.png");
+}
+
+body:not(.jr) #gimBadge[data-gim-kind="multiple"]:before {
+  background-image:url("assets/ui/dialogue/instruction_attribute_icon_multiple.png");
+}
+
 body:not(.jr) #enemyHpFill {
   width:96.694% !important;
   max-width:none;
@@ -4593,6 +4832,1081 @@ body:not(.jr) #comboMeter .comboBurstFrame.f8 { background-image:url("assets/ui/
   70% { opacity:.72; transform:scale(1.08); }
   100% { opacity:0; transform:scale(1.16); }
 }
+
+/* ===================== SUMMON 頁(抽蛋/孵化)=====================
+   Figma node 19267:22216 / 440×956 canvas
+   策略：同 Quest 頁面 — 固定 440/956 比例內容盒(#gachaInner) + position:absolute 子元素
+   所有 left/top/width/height 由 Figma px 換算成 %（÷440 或 ÷956）
+   這樣無論螢幕多寬，排版永遠精準對應 Figma。 */
+
+/* ── Overlay：深色底(Figma 外圍) + 置中內容盒 ── */
+#gachaOverlay {
+  background: #071827 !important;
+  overflow: hidden;
+}
+#gachaOverlay.center {
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  padding: 0;
+}
+
+/* ── 440×956 比例內容盒 — 同 Quest #mapZones 公式 ──
+   container-type 啟用 cqw 單位：1cqw = container 寬 1%，永遠等比對應 Figma 440px canvas */
+#gachaInner {
+  position: relative;
+  width: min(100vw, calc(100dvh * 440 / 956), 440px);
+  aspect-ratio: 440 / 956;
+  max-width: 440px;
+  flex-shrink: 0;
+  container-type: inline-size;
+  background: url("assets/ui/summon/summon_page_bg.png") left top / 100% 100% no-repeat;
+  overflow: hidden;
+}
+
+/* ── 所有直接子元素：absolute % 定位，座標來自 Figma JSON absoluteBoundingBox ÷ 440 或 956 ── */
+#gachaInner > * { position: absolute; }
+
+/* ── 標題 Figma x=18,y=13,w=404,h=128 / 80px Baloo2 fw=700 #F9C208 UPPER ── */
+#gachaOverlay h1 {
+  left: 4.091%;    /* 18/440 */
+  top:  1.360%;    /* 13/956 */
+  width: 91.818%;  /* 404/440 */
+  height: 13.389%; /* 128/956 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0;
+  margin: 0;
+  min-height: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18.18cqw;  /* 80/440*100 — cqw 跟 container 等比，永遠準確 */
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: #F9C208;
+  text-shadow: 0 4px 0 rgba(0,0,0,.6);
+  -webkit-text-stroke: 0;
+}
+
+/* ── 蛋台 Figma x=20,y=157,w=400,h=420 ──
+   全域 #gachaArt 有 height/overflow/border/gradient/::before/::after 全需 !important 覆蓋 */
+#gachaOverlay #gachaArt {
+  left: 4.545%;    /* 20/440 */
+  top:  16.423%;   /* 157/956 */
+  width: 90.909%;  /* 400/440 */
+  height: 43.933%; /* 420/956 */
+  height: 43.933% !important;
+  overflow: visible !important;
+  display: block !important;
+  background: url("assets/ui/summon/summon_egg_stage_ready.png") left top / 100% 100% no-repeat !important;  /* Figma scaleMode:STRETCH */
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+#gachaOverlay #gachaArt:before,
+#gachaOverlay #gachaArt:after { display: none !important; }
+
+#gachaOverlay #gachaArt.wob { animation: eggBob 1.8s ease-in-out infinite; }
+@keyframes eggBob { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-6px); } }
+#gachaOverlay #gachaArt.hatched {
+  background-image: url("assets/ui/summon/summon_hatched_egg_stage_empty.png") !important;
+}
+#gachaOverlay #gachaArt .hatchChar {
+  position: absolute;
+  left: 50%; top: 40%;
+  transform: translate(-50%,-50%);
+  width: 48%; height: 48%;
+}
+#gachaOverlay #gachaArt .hatchChar svg,
+#gachaOverlay #gachaArt .hatchChar .spriteChar,
+#gachaOverlay #gachaArt .hatchChar img { width:100%; height:100%; object-fit:contain; }
+
+/* ── 計數面板 Figma outer frame x=18,y=593,w=404,h=87.5 ──
+   JS 注入「抽蛋機會 <span class="sCountBadge">N</span> 次」
+   策略：#gachaCount 只當背景容器，文字/badge 用 position:absolute 獨立定位
+   → 不靠 flex 推擠，字型渲染差異不影響 badge 位置 */
+#gachaOverlay #gachaCount {
+  left: 4.091%;    /* 18/440 */
+  top:  62.029%;   /* 593/956 */
+  width: 91.818%;  /* 404/440 */
+  max-width: none !important;  /* 取消全域 314/326/356px 三層 max-width */
+  min-height: 0 !important;    /* 取消全域 48px min-height */
+  height: 9.156%;  /* 87.5/956 */
+  padding: 0;
+  background: url("assets/ui/summon/summon_counter_panel_blank.png") left top / 100% 100% no-repeat !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  display: block;  /* 非 flex — 子元素各自 absolute 定位 */
+  font-size: 0;
+}
+
+/* "HATCH CHANCES"：Figma 文字 x=46.5(panel 內 28.5px=7.06%), fs=33px=7.5cqw */
+#gachaOverlay #gachaCount::before {
+  content: "HATCH CHANCES";
+  position: absolute;       /* 相對 #gachaCount */
+  left: 7.06%;              /* 28.5/404 */
+  top: 50%;
+  transform: translateY(-50%);
+  width: auto; height: auto;
+  background: none !important;
+  background-image: none !important;
+  border: none; border-radius: 0; box-shadow: none;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 7.5cqw;        /* 33/440*100 — cqw 永遠等比 Figma canvas */
+  color: #000;
+  line-height: 1;
+  text-shadow: none;
+  -webkit-text-stroke: 0;
+  white-space: nowrap;
+}
+
+/* 數字徽章：Figma badge x=309.9(panel 內 291.9px), right=32.7px(8.09%), w=79.4px=18.04cqw
+   JS stroke spec 3px 外側 → CSS centered stroke 6px 外露 3px ≈ Figma 3px */
+#gachaOverlay #gachaCount .sCountBadge {
+  position: absolute !important;
+  right: 8.09%;             /* 32.7/404 */
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-grid;
+  place-items: center;
+  width: 18.04cqw;          /* 79.4/440*100 */
+  aspect-ratio: 159 / 98;
+  background: url("assets/ui/summon/summon_number_badge.png") center / 100% 100% no-repeat;
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 6.36cqw;       /* 28/440*100 */
+  -webkit-text-stroke: 6px #000;
+  paint-order: stroke fill;
+  text-shadow: none;
+}
+
+/* ── 孵化按鈕 Figma x=18,y=685,w=404,h=120 / 三狀態圖 ──
+   font-size:0 隱藏 JS 文字；::after 疊加 "HATCH" 標籤（含 disabled 狀態） */
+#gachaOverlay #gachaDrawBtn {
+  left: 6.818%;    /* 30/440 */
+  top:  70.872%;   /* 677.5/956 */
+  width: 86.364%;  /* 380/440 */
+  max-width: none !important;
+  height: 11.925%; /* 114/956 */
+  min-height: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: url("assets/ui/shared/huge_button_normal.png") center / 100% 100% no-repeat !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0;
+  font-size: 0;
+  color: transparent;
+}
+#gachaOverlay #gachaDrawBtn::after {
+  content: "HATCH";
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 9.545cqw;   /* 42px / 440 × 100 */
+  color: #fff;
+  text-transform: uppercase;
+  -webkit-text-stroke: 6px #000;
+  paint-order: stroke fill;
+  text-shadow: none;
+  pointer-events: none;
+}
+#gachaOverlay #gachaDrawBtn:hover:not(.disabled) {
+  background-image: url("assets/ui/shared/huge_button_hoverl.png") !important;
+}
+#gachaOverlay #gachaDrawBtn:active:not(.disabled) {
+  background-image: url("assets/ui/shared/huge_button_pressed.png") !important;
+  transform: translateY(2px);
+}
+#gachaOverlay #gachaDrawBtn.disabled {
+  background-image: url("assets/ui/shared/huge_button_disabled.png") !important;
+  opacity: 1;
+  filter: none;
+}
+
+/* gachaMsg：Figma 無此元素，隱藏以保持 Figma 排版 */
+#gachaOverlay #gachaMsg { display: none !important; }
+
+/* ── Navbar(固定底部,復用 quest/navbar.png + tab 素材)── */
+#gachaNav {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  width: min(100vw, calc(100dvh * 440 / 956), 440px);
+  max-width: 440px;
+  aspect-ratio: 440 / 139;
+  height: auto;
+  display: block;
+  padding: 0;
+  transform: translateX(-50%);
+  z-index: 12;
+  pointer-events: auto;
+}
+#gachaNav:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 3.597%;
+  width: 100%;
+  height: 93.525%;
+  background: url("assets/ui/quest/navbar.png") center / 100% 100% no-repeat;
+  z-index: 0;
+  pointer-events: none;
+}
+.gNavBtn {
+  position: absolute;
+  top: 0;
+  width: 22.727%;
+  height: 76.978%;
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 2% 1.5%;
+  color: #fff8df;
+  background: transparent !important;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  font-family: var(--font-display);
+  font-size: clamp(10px, 3.64vw, 16px);
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: 1;
+  text-shadow: 0 3px 0 #000;
+  -webkit-text-stroke: 1px #0b0910;
+  paint-order: stroke fill;
+  cursor: pointer;
+  z-index: 1;
+}
+.gNavBtn:before {
+  content: "";
+  position: absolute;
+  left: 2%;
+  top: 0;
+  width: 96%;
+  height: 80.374%;
+  background: transparent center / contain no-repeat;
+  z-index: 0;
+  pointer-events: none;
+}
+#gNavQuest  { left: 3.864%; }
+#gNavMonster{ left: 27.045%; }
+#gNavSummon { left: 50.227%; }
+#gNavEvents { left: 73.409%; }
+#gNavQuest:before   { background-image: url("assets/ui/quest/tab_quests_default.png"); }
+#gNavMonster:before { background-image: url("assets/ui/quest/tab_monsters_default.png"); }
+#gNavSummon:before  { background-image: url("assets/ui/quest/tab_summon_selected.png"); }
+#gNavEvents:before  { background-image: url("assets/ui/quest/tab_events_default.png"); }
+#gNavQuest:active:before   { background-image: url("assets/ui/quest/tab_quests_pressed.png"); }
+#gNavMonster:active:before { background-image: url("assets/ui/quest/tab_monsters_pressed.png"); }
+#gNavEvents:active:before  { background-image: url("assets/ui/quest/tab_events_pressed.png"); }
+
+/* 動畫 */
+#gachaOverlay #gachaArt.pop { animation: hatchPop .55s cubic-bezier(.2,1.5,.3,1); }
+@keyframes hatchPop { 0%{transform:scale(.55);opacity:.4;} 60%{transform:scale(1.08);opacity:1;} 100%{transform:scale(1);} }
+
+/* ===================== SHARED MAIN NAV =====================
+   Quest / Monster / Summon / Events 三頁共用底部 navbar。
+   舊的 #gachaNav、#teamNav、#selectOverlay #mapActions 已隱藏。
+   active 狀態透過 body:has() 依當前 overlay 自動切換。
+   ============================================================ */
+#mainNav {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  width: min(100vw, calc(100dvh * 440 / 956), 440px);
+  max-width: 440px;
+  aspect-ratio: 440 / 139;
+  height: auto;
+  display: none;
+  padding: 0;
+  transform: translateX(-50%);
+  z-index: 12;
+  pointer-events: auto;
+  container-type: inline-size;
+}
+
+body:has(#selectOverlay:not(.hidden)) #mainNav,
+body:has(#gachaOverlay:not(.hidden)) #mainNav,
+body:has(#teamOverlay:not(.hidden)) #mainNav,
+body:has(#monsterDetailOverlay:not(.hidden)) #mainNav,
+body:has(#failOverlay:not(.hidden)) #mainNav,
+body:has(#eventsOverlay:not(.hidden)) #mainNav { display: block; }
+
+#mainNav::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 3.597%;
+  width: 100%;
+  height: 93.525%;
+  background: url("assets/ui/quest/navbar.png") center / 100% 100% no-repeat;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.mNavBtn {
+  position: absolute;
+  top: 0;
+  width: 22.727%;
+  height: 76.978%;
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 2% 1.5%;
+  color: transparent;
+  font-size: 0;
+  background: transparent !important;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+  z-index: 1;
+  isolation: isolate;
+}
+
+.mNavBtn::before {
+  content: "";
+  position: absolute;
+  left: 2%;
+  top: 0;
+  width: 96%;
+  height: 80.374%;
+  background: var(--tab-img, none) center / contain no-repeat;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.mNavBtn::after {
+  display: block;
+  font-family: "Baloo 2","Noto Sans TC","PingFang TC",sans-serif;
+  font-size: 3.636cqw;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+  text-transform: uppercase;
+  -webkit-text-stroke: 4px #000;
+  paint-order: stroke fill;
+  text-shadow: none;
+  pointer-events: none;
+}
+
+#mNavQuests  { left: 3.864%;  --tab-img: url("assets/ui/quest/tab_quests_default.png"); }
+#mNavMonster { left: 27.045%; --tab-img: url("assets/ui/quest/tab_monsters_default.png"); }
+#mNavSummon  { left: 50.227%; --tab-img: url("assets/ui/quest/tab_summon_default.png"); }
+#mNavEvents  { left: 73.409%; --tab-img: url("assets/ui/quest/tab_events_default.png"); }
+
+#mNavQuests::after  { content: "Quests"; }
+#mNavMonster::after { content: "Monster"; }
+#mNavSummon::after  { content: "Summon"; }
+#mNavEvents::after  { content: "Events"; }
+
+body:has(#selectOverlay:not(.hidden)) #mNavQuests  { --tab-img: url("assets/ui/quest/tab_quests_selected.png"); }
+body:has(#teamOverlay:not(.hidden))   #mNavMonster { --tab-img: url("assets/ui/quest/tab_monsters_selected.png"); }
+body:has(#monsterDetailOverlay:not(.hidden)) #mNavMonster { --tab-img: url("assets/ui/quest/tab_monsters_selected.png"); }
+body:has(#gachaOverlay:not(.hidden))  #mNavSummon  { --tab-img: url("assets/ui/quest/tab_summon_selected.png"); }
+body:has(#failOverlay:not(.hidden))   #mNavSummon  { --tab-img: url("assets/ui/quest/tab_summon_selected.png"); }
+body:has(#eventsOverlay:not(.hidden)) #mNavEvents  { --tab-img: url("assets/ui/quest/tab_events_selected.png"); }
+
+#mNavQuests:active  { --tab-img: url("assets/ui/quest/tab_quests_pressed.png"); }
+#mNavMonster:active { --tab-img: url("assets/ui/quest/tab_monsters_pressed.png"); }
+#mNavSummon:active  { --tab-img: url("assets/ui/quest/tab_summon_pressed.png"); }
+#mNavEvents:active  { --tab-img: url("assets/ui/quest/tab_events_pressed.png"); }
+
+/* 隱藏舊版各頁專屬 navbar */
+#gachaNav { display: none !important; }
+#teamNav  { display: none !important; }
+#selectOverlay #mapActions { display: none !important; }
+
+/* === Monster detail: Figma frame 440 x 956 === */
+#monsterDetailOverlay {
+  --monster-detail:"../assets/ui/monster/detail/";
+  inset:auto;
+  top:50%;
+  left:50%;
+  width:min(100vw, calc(100dvh * 440 / 956), 440px);
+  height:min(100dvh, calc(100vw * 956 / 440), 956px);
+  max-height:none;
+  padding:0;
+  gap:0;
+  overflow:hidden;
+  transform:translate(-50%,-50%);
+  color:#251a0d;
+  background:#071729 url("assets/ui/events/events_tower_background.png") center/100% 100% no-repeat;
+  border:0;
+  box-shadow:0 0 0 100vmax #071729;
+  container-type:inline-size;
+  touch-action:manipulation;
+}
+
+#monsterDetailOverlay.hidden { display:none !important; }
+
+#monsterDetailTitle {
+  position:absolute;
+  left:10.455%;
+  top:2.615%;
+  width:79.091%;
+  height:7.008%;
+  margin:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#f9c208;
+  background:transparent;
+  border:0;
+  box-shadow:none;
+  font-family:"Baloo 2","Arial Rounded MT Bold","Noto Sans TC Black",sans-serif;
+  font-size:9.545cqw;
+  font-weight:800;
+  line-height:1;
+  letter-spacing:0;
+  text-transform:uppercase;
+  white-space:nowrap;
+  -webkit-text-stroke:1.55cqw #1d1510;
+  paint-order:stroke fill;
+  text-shadow:0 .8cqw 0 rgba(0,0,0,.28);
+}
+
+#monsterDetailArt {
+  position:absolute;
+  left:15.227%;
+  top:6.695%;
+  width:71.818%;
+  height:33.054%;
+  display:grid;
+  place-items:center;
+  overflow:visible;
+}
+
+#monsterDetailArt .spriteChar,
+#monsterDetailArt .pngChar,
+#monsterDetailArt svg {
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  filter:drop-shadow(0 1.8cqw 1.4cqw rgba(0,0,0,.45));
+}
+
+#monsterDetailNameBadge {
+  position:absolute;
+  left:13.148%;
+  top:36.506%;
+  width:73.023%;
+  height:8.096%;
+  display:grid;
+  place-items:center;
+  background:url("assets/ui/monster/detail/detail_info_badge.png") center/100% 100% no-repeat;
+  z-index:2;
+}
+
+#monsterDetailName {
+  display:block;
+  max-width:78%;
+  color:#fff;
+  font-family:"Baloo 2","Arial Rounded MT Bold","Noto Sans TC Black",sans-serif;
+  font-size:6.364cqw;
+  font-weight:800;
+  line-height:1;
+  letter-spacing:0;
+  text-transform:uppercase;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  -webkit-text-stroke:1.05cqw #1d1510;
+  paint-order:stroke fill;
+}
+
+#monsterDetailInfo {
+  position:absolute;
+  left:3.636%;
+  top:38.494%;
+  width:92.955%;
+  height:46.025%;
+  margin:0;
+  padding:0;
+  pointer-events:none;
+}
+
+.monsterDetailPanelSlice {
+  position:absolute;
+  left:0;
+  width:100%;
+  background:center/100% 100% no-repeat;
+  pointer-events:none;
+}
+
+.monsterDetailPanelSliceTop {
+  top:4.545%;
+  height:50.909%;
+  background-image:url("assets/ui/monster/detail/figma_downloads/detail_panel_rewards_top.png");
+}
+
+.monsterDetailPanelSliceBottom {
+  top:55%;
+  height:45%;
+  background-image:url("assets/ui/monster/detail/figma_downloads/detail_panel_rewards_bottom.png");
+}
+
+.monsterDetailPanelSliceMiddle {
+  top:31.364%;
+  height:34.318%;
+  background-image:url("assets/ui/monster/detail/figma_downloads/detail_panel_rewards_middle.png");
+}
+
+.monsterDetailPanel {
+  position:absolute;
+  left:6.112%;
+  width:87.286%;
+  margin:0;
+  background:transparent center/100% 100% no-repeat;
+  font-family:"Baloo 2","Arial Rounded MT Bold","Noto Sans TC Black",sans-serif;
+  letter-spacing:0;
+}
+
+#monsterDetailAtkPanel {
+  top:15%;
+  height:18.409%;
+  background-image:url("assets/ui/monster/detail/figma_downloads/detail_atk_row.png");
+}
+
+#monsterDetailLeaderPanel {
+  top:35.227%;
+  height:26.364%;
+  background-image:url("assets/ui/monster/detail/detail_info_panel_leader.png");
+}
+
+#monsterDetailActivePanel {
+  top:63.409%;
+  height:30.227%;
+  background-image:url("assets/ui/monster/detail/detail_info_panel_active.png");
+}
+
+.monsterDetailAtkIcon {
+  position:absolute;
+  left:30.532%;
+  top:14.815%;
+  width:15.686%;
+  aspect-ratio:1;
+  background:url("assets/ui/game/battle_skill_icon_strike.png") center/contain no-repeat;
+}
+
+.monsterDetailAtkLabel {
+  position:absolute;
+  left:52.381%;
+  top:19.753%;
+  width:22.689%;
+  color:#261b10;
+  font-size:4.545cqw;
+  font-weight:700;
+  line-height:1;
+  text-align:center;
+  text-transform:uppercase;
+  letter-spacing:-.182cqw;
+}
+
+#monsterDetailAtk {
+  position:absolute;
+  left:50.42%;
+  top:32.099%;
+  width:26.331%;
+  color:#d63d37;
+  font-size:10.909cqw;
+  font-weight:700;
+  line-height:1;
+  text-align:center;
+  text-transform:uppercase;
+}
+
+.monsterDetailSkillIcon {
+  position:absolute;
+  left:5.602%;
+  width:15.686%;
+  aspect-ratio:1;
+  background:center/contain no-repeat;
+}
+
+.monsterDetailLeaderIcon {
+  top:18.966%;
+  background-image:url("assets/ui/dialogue/instruction_attribute_icon_resonance.png");
+}
+
+.monsterDetailActiveIcon {
+  top:28.947%;
+  background-image:url("assets/ui/game/battle_skill_icon_reroll.png");
+}
+
+#monsterDetailActivePanel[data-skill="plus1"] .monsterDetailActiveIcon { background-image:url("assets/ui/game/battle_skill_icon_add.png"); }
+#monsterDetailActivePanel[data-skill="minus1"] .monsterDetailActiveIcon { background-image:url("assets/ui/game/battle_skill_icon_minus.png"); }
+#monsterDetailActivePanel[data-skill="reroll"] .monsterDetailActiveIcon { background-image:url("assets/ui/game/battle_skill_icon_reroll.png"); }
+#monsterDetailActivePanel[data-skill="shield"] .monsterDetailActiveIcon { background-image:url("assets/ui/game/battle_skill_icon_shield_break.png"); }
+#monsterDetailActivePanel[data-skill="swapUp"] .monsterDetailActiveIcon { background-image:url("assets/ui/game/battle_skill_icon_swap.png"); }
+
+.monsterDetailSkillText {
+  position:absolute;
+  left:25.49%;
+  width:68.908%;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:flex-start;
+  color:#261b10;
+  text-align:left;
+}
+
+#monsterDetailLeaderPanel .monsterDetailSkillText {
+  top:16.379%;
+  height:67.241%;
+}
+
+#monsterDetailActivePanel .monsterDetailSkillText {
+  top:11.654%;
+  height:76.692%;
+}
+
+.monsterDetailSkillLabel {
+  font-size:3.182cqw;
+  font-weight:700;
+  line-height:1;
+  text-transform:uppercase;
+  letter-spacing:-.182cqw;
+}
+
+.monsterDetailSkillName {
+  margin-top:0;
+  font-size:4.545cqw;
+  font-weight:700;
+  line-height:1;
+  letter-spacing:-.182cqw;
+  text-transform:uppercase;
+}
+
+.monsterDetailSkillDesc {
+  margin-top:1.364cqw;
+  max-width:100%;
+  font-size:4.091cqw;
+  font-weight:500;
+  line-height:1;
+  letter-spacing:-.164cqw;
+  text-transform:uppercase;
+}
+
+.monsterDetailCooldown {
+  margin-top:1.364cqw;
+  font-size:3.182cqw;
+  font-weight:500;
+  line-height:1;
+  text-transform:uppercase;
+  letter-spacing:-.127cqw;
+}
+
+#monsterDetailBack {
+  position:absolute;
+  left:0;
+  top:0;
+  width:100%;
+  height:13%;
+  padding:0;
+  border:0;
+  background:transparent;
+  opacity:0;
+  cursor:pointer;
+}
+
+/* === Instruction dialogue: Figma 440 x 956 ratio implementation === */
+#teachOverlay.overlay {
+  z-index:var(--z-instruction-overlay);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:0;
+  padding:0 !important;
+  max-height:none;
+  overflow:hidden;
+  touch-action:none;
+  color:#000;
+  background:rgba(0,0,0,.8) !important;
+}
+
+#teachOverlay.hidden {
+  display:none !important;
+}
+
+#teachDialog.instructionDialog {
+  position:relative;
+  width:min(100vw, calc(100dvh * 440 / 956), 440px);
+  max-width:440px;
+  aspect-ratio:440 / 956;
+  container-type:inline-size;
+  overflow:visible;
+  font-family:"Baloo 2","Noto Sans TC","PingFang TC",sans-serif;
+  letter-spacing:0;
+  text-align:center;
+}
+
+#teachDialog.instructionDialog > * {
+  position:absolute;
+}
+
+.instructionHeroIcon {
+  left:33.727%;
+  top:17.992%;
+  width:32.375%;
+  height:auto;
+  aspect-ratio:285 / 237;
+  transform:none;
+  z-index:3;
+  background:url("assets/ui/dialogue/instruction_shield_icon_large.png") center / contain no-repeat;
+  pointer-events:none;
+}
+
+.instructionPanel {
+  left:3.036%;
+  top:27.448%;
+  width:93.927%;
+  height:46.234%;
+  z-index:1;
+  background:url("assets/ui/dialogue/instruction_modal_panel.png") left top / 100% 100% no-repeat;
+  pointer-events:none;
+}
+
+#teachDialog .instructionTitle {
+  left:13.636%;
+  top:30.523%;
+  width:72.727%;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  margin:0;
+  z-index:2;
+  color:rgba(0,0,0,.8) !important;
+  font-family:"Baloo 2","Noto Sans TC","PingFang TC",sans-serif;
+  font-size:11.636cqw;
+  font-weight:800;
+  line-height:1.602;
+  letter-spacing:0;
+  text-transform:uppercase;
+  text-align:center;
+  text-shadow:none !important;
+  white-space:nowrap;
+}
+
+#teachOverlay[data-attribute="resonance"] .instructionTitle,
+#teachOverlay[data-attribute="multiple"] .instructionTitle {
+  font-size:9.455cqw;
+}
+
+.instructionIconRow {
+  left:29.819%;
+  top:40.167%;
+  width:40.364%;
+  height:4.393%;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.728cqw;
+  margin:0 !important;
+  font-size:0 !important;
+}
+
+.instructionIconRow img {
+  flex:0 0 auto;
+  width:9.545cqw;
+  height:9.545cqw;
+  object-fit:contain;
+}
+
+.instructionCondition {
+  left:30.227%;
+  top:45.9%;
+  width:39.545%;
+  height:5.439%;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding-bottom:.477%;
+  color:#fff;
+  font-family:"Baloo 2","Noto Sans TC","PingFang TC",sans-serif;
+  font-size:5.818cqw;
+  font-weight:800;
+  line-height:1.602;
+  letter-spacing:0;
+  text-transform:uppercase;
+  white-space:nowrap;
+  background:url("assets/ui/dialogue/instruction_attribute_title_badge_blank.png") left top / 100% 100% no-repeat;
+  -webkit-text-stroke:1.11cqw rgba(0,0,0,.8);
+  paint-order:stroke fill;
+  text-shadow:none;
+}
+
+#teachOverlay[data-attribute="multiple"] .instructionCondition {
+  font-size:4.909cqw;
+}
+
+#teachDialog .instructionBody {
+  left:13.636%;
+  top:52.678%;
+  width:72.727%;
+  max-width:none;
+  margin:0;
+  z-index:2;
+  color:rgba(0,0,0,.8);
+  font-family:"Baloo 2","Noto Sans TC","PingFang TC",sans-serif;
+  font-size:5.455cqw;
+  font-weight:700;
+  line-height:1.602;
+  letter-spacing:0;
+  text-transform:uppercase;
+  text-shadow:none;
+  opacity:1;
+}
+
+#teachDialog .instructionOk {
+  left:27.273%;
+  top:61.695%;
+  width:45.455%;
+  height:7.95%;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 0 .95%;
+  color:#fff;
+  font-family:"Baloo 2","Noto Sans TC","PingFang TC",sans-serif;
+  font-size:7.273cqw;
+  font-weight:700;
+  line-height:1.602;
+  letter-spacing:0;
+  text-transform:uppercase;
+  border:0 !important;
+  border-radius:0;
+  box-shadow:none !important;
+  background:url("assets/ui/dialogue/instruction_ok_button_normal.png") left top / 100% 100% no-repeat !important;
+  -webkit-text-stroke:1.455cqw rgba(0,0,0,.8);
+  paint-order:stroke fill;
+  text-shadow:none;
+  cursor:pointer;
+}
+
+#teachDialog .instructionOk:active {
+  background-image:url("assets/ui/dialogue/instruction_ok_button_pressed.png") !important;
+  transform:translateY(.419%);
+}
+
+#teachDialog #teachReplay {
+  display:none !important;
+}
+
+/* ===================== EVENTS PAGE (無限塔大廳) =====================
+   座標依據：Figma node 19291:22615，440×956 frame
+   資產 2x：邏輯尺寸 = PNG像素 ÷ 2
+   ================================================================== */
+#eventsOverlay {
+  padding: 0;
+  gap: 0;
+  background: none;
+  overflow: hidden;
+}
+
+#eventsInner {
+  position: relative;
+  width: min(100vw, calc(100dvh * 440 / 956), 440px);
+  height: min(100dvh, calc(100vw * 956 / 440), 956px);
+  max-width: 440px;
+  max-height: 956px;
+  margin: 0 auto;
+  flex-shrink: 0;
+  container-type: inline-size;
+  background: url("assets/ui/events/events_tower_background.png") left top / 100% 100% no-repeat;
+  overflow: hidden;
+}
+
+#eventsInner > * { position: absolute; }
+
+/* EVENTS 標題文字：Figma 最頂層，z=6 壓過所有元素 */
+#eventsInner::before {
+  content: "EVENTS";
+  position: absolute;
+  left: 0;
+  top: 2.615%;   /* 25/956 */
+  width: 100%;
+  text-align: center;
+  font-family: "Baloo 2","Noto Sans TC","PingFang TC",sans-serif;
+  font-size: 18.182cqw;   /* 80px / 440 × 100 */
+  font-weight: 800;
+  color: #f9c208;
+  line-height: normal;
+  text-transform: uppercase;
+  -webkit-text-stroke: 10px #000000;
+  paint-order: stroke fill;
+  text-shadow: none;
+  z-index: 6;
+  pointer-events: none;
+}
+
+/* INFINITE TOWER 橫幅：357×86 logical (714×172 @2x)
+   z=4：需在塔圖(z=3)上方，"INFINITE TOWER"文字才可見 */
+#eventsTitleBanner {
+  left: 9.545%;    /* 42/440 */
+  top: 14.225%;    /* 136/956 */
+  width: 81.136%;  /* 357/440 */
+  height: 8.996%;  /* 86/956 */
+  background: url("assets/ui/events/events_tower_title_banner.png") left top / 100% 100% no-repeat;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#eventsTitleBanner::after {
+  content: "INFINITE TOWER";
+  font-family: "Baloo 2","Noto Sans TC","PingFang TC",sans-serif;
+  font-size: 7.273cqw;   /* 32px / 440 × 100 */
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1;
+  text-transform: uppercase;
+  -webkit-text-stroke: 4px #000000;
+  paint-order: stroke fill;
+  text-shadow: none;
+  pointer-events: none;
+}
+
+/* 塔主視覺：273.5×422 logical (547×844 @2x) */
+#eventsTowerArt {
+  left: 18.839%;   /* 82.89/440 */
+  top: 15.900%;    /* 152/956 */
+  width: 62.327%;  /* 274.238/440 */
+  height: 44.268%; /* 423.198/956 */
+  background: url("assets/ui/events/events_tower_foreground.png") left top / 100% 100% no-repeat;
+  z-index: 1;
+}
+
+/* 統計面板：409×335 logical (818×670 @2x) */
+#eventsPanel {
+  left: 3.636%;    /* 16/440 */
+  top: 48.954%;    /* 468/956 */
+  width: 92.955%;  /* 409/440 */
+  height: 35.042%; /* 335/956 */
+  background: url("assets/ui/events/events_panel.png") left top / 100% 100% no-repeat;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-evenly;
+  padding: 5.455% 0 0;  /* 24/440 */
+}
+
+/* 三欄卡片，各自帶 badge 背景：108×174 logical (216×348 @2x) */
+.eventsStatCard {
+  width: 24.545cqw;      /* 108/440 × 100 */
+  aspect-ratio: 108 / 174;
+  background: url("assets/ui/events/events_reward_count_badge.png") left top / 100% 100% no-repeat;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 2.727cqw; /* 12px */
+  gap: 4px;
+}
+
+.eventsStatLabel {
+  font-family: "Baloo 2","Noto Sans TC","PingFang TC",sans-serif;
+  font-size: 4.545cqw;   /* 20px / 440 × 100 */
+  font-weight: 700;
+  color: rgba(0,0,0,0.8);
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: -0.8px;
+  -webkit-text-stroke: 0;
+}
+
+.eventsStatVal {
+  font-family: "Baloo 2","Noto Sans TC","PingFang TC",sans-serif;
+  font-size: 12.273cqw;   /* 54px / 440 × 100 */
+  font-weight: 700;
+  color: #dd5f09;
+  line-height: 1;
+  flex: 1;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.eventsStatChain { color: #0676c5; }
+
+/* 蛋圖示：52×64 logical (104×128 @2x) */
+#eventsEggIcon {
+  width: 11.818cqw;   /* 52/440 × 100 */
+  aspect-ratio: 52 / 64;
+  background: url("assets/ui/events/events_reward_egg_earned.png") center / 100% 100% no-repeat;
+  flex-shrink: 0;
+}
+
+.eventsEggCount {
+  font-family: "Baloo 2","Noto Sans TC","PingFang TC",sans-serif;
+  font-size: 8.182cqw;   /* 36px / 440 × 100 */
+  font-weight: 700;
+  color: #592985;
+  line-height: 1;
+  text-align: center;
+}
+
+/* ENTER TOWER 按鈕：340×95 logical (680×190 @2x)；z=5 壓過橫幅和塔圖 */
+#eventsStartBtn {
+  left: 11.477%;   /* 50.5/440 */
+  top: 70.711%;    /* 676/956 */
+  width: 77.273%;  /* 340/440 */
+  height: 9.937%;  /* 95/956 */
+  padding: 0;
+  font-size: 0;
+  color: transparent;
+  background: url("assets/ui/events/events_start_button_normal.png") left top / 100% 100% no-repeat;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: pointer;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 按鈕文字：白色加黑色描邊 */
+#eventsStartBtn::after {
+  content: "ENTER TOWER";
+  font-family: "Baloo 2","Noto Sans TC","PingFang TC",sans-serif;
+  font-size: 8.182cqw;   /* 36px / 440 × 100 */
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1;
+  text-transform: uppercase;
+  -webkit-text-stroke: 6px #000000;
+  paint-order: stroke fill;
+  text-shadow: none;
+  pointer-events: none;
+}
+
+#eventsStartBtn:active {
+  background-image: url("assets/ui/events/events_start_button_pressed.png");
+}
+
+#eventsStartBtn.disabled,
+#eventsStartBtn:disabled {
+  background-image: url("assets/ui/events/events_start_button_disabled.png");
+  pointer-events: none;
+}
 </style>
 <style>
 /* 由 assets/ui/kit/make_kit.py 自動生成,請勿手改;改 ui_manifest.json 或換 art/ 圖後重跑 */
@@ -4753,6 +6067,40 @@ body:not(.jr) #comboMeter .comboBurstFrame.f8 { background-image:url("assets/ui/
   <button class="btnGhost" id="teamBack">回地圖</button>
 </div>
 
+<div id="monsterDetailOverlay" class="overlay hidden">
+  <h1 id="monsterDetailTitle">MONSTER DETAILS</h1>
+  <div id="monsterDetailArt" aria-hidden="true"></div>
+  <div id="monsterDetailNameBadge"><span id="monsterDetailName">MONSTER</span></div>
+  <section id="monsterDetailInfo" aria-label="Monster details">
+    <div class="monsterDetailPanelSlice monsterDetailPanelSliceTop" aria-hidden="true"></div>
+    <div class="monsterDetailPanelSlice monsterDetailPanelSliceBottom" aria-hidden="true"></div>
+    <div class="monsterDetailPanelSlice monsterDetailPanelSliceMiddle" aria-hidden="true"></div>
+    <div id="monsterDetailAtkPanel" class="monsterDetailPanel">
+      <span class="monsterDetailAtkIcon" aria-hidden="true"></span>
+      <span class="monsterDetailAtkLabel">ATK</span>
+      <span id="monsterDetailAtk">+0</span>
+    </div>
+    <div id="monsterDetailLeaderPanel" class="monsterDetailPanel">
+      <span class="monsterDetailSkillIcon monsterDetailLeaderIcon" aria-hidden="true"></span>
+      <div class="monsterDetailSkillText">
+        <span class="monsterDetailSkillLabel">LEADER SKILL</span>
+        <span id="monsterDetailLeaderName" class="monsterDetailSkillName"></span>
+        <span id="monsterDetailLeaderDesc" class="monsterDetailSkillDesc"></span>
+      </div>
+    </div>
+    <div id="monsterDetailActivePanel" class="monsterDetailPanel">
+      <span class="monsterDetailSkillIcon monsterDetailActiveIcon" aria-hidden="true"></span>
+      <div class="monsterDetailSkillText">
+        <span class="monsterDetailSkillLabel">ACTIVE SKILL</span>
+        <span id="monsterDetailActiveName" class="monsterDetailSkillName"></span>
+        <span id="monsterDetailActiveDesc" class="monsterDetailSkillDesc"></span>
+        <span id="monsterDetailCooldown" class="monsterDetailCooldown"></span>
+      </div>
+    </div>
+  </section>
+  <button id="monsterDetailBack" type="button" aria-label="Back to monster list"></button>
+</div>
+
 <div id="splitOverlay" class="overlay center hidden">
   <h1>✂️ 怎麼拆？</h1>
   <p id="splitDesc"></p>
@@ -4772,27 +6120,48 @@ body:not(.jr) #comboMeter .comboBurstFrame.f8 { background-image:url("assets/ui/
 </div>
 
 <div id="gachaOverlay" class="overlay center hidden">
-  <h1>🥚 數靈孵化所</h1>
-  <p id="gachaCount"></p>
-  <div id="gachaArt"></div>
-  <p id="gachaMsg" style="min-height:40px"></p>
-  <button class="btn" id="gachaDrawBtn" style="background:linear-gradient(135deg,#ffcf4d,#ff9d2e)">抽一次 🥚</button>
-  <button class="btnGhost" id="gachaBack">返回</button>
+  <div id="gachaInner">
+    <h1>Summon</h1>
+    <p id="gachaCount"></p>
+    <div id="gachaArt"></div>
+    <p id="gachaMsg"></p>
+    <button class="btn" id="gachaDrawBtn">孵化一次</button>
+    <button class="btnGhost" id="gachaBack" style="display:none"></button>
+    <nav id="gachaNav">
+      <button class="gNavBtn" id="gNavQuest" onclick="document.getElementById('gachaBack').click()">Quests</button>
+      <button class="gNavBtn" id="gNavMonster" onclick="(function(){['gachaOverlay','teamOverlay','eventsOverlay','selectOverlay'].forEach(function(id){var e=document.getElementById(id);if(e)e.classList.add('hidden');});document.getElementById('teamBtn').click();})()">Monster</button>
+      <button class="gNavBtn gNavActive" id="gNavSummon">Summon</button>
+      <button class="gNavBtn" id="gNavEvents" onclick="(function(){document.getElementById('gachaBack').click();var so=document.getElementById('selectOverlay');var eo=document.getElementById('eventsOverlay');if(so)so.classList.add('hidden');if(eo)eo.classList.remove('hidden');})()">Events</button>
+    </nav>
+  </div>
 </div>
 
 <div id="failOverlay" class="overlay center hidden">
-  <h1>💦 被打倒了…</h1>
-  <p id="failStats"></p>
-  <button class="btn" id="retryBtn">再試一次</button>
-  <button class="btnGhost" id="backBtn">回地圖</button>
+  <div id="failTitleRow" aria-hidden="true">
+    <span class="failTitleWing failTitleWingLeft"></span>
+    <h1>TRY AGAIN</h1>
+    <span class="failTitleWing failTitleWingRight"></span>
+  </div>
+  <div id="failHeroArt" aria-hidden="true"></div>
+  <div id="failStatusBanner"><span>BATTLE FAILED</span></div>
+  <p id="failStats"><strong>ALMOST THERE!</strong><span>TRY A LONGER CHAIN</span></p>
+  <div id="failActions">
+    <button class="btn" id="retryBtn">RETRY</button>
+    <button class="btnGhost" id="backBtn">BACK</button>
+  </div>
 </div>
 
 <div id="teachOverlay" class="overlay center hidden">
-  <h1 id="teachTitle"></h1>
-  <div id="teachArt" style="font-size:40px;margin:4px 0"></div>
-  <p id="teachBody"></p>
-  <button class="btnGhost" id="teachReplay" style="font-size:14px">🔊 再聽一次</button>
-  <button class="btn" id="teachOk">我知道了！</button>
+  <div id="teachDialog" class="instructionDialog" role="dialog" aria-modal="true" aria-labelledby="teachTitle">
+    <div id="teachHeroIcon" class="instructionHeroIcon" aria-hidden="true"></div>
+    <div class="instructionPanel" aria-hidden="true"></div>
+    <h1 id="teachTitle" class="instructionTitle"></h1>
+    <div id="teachArt" class="instructionIconRow" aria-hidden="true"></div>
+    <div id="teachBadge" class="instructionCondition"></div>
+    <p id="teachBody" class="instructionBody"></p>
+    <button class="instructionOk" id="teachOk" type="button">OK</button>
+    <button class="btnGhost hidden" id="teachReplay" type="button">🔊 再聽一次</button>
+  </div>
 </div>
 
 <div id="captainPickOverlay" class="overlay center hidden">
@@ -4800,6 +6169,38 @@ body:not(.jr) #comboMeter .comboBurstFrame.f8 { background-image:url("assets/ui/
   <p style="font-size:12px;opacity:.7">隊長技整場常駐，選一隻最適合這關打法的！</p>
   <div id="captainPickGrid" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:8px 0"></div>
   <button class="btnGhost" id="captainPickCancel">回地圖</button>
+</div>
+
+<!-- ============ Events 頁（無限塔大廳）============ -->
+<div id="eventsOverlay" class="overlay hidden">
+  <div id="eventsInner">
+    <!-- 隱藏返回按鈕：供 mainNav 程式呼叫使用 -->
+    <button id="eventsBack" style="display:none"
+      onclick="document.getElementById('eventsOverlay').classList.add('hidden');document.getElementById('selectOverlay').classList.remove('hidden')"></button>
+    <!-- 塔橫幅 -->
+    <div id="eventsTitleBanner"></div>
+    <!-- 塔主視覺 -->
+    <div id="eventsTowerArt"></div>
+    <!-- 統計面板（三欄各用一張 events_reward_count_badge.png）-->
+    <div id="eventsPanel">
+      <div class="eventsStatCard">
+        <div class="eventsStatLabel">HIGHEST<br>FLOOR</div>
+        <div class="eventsStatVal" id="eventsHighFloor">0</div>
+      </div>
+      <div class="eventsStatCard">
+        <div class="eventsStatLabel">EGGS<br>EARNED</div>
+        <div id="eventsEggIcon"></div>
+        <div class="eventsEggCount">×<span id="eventsEggsEarned">0</span></div>
+      </div>
+      <div class="eventsStatCard">
+        <div class="eventsStatLabel">BEST<br>CHAIN</div>
+        <div class="eventsStatVal eventsStatChain" id="eventsBestChain">0</div>
+      </div>
+    </div>
+    <!-- 開始按鈕 -->
+    <button id="eventsStartBtn"
+      onclick="document.getElementById('eventsOverlay').classList.add('hidden');document.getElementById('towerBtn').click()"></button>
+  </div>
 </div>
 
 <!-- ============ 純邏輯（盤面大小由 values.length 決定；0 = 減法珠）============ -->
@@ -5427,7 +6828,7 @@ function eggSVG(attrColor) {
   }
   const battleChromeBlockers = new Set([
     'startOverlay', 'surveyOverlay', 'selectOverlay', 'settingsOverlay',
-    'teamOverlay', 'gachaOverlay', 'captainPickOverlay', 'teachOverlay',
+    'teamOverlay', 'gachaOverlay', 'captainPickOverlay',
     'resultOverlay', 'failOverlay', 'towerResultOverlay'
   ]);
   function battleChromeBlocked() {
@@ -5488,12 +6889,69 @@ function eggSVG(attrColor) {
   let SURVEY = store('nh5_survey', null);         // 開場問卷（年齡/性別/數學程度/暱稱）
   let UNLOCKALL = store('nh5_unlockall', false);  // 預設關閉：循序解鎖（可在設定開啟）
   let teachQueue = [];
-  function teach(id, title, art, body) {
+  const dialogueAssetRoot = location.pathname.includes('/src/') ? '../assets/ui/dialogue/' : 'assets/ui/dialogue/';
+  const ATTRIBUTE_HELP = {
+    shell: {
+      title: 'HARD SHELL',
+      icon: 'instruction_attribute_icon_shell.png',
+      condition: n => `${n} CHAIN +`,
+      body: n => `ONLY A CHAIN OF ${n}+ BEADS CAN CRACK IT.`
+    },
+    odd: {
+      title: 'ODD SHIELD',
+      icon: 'instruction_attribute_icon_shield.png',
+      condition: n => `${n} ODD +`,
+      body: n => `YOUR CHAIN MUST INCLUDE ${n}+ ODD NUMBERS.`
+    },
+    resonance: {
+      title: 'ECHO SHIELD',
+      icon: 'instruction_attribute_icon_resonance.png',
+      condition: n => `${n} SAME`,
+      body: n => `LINK ${n} OF THE SAME NUMBER IN A ROW.`
+    },
+    multiple: {
+      title: 'MULTIPLE SHIELD',
+      icon: 'instruction_attribute_icon_multiple.png',
+      condition: n => `MULTIPLE OF ${n}`,
+      body: n => `HIT IT WITH ANY MULTIPLE OF ${n}.`
+    }
+  };
+  function teach(id, title, art, body, meta = null) {
     if (TAUGHT[id]) return false;
     TAUGHT[id] = 1; save('nh5_taught', TAUGHT);
-    teachQueue.push({ id, title, art, body });
+    teachQueue.push({ id, title, art, body, meta });
     if (teachQueue.length === 1) showNextTeach();
     return true;
+  }
+  function showAttributeTeach(kind, num, force = false) {
+    const cfg = ATTRIBUTE_HELP[kind];
+    if (!cfg) return false;
+    const n = Math.max(1, Number(num) || 1);
+    const id = `attribute_${kind}`;
+    const item = {
+      id,
+      title: cfg.title,
+      art: '',
+      body: cfg.body(n),
+      meta: { attributeKind: kind, attributeNum: n, condition: cfg.condition(n), icon: cfg.icon }
+    };
+    if (!force) {
+      if (TAUGHT[id]) return false;
+      TAUGHT[id] = 1; save('nh5_taught', TAUGHT);
+    }
+    teachQueue.push(item);
+    if (teachQueue.length === 1) showNextTeach();
+    return true;
+  }
+  function renderAttributeTeach(t) {
+    const meta = t.meta || {};
+    const n = Math.max(1, Number(meta.attributeNum) || 1);
+    const icon = `${dialogueAssetRoot}${meta.icon}`;
+    $('teachTitle').textContent = t.title;
+    $('teachArt').innerHTML = Array.from({ length: n }, () => `<img src="${icon}" alt="">`).join('');
+    $('teachBadge').textContent = meta.condition || '';
+    $('teachBody').textContent = t.body;
+    $('teachOverlay').dataset.attribute = meta.attributeKind || '';
   }
   // 把教學內容唸出來（小小獵人專用，照顧還不識字的孩子）。
   // 取 HTML 的純文字、把 ×/− 換成「乘/減」、+ 換「加」、= 換「等於」，唸起來更自然。
@@ -5508,9 +6966,14 @@ function eggSVG(attrColor) {
     if (!teachQueue.length) return;
     const t = teachQueue[0];
     locked = true;
-    $('teachTitle').textContent = t.title;
-    $('teachArt').innerHTML = t.art || '';
-    $('teachBody').innerHTML = t.body;
+    if (t.meta && t.meta.attributeKind) renderAttributeTeach(t);
+    else {
+      $('teachTitle').textContent = t.title;
+      $('teachArt').innerHTML = t.art || '';
+      $('teachBadge').textContent = '';
+      $('teachBody').innerHTML = t.body;
+      $('teachOverlay').dataset.attribute = '';
+    }
     $('teachReplay').classList.toggle('hidden', !isJr());   // 只有小小獵人顯示「再聽一次」
     show('teachOverlay');
     if (isJr()) speakTeach(t);
@@ -5672,21 +7135,13 @@ function eggSVG(attrColor) {
     renderHud();
     if (!enemy.isBoss) say(enemy.divisor ? `湊出 ${enemy.divisor} 的倍數` : `目標是 ${target}`);
     // 新機制怪物登場 → 教學（每種只跳一次）
-    if (enemy.divisor) teach('divisor', '➗ 整除盾怪物！',
-      `<span style="font-size:30px;color:#6fe3ff">${enemy.divisor}·${enemy.divisor*2}·${enemy.divisor*3}…</span>`,
-      `這隻怪只怕「<b>${enemy.divisor} 的倍數</b>」。<br>你的總和只要<b>能被 ${enemy.divisor} 整除</b>就打得中——${enemy.divisor}、${enemy.divisor*2}、${enemy.divisor*3}… <b>哪個都行</b>，湊法很自由！<br><span style="font-size:12px;opacity:.75">這就是在練「哪些數能被 ${enemy.divisor} 整除」。</span>`);
+    if (enemy.divisor) showAttributeTeach('multiple', enemy.divisor);
     else if (enemy.divN) teach('divShare', '➗ 等分盾怪物！',
       '<span style="font-size:34px;color:#5ad6ff">12÷3=4</span>',
       `這隻怪要你「<b>把目標分成 ${enemy.divN} 等份</b>」。<br>先算：<b>目標 ÷ ${enemy.divN} = 每份多少</b>，再<b>連 ${enemy.divN} 顆一樣的</b>數字！<br><span style="font-size:12px;opacity:.75">例如目標 12、分 3 份 → 12÷3=4 → 連三顆 4。</span>`);
-    else if (enemy.needRun) teach('weakRun', '🔢 共鳴盾怪物！',
-      '<span style="font-size:40px;color:#ffae3d">3+3+3</span>',
-      `這隻怪有<b>共鳴盾</b>：鏈裡要<b>連續連到 ${enemy.needRun} 顆相同的數字</b>才打得中（例如 ${enemy.needRun} 顆 3）。<br>連相同數字＝<b>乘法</b>，傷害還會暴增！`);
-    else if (enemy.needOdd) teach('weakOdd', '🔆 奇數盾怪物！',
-      '<span style="font-size:42px">🔆</span>',
-      `這隻怪有<b>奇數盾</b>：你的鏈裡必須包含 <b>${enemy.needOdd} 顆以上奇數</b>（1·3·5·7·9）才打得中。<br>總和一樣要剛好等於目標，只是<b>多了一個「要用幾顆奇數」的條件</b>。`);
-    else if (enemy.minLen > 2) teach('shell', '🛡️ 硬殼怪物！',
-      '<span style="font-size:42px">🛡️</span>',
-      `這隻怪有<b>硬殼</b>：只有 <b>${enemy.minLen} 顆以上</b>的長鏈才打得進去。短鏈會被彈開！`);
+    else if (enemy.needRun) showAttributeTeach('resonance', enemy.needRun);
+    else if (enemy.needOdd) showAttributeTeach('odd', enemy.needOdd);
+    else if (enemy.minLen > 2) showAttributeTeach('shell', enemy.minLen);
     else if (enemy.banned) teach('ban', '🚫 封印怪物！',
       '<span style="font-size:42px">🚫</span>',
       `這隻怪會<b>封印一個數字</b>（變灰、不能用）。用 ✏️ 加一 / ➖ 減一 技能可以把被封的珠改成別的數字喔！`);
@@ -5706,8 +7161,8 @@ function eggSVG(attrColor) {
   function gimMeta() {
     if (!enemy) return { text: '', kind: '', num: '' };
     const text = gimText();
-    if (enemy.needRun) return { text, kind: 'run', num: enemy.needRun };
-    if (enemy.minLen > 2) return { text, kind: 'shield', num: enemy.minLen };
+    if (enemy.needRun) return { text, kind: 'resonance', num: enemy.needRun };
+    if (enemy.minLen > 2) return { text, kind: 'shell', num: enemy.minLen };
     if (enemy.needOdd) return { text, kind: 'odd', num: enemy.needOdd };
     if (enemy.divN) return { text, kind: 'divide', num: enemy.divN };
     if (enemy.divisor) return { text, kind: 'multiple', num: enemy.divisor };
@@ -6619,12 +8074,15 @@ function eggSVG(attrColor) {
     show('gachaOverlay');
   }
   function renderGacha(idle) {
-    $('gachaCount').innerHTML = `🥚 抽蛋機會 <b>${DRAWS}</b> 次`;
+    $('gachaCount').innerHTML = `抽蛋機會 <span class="sCountBadge">${DRAWS}</span> 次`;
     $('gachaDrawBtn').classList.toggle('disabled', DRAWS <= 0);
-    $('gachaDrawBtn').textContent = DRAWS > 0 ? '抽一次 🥚' : '沒有抽蛋機會了';
+    $('gachaDrawBtn').textContent = DRAWS > 0 ? '孵化一次' : '沒有機會了';
     if (idle) {
-      $('gachaArt').innerHTML = `<div class="art ${DRAWS > 0 ? 'wob' : ''}">${eggSVG(DRAWS > 0 ? '#ffd36b' : '#888')}</div>`;
-      $('gachaMsg').innerHTML = DRAWS > 0 ? '點「抽一次」孵化數靈！' : '去過關拿星星，換更多抽蛋機會吧！';
+      const art = $('gachaArt');
+      art.classList.remove('hatched', 'pop');
+      art.classList.toggle('wob', DRAWS > 0);   // 蛋台由 CSS 背景圖呈現(summon_egg_stage_ready)
+      art.innerHTML = '';
+      $('gachaMsg').innerHTML = DRAWS > 0 ? '點「孵化一次」召喚數靈！' : '去過關拿星星，換更多孵化機會吧！';
     }
   }
   function drawOne() {
@@ -6636,7 +8094,10 @@ function eggSVG(attrColor) {
     save('nh5_coll', COLL);
     log('egg_drop', { source: 'gacha', species: spId });
     log('hatch', { species: spId, dup, level: COLL[spId] });
-    $('gachaArt').innerHTML = `<div class="art pop">${charSVG(spId)}</div>`;
+    const gart = $('gachaArt');                 // 孵化:空巢圖 + 角色疊上
+    gart.classList.remove('wob');
+    gart.classList.add('hatched', 'pop');
+    gart.innerHTML = `<div class="hatchChar">${charSVG(spId)}</div>`;
     $('gachaMsg').innerHTML = dup
       ? `<b>${sp.name}</b> 升級了！Lv${COLL[spId]}（傷害提升）`
       : `🎉 新夥伴 <b>${sp.name}</b>（${ATTRS[sp.attr].n}）！<br><span style="font-size:12px;opacity:.7">${SKILL_DEFS[sp.skill].ic}${SKILL_DEFS[sp.skill].name}　${CAPTAIN_DEFS[sp.attr].ic}${CAPTAIN_DEFS[sp.attr].name}</span>`;
@@ -6827,9 +8288,7 @@ function eggSVG(attrColor) {
     floaters = []; particles = [];
     updateDDA(false);
     log('stage_fail', { stage: stg().key, foe: foeIdx + 1, dur_ms: Date.now() - stageStat.t0 });
-    $('failStats').innerHTML =
-      `打到第 ${foeIdx + 1} 隻怪物<br>平均鏈長 ${avgChain().toFixed(2)}<br>` +
-      `<span style="font-size:12px;opacity:.7">小訣竅：夥伴技能冷卻好就用掉，別捨不得！</span>`;
+    $('failStats').innerHTML = '<strong>ALMOST THERE!</strong><span>TRY A LONGER CHAIN</span>';
     show('failOverlay');
   }
 
@@ -6995,19 +8454,7 @@ function eggSVG(attrColor) {
         <div class="atkBadge" aria-hidden="true"></div>
         <div class="atkText">${atkBonus(sp)}</div>`;
       card.addEventListener('click', () => {
-        if (!equipped) {
-          if (EQUIP.length >= 2) { toast('最多帶 2 隻，先卸下一隻吧'); return; }
-          EQUIP.push(sp.id);
-        } else if (!isCap) {
-          EQUIP = [sp.id, ...EQUIP.filter(x => x !== sp.id)];
-          toast(`👑 ${sp.name} 成為隊長！`);
-        } else {
-          if (EQUIP.length <= 1) { toast('至少要帶一隻夥伴！'); return; }
-          EQUIP = EQUIP.filter(x => x !== sp.id);
-        }
-        save('nh5_equip', EQUIP);
-        log('equip', { team: [...EQUIP], captain: captainAttr() });
-        renderTeam();
+        renderMonsterDetail(sp.id);
       });
       og.appendChild(card);
     });
@@ -7040,6 +8487,55 @@ function eggSVG(attrColor) {
       grid.appendChild(sec);
     }
     show('teamOverlay');
+  }
+
+  const monsterNameEN = {
+    kiki:'Kiki',
+    oo:'O-O',
+    prima:'Primer',
+    swapy:'Swapy',
+    starle:'Starle',
+    guardy:'Guardy',
+    dubdragon:'Dub Dragon',
+    munchdragon:'Munch Dragon',
+  };
+  const leaderDetailEN = {
+    prime: { name:'Prime Resonance', desc:'+18% damage for each prime bead (2, 3, 5, 7) in your chain.' },
+    odd:   { name:'Odd Strike', desc:'+12% damage for each odd bead in your chain.' },
+    even:  { name:'Even Link', desc:'+1 chain multiplier for every 2 even beads in your chain.' },
+    multi: { name:'Multiple Burst', desc:'Deal double damage when your chain length is a multiple of 3.' },
+  };
+  const activeDetailEN = {
+    plus1:  { name:'Add One', desc:'Tap a bead to increase it by 1.' },
+    minus1: { name:'Minus One', desc:'Tap a bead to decrease it by 1.' },
+    reroll: { name:'Reroll', desc:'Tap a bead to change it into a random new one.' },
+    split:  { name:'Split', desc:'Tap a bead to split it into two smaller beads.' },
+    swapUp: { name:'Swap', desc:'Tap a bead to swap it with the bead above.' },
+    purify: { name:'Clean', desc:'Tap a bead to remove it from the board.' },
+    lucky:  { name:'Luck', desc:'Make your next chain deal extra damage.' },
+    shield: { name:'Shield', desc:'Block the enemy’s next attack.' },
+  };
+
+  function renderMonsterDetail(spId) {
+    const sp = SP(spId);
+    if (!sp) return;
+    const level = Math.max(1, COLL[sp.id] || 1);
+    const leader = leaderDetailEN[sp.attr] || { name: CAPTAIN_DEFS[sp.attr]?.name || 'Leader Skill', desc: CAPTAIN_DEFS[sp.attr]?.desc || '' };
+    const active = activeDetailEN[sp.skill] || { name: SKILL_DEFS[sp.skill]?.name || 'Active Skill', desc: SKILL_DEFS[sp.skill]?.tip || '' };
+    const skillDef = SKILL_DEFS[sp.skill] || {};
+
+    $('monsterDetailName').textContent = monsterNameEN[sp.id] || sp.name;
+    $('monsterDetailAtk').textContent = `+${level * 2}`;
+    $('monsterDetailLeaderName').textContent = leader.name;
+    $('monsterDetailLeaderDesc').textContent = leader.desc;
+    $('monsterDetailActiveName').textContent = active.name;
+    $('monsterDetailActiveDesc').textContent = active.desc;
+    $('monsterDetailCooldown').textContent = `COOL DOWN: ${skillDef.cd || 0}`;
+    $('monsterDetailActivePanel').dataset.skill = sp.skill;
+    $('monsterDetailArt').innerHTML = charSVG(sp.id, EQUIP[0] === sp.id);
+
+    hide('teamOverlay');
+    show('monsterDetailOverlay');
   }
 
   // ---------- 匯出 ----------
@@ -7081,8 +8577,9 @@ function eggSVG(attrColor) {
   });
   $('gimBadge').addEventListener('click', () => {
     if (!enemy) return;
-    const detail = gimText();
-    if (detail) toast(detail, 3600);
+    const gim = gimMeta();
+    if (gim.kind && ATTRIBUTE_HELP[gim.kind]) showAttributeTeach(gim.kind, gim.num, true);
+    else if (gim.text) toast(gim.text, 3600);
   });
   $('startJrBtn').addEventListener('click', () => { audioInit(); applyMode('jr'); hide('startOverlay'); renderMap(); say('歡迎來到小小世界！'); });
   $('startStdBtn').addEventListener('click', () => { audioInit(); applyMode('std'); hide('startOverlay'); renderMap(); });
@@ -7114,6 +8611,7 @@ function eggSVG(attrColor) {
   $('teamMonsterTab').addEventListener('click', () => renderTeam());
   $('teamSummonTab').addEventListener('click', () => { hide('teamOverlay'); openGacha(); });
   $('teamEventsTab').addEventListener('click', () => { hide('teamOverlay'); startTower(); });
+  $('monsterDetailBack').addEventListener('click', () => { hide('monsterDetailOverlay'); renderTeam(); });
   $('teamCaptainSlot').addEventListener('click', () => { toast(EQUIP[0] ? '點下方卡片可更換隊長' : '點下方卡片選隊長'); });
   $('teamMemberSlot').addEventListener('click', () => { toast(EQUIP[1] ? '點下方卡片可更換隊員' : '點下方卡片選隊員'); });
   $('towerBtn').addEventListener('click', startTower);
@@ -7161,6 +8659,22 @@ function eggSVG(attrColor) {
     return { age: pick('svAge'), gender: pick('svGender'), math: pick('svMath'),
              nick: ($('svNick').value || '').trim(), ts: Date.now() };
   }
+  function previewParam() {
+    try {
+      const qs = new URLSearchParams(location.search);
+      const hash = new URLSearchParams((location.hash || '').replace(/^#/, ''));
+      return qs.get('preview') || hash.get('preview') || '';
+    } catch (e) {
+      return '';
+    }
+  }
+  function openPreview(name) {
+    if (name !== 'fail') return false;
+    ['startOverlay','surveyOverlay','selectOverlay','settingsOverlay','teamOverlay','gachaOverlay','captainPickOverlay','resultOverlay','towerResultOverlay','monsterDetailOverlay'].forEach(hide);
+    $('failStats').innerHTML = '<strong>ALMOST THERE!</strong><span>TRY A LONGER CHAIN</span>';
+    show('failOverlay');
+    return true;
+  }
   // 依年齡決定模式：5~6 歲 → 小小獵人；7 歲以上 → 數字獵人
   const modeByAge = age => (age === '5' || age === '6') ? 'jr' : 'std';
   function enterByAge(age) {
@@ -7189,8 +8703,11 @@ function eggSVG(attrColor) {
   buildSurvey();
 
   log('session_start', { version: 'v10' });
+  const preview = previewParam();
   // 已填問卷 → 依（記住的模式 or 年齡）直接進地圖；未填 → 先問卷
-  if (SURVEY) {
+  if (preview && openPreview(preview)) {
+    applyMode(MODE || 'std');
+  } else if (SURVEY) {
     applyMode(MODE || modeByAge(SURVEY.age));
     hide('surveyOverlay'); renderMap();
   } else if (MODE) {
@@ -7200,5 +8717,17 @@ function eggSVG(attrColor) {
   tick();
 })();
 </script>
+
+<!-- ============ 共用底部 Navbar（Quest / Monster / Summon / Events 共用）============ -->
+<nav id="mainNav">
+  <button class="mNavBtn" id="mNavQuests"
+    onclick="(function(){var g=function(id){var e=document.getElementById(id);if(e)e.click();};var d=document.getElementById('monsterDetailOverlay');if(d)d.classList.add('hidden');g('eventsBack');g('gachaBack');g('teamBack');g('backBtn');})()">Quests</button>
+  <button class="mNavBtn" id="mNavMonster"
+    onclick="(function(){var d=document.getElementById('monsterDetailOverlay');if(d)d.classList.add('hidden');['gachaOverlay','teamOverlay','eventsOverlay','selectOverlay'].forEach(function(id){var e=document.getElementById(id);if(e)e.classList.add('hidden');});document.getElementById('teamBtn').click();})()">Monster</button>
+  <button class="mNavBtn" id="mNavSummon"
+    onclick="(function(){var d=document.getElementById('monsterDetailOverlay');if(d)d.classList.add('hidden');['gachaOverlay','teamOverlay','eventsOverlay','selectOverlay'].forEach(function(id){var e=document.getElementById(id);if(e)e.classList.add('hidden');});document.getElementById('gachaBtn').click();})()">Summon</button>
+  <button class="mNavBtn" id="mNavEvents"
+    onclick="(function(){var g=function(id){var e=document.getElementById(id);if(e)e.click();};var d=document.getElementById('monsterDetailOverlay');if(d)d.classList.add('hidden');g('gachaBack');g('teamBack');g('backBtn');var eo=document.getElementById('eventsOverlay');var so=document.getElementById('selectOverlay');if(eo&&so){eo.classList.remove('hidden');so.classList.add('hidden');}})()">Events</button>
+</nav>
 </body>
 </html>

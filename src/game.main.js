@@ -350,7 +350,7 @@
   }
   const battleChromeBlockers = new Set([
     'startOverlay', 'surveyOverlay', 'selectOverlay', 'settingsOverlay',
-    'teamOverlay', 'gachaOverlay', 'captainPickOverlay', 'teachOverlay',
+    'teamOverlay', 'gachaOverlay', 'captainPickOverlay',
     'resultOverlay', 'failOverlay', 'towerResultOverlay'
   ]);
   function battleChromeBlocked() {
@@ -411,12 +411,69 @@
   let SURVEY = store('nh5_survey', null);         // 開場問卷（年齡/性別/數學程度/暱稱）
   let UNLOCKALL = store('nh5_unlockall', false);  // 預設關閉：循序解鎖（可在設定開啟）
   let teachQueue = [];
-  function teach(id, title, art, body) {
+  const dialogueAssetRoot = location.pathname.includes('/src/') ? '../assets/ui/dialogue/' : 'assets/ui/dialogue/';
+  const ATTRIBUTE_HELP = {
+    shell: {
+      title: 'HARD SHELL',
+      icon: 'instruction_attribute_icon_shell.png',
+      condition: n => `${n} CHAIN +`,
+      body: n => `ONLY A CHAIN OF ${n}+ BEADS CAN CRACK IT.`
+    },
+    odd: {
+      title: 'ODD SHIELD',
+      icon: 'instruction_attribute_icon_shield.png',
+      condition: n => `${n} ODD +`,
+      body: n => `YOUR CHAIN MUST INCLUDE ${n}+ ODD NUMBERS.`
+    },
+    resonance: {
+      title: 'ECHO SHIELD',
+      icon: 'instruction_attribute_icon_resonance.png',
+      condition: n => `${n} SAME`,
+      body: n => `LINK ${n} OF THE SAME NUMBER IN A ROW.`
+    },
+    multiple: {
+      title: 'MULTIPLE SHIELD',
+      icon: 'instruction_attribute_icon_multiple.png',
+      condition: n => `MULTIPLE OF ${n}`,
+      body: n => `HIT IT WITH ANY MULTIPLE OF ${n}.`
+    }
+  };
+  function teach(id, title, art, body, meta = null) {
     if (TAUGHT[id]) return false;
     TAUGHT[id] = 1; save('nh5_taught', TAUGHT);
-    teachQueue.push({ id, title, art, body });
+    teachQueue.push({ id, title, art, body, meta });
     if (teachQueue.length === 1) showNextTeach();
     return true;
+  }
+  function showAttributeTeach(kind, num, force = false) {
+    const cfg = ATTRIBUTE_HELP[kind];
+    if (!cfg) return false;
+    const n = Math.max(1, Number(num) || 1);
+    const id = `attribute_${kind}`;
+    const item = {
+      id,
+      title: cfg.title,
+      art: '',
+      body: cfg.body(n),
+      meta: { attributeKind: kind, attributeNum: n, condition: cfg.condition(n), icon: cfg.icon }
+    };
+    if (!force) {
+      if (TAUGHT[id]) return false;
+      TAUGHT[id] = 1; save('nh5_taught', TAUGHT);
+    }
+    teachQueue.push(item);
+    if (teachQueue.length === 1) showNextTeach();
+    return true;
+  }
+  function renderAttributeTeach(t) {
+    const meta = t.meta || {};
+    const n = Math.max(1, Number(meta.attributeNum) || 1);
+    const icon = `${dialogueAssetRoot}${meta.icon}`;
+    $('teachTitle').textContent = t.title;
+    $('teachArt').innerHTML = Array.from({ length: n }, () => `<img src="${icon}" alt="">`).join('');
+    $('teachBadge').textContent = meta.condition || '';
+    $('teachBody').textContent = t.body;
+    $('teachOverlay').dataset.attribute = meta.attributeKind || '';
   }
   // 把教學內容唸出來（小小獵人專用，照顧還不識字的孩子）。
   // 取 HTML 的純文字、把 ×/− 換成「乘/減」、+ 換「加」、= 換「等於」，唸起來更自然。
@@ -431,9 +488,14 @@
     if (!teachQueue.length) return;
     const t = teachQueue[0];
     locked = true;
-    $('teachTitle').textContent = t.title;
-    $('teachArt').innerHTML = t.art || '';
-    $('teachBody').innerHTML = t.body;
+    if (t.meta && t.meta.attributeKind) renderAttributeTeach(t);
+    else {
+      $('teachTitle').textContent = t.title;
+      $('teachArt').innerHTML = t.art || '';
+      $('teachBadge').textContent = '';
+      $('teachBody').innerHTML = t.body;
+      $('teachOverlay').dataset.attribute = '';
+    }
     $('teachReplay').classList.toggle('hidden', !isJr());   // 只有小小獵人顯示「再聽一次」
     show('teachOverlay');
     if (isJr()) speakTeach(t);
@@ -595,21 +657,13 @@
     renderHud();
     if (!enemy.isBoss) say(enemy.divisor ? `湊出 ${enemy.divisor} 的倍數` : `目標是 ${target}`);
     // 新機制怪物登場 → 教學（每種只跳一次）
-    if (enemy.divisor) teach('divisor', '➗ 整除盾怪物！',
-      `<span style="font-size:30px;color:#6fe3ff">${enemy.divisor}·${enemy.divisor*2}·${enemy.divisor*3}…</span>`,
-      `這隻怪只怕「<b>${enemy.divisor} 的倍數</b>」。<br>你的總和只要<b>能被 ${enemy.divisor} 整除</b>就打得中——${enemy.divisor}、${enemy.divisor*2}、${enemy.divisor*3}… <b>哪個都行</b>，湊法很自由！<br><span style="font-size:12px;opacity:.75">這就是在練「哪些數能被 ${enemy.divisor} 整除」。</span>`);
+    if (enemy.divisor) showAttributeTeach('multiple', enemy.divisor);
     else if (enemy.divN) teach('divShare', '➗ 等分盾怪物！',
       '<span style="font-size:34px;color:#5ad6ff">12÷3=4</span>',
       `這隻怪要你「<b>把目標分成 ${enemy.divN} 等份</b>」。<br>先算：<b>目標 ÷ ${enemy.divN} = 每份多少</b>，再<b>連 ${enemy.divN} 顆一樣的</b>數字！<br><span style="font-size:12px;opacity:.75">例如目標 12、分 3 份 → 12÷3=4 → 連三顆 4。</span>`);
-    else if (enemy.needRun) teach('weakRun', '🔢 共鳴盾怪物！',
-      '<span style="font-size:40px;color:#ffae3d">3+3+3</span>',
-      `這隻怪有<b>共鳴盾</b>：鏈裡要<b>連續連到 ${enemy.needRun} 顆相同的數字</b>才打得中（例如 ${enemy.needRun} 顆 3）。<br>連相同數字＝<b>乘法</b>，傷害還會暴增！`);
-    else if (enemy.needOdd) teach('weakOdd', '🔆 奇數盾怪物！',
-      '<span style="font-size:42px">🔆</span>',
-      `這隻怪有<b>奇數盾</b>：你的鏈裡必須包含 <b>${enemy.needOdd} 顆以上奇數</b>（1·3·5·7·9）才打得中。<br>總和一樣要剛好等於目標，只是<b>多了一個「要用幾顆奇數」的條件</b>。`);
-    else if (enemy.minLen > 2) teach('shell', '🛡️ 硬殼怪物！',
-      '<span style="font-size:42px">🛡️</span>',
-      `這隻怪有<b>硬殼</b>：只有 <b>${enemy.minLen} 顆以上</b>的長鏈才打得進去。短鏈會被彈開！`);
+    else if (enemy.needRun) showAttributeTeach('resonance', enemy.needRun);
+    else if (enemy.needOdd) showAttributeTeach('odd', enemy.needOdd);
+    else if (enemy.minLen > 2) showAttributeTeach('shell', enemy.minLen);
     else if (enemy.banned) teach('ban', '🚫 封印怪物！',
       '<span style="font-size:42px">🚫</span>',
       `這隻怪會<b>封印一個數字</b>（變灰、不能用）。用 ✏️ 加一 / ➖ 減一 技能可以把被封的珠改成別的數字喔！`);
@@ -629,8 +683,8 @@
   function gimMeta() {
     if (!enemy) return { text: '', kind: '', num: '' };
     const text = gimText();
-    if (enemy.needRun) return { text, kind: 'run', num: enemy.needRun };
-    if (enemy.minLen > 2) return { text, kind: 'shield', num: enemy.minLen };
+    if (enemy.needRun) return { text, kind: 'resonance', num: enemy.needRun };
+    if (enemy.minLen > 2) return { text, kind: 'shell', num: enemy.minLen };
     if (enemy.needOdd) return { text, kind: 'odd', num: enemy.needOdd };
     if (enemy.divN) return { text, kind: 'divide', num: enemy.divN };
     if (enemy.divisor) return { text, kind: 'multiple', num: enemy.divisor };
@@ -1542,12 +1596,15 @@
     show('gachaOverlay');
   }
   function renderGacha(idle) {
-    $('gachaCount').innerHTML = `🥚 抽蛋機會 <b>${DRAWS}</b> 次`;
+    $('gachaCount').innerHTML = `抽蛋機會 <span class="sCountBadge">${DRAWS}</span> 次`;
     $('gachaDrawBtn').classList.toggle('disabled', DRAWS <= 0);
-    $('gachaDrawBtn').textContent = DRAWS > 0 ? '抽一次 🥚' : '沒有抽蛋機會了';
+    $('gachaDrawBtn').textContent = DRAWS > 0 ? '孵化一次' : '沒有機會了';
     if (idle) {
-      $('gachaArt').innerHTML = `<div class="art ${DRAWS > 0 ? 'wob' : ''}">${eggSVG(DRAWS > 0 ? '#ffd36b' : '#888')}</div>`;
-      $('gachaMsg').innerHTML = DRAWS > 0 ? '點「抽一次」孵化數靈！' : '去過關拿星星，換更多抽蛋機會吧！';
+      const art = $('gachaArt');
+      art.classList.remove('hatched', 'pop');
+      art.classList.toggle('wob', DRAWS > 0);   // 蛋台由 CSS 背景圖呈現(summon_egg_stage_ready)
+      art.innerHTML = '';
+      $('gachaMsg').innerHTML = DRAWS > 0 ? '點「孵化一次」召喚數靈！' : '去過關拿星星，換更多孵化機會吧！';
     }
   }
   function drawOne() {
@@ -1559,7 +1616,10 @@
     save('nh5_coll', COLL);
     log('egg_drop', { source: 'gacha', species: spId });
     log('hatch', { species: spId, dup, level: COLL[spId] });
-    $('gachaArt').innerHTML = `<div class="art pop">${charSVG(spId)}</div>`;
+    const gart = $('gachaArt');                 // 孵化:空巢圖 + 角色疊上
+    gart.classList.remove('wob');
+    gart.classList.add('hatched', 'pop');
+    gart.innerHTML = `<div class="hatchChar">${charSVG(spId)}</div>`;
     $('gachaMsg').innerHTML = dup
       ? `<b>${sp.name}</b> 升級了！Lv${COLL[spId]}（傷害提升）`
       : `🎉 新夥伴 <b>${sp.name}</b>（${ATTRS[sp.attr].n}）！<br><span style="font-size:12px;opacity:.7">${SKILL_DEFS[sp.skill].ic}${SKILL_DEFS[sp.skill].name}　${CAPTAIN_DEFS[sp.attr].ic}${CAPTAIN_DEFS[sp.attr].name}</span>`;
@@ -1750,9 +1810,7 @@
     floaters = []; particles = [];
     updateDDA(false);
     log('stage_fail', { stage: stg().key, foe: foeIdx + 1, dur_ms: Date.now() - stageStat.t0 });
-    $('failStats').innerHTML =
-      `打到第 ${foeIdx + 1} 隻怪物<br>平均鏈長 ${avgChain().toFixed(2)}<br>` +
-      `<span style="font-size:12px;opacity:.7">小訣竅：夥伴技能冷卻好就用掉，別捨不得！</span>`;
+    $('failStats').innerHTML = '<strong>ALMOST THERE!</strong><span>TRY A LONGER CHAIN</span>';
     show('failOverlay');
   }
 
@@ -1918,19 +1976,7 @@
         <div class="atkBadge" aria-hidden="true"></div>
         <div class="atkText">${atkBonus(sp)}</div>`;
       card.addEventListener('click', () => {
-        if (!equipped) {
-          if (EQUIP.length >= 2) { toast('最多帶 2 隻，先卸下一隻吧'); return; }
-          EQUIP.push(sp.id);
-        } else if (!isCap) {
-          EQUIP = [sp.id, ...EQUIP.filter(x => x !== sp.id)];
-          toast(`👑 ${sp.name} 成為隊長！`);
-        } else {
-          if (EQUIP.length <= 1) { toast('至少要帶一隻夥伴！'); return; }
-          EQUIP = EQUIP.filter(x => x !== sp.id);
-        }
-        save('nh5_equip', EQUIP);
-        log('equip', { team: [...EQUIP], captain: captainAttr() });
-        renderTeam();
+        renderMonsterDetail(sp.id);
       });
       og.appendChild(card);
     });
@@ -1963,6 +2009,55 @@
       grid.appendChild(sec);
     }
     show('teamOverlay');
+  }
+
+  const monsterNameEN = {
+    kiki:'Kiki',
+    oo:'O-O',
+    prima:'Primer',
+    swapy:'Swapy',
+    starle:'Starle',
+    guardy:'Guardy',
+    dubdragon:'Dub Dragon',
+    munchdragon:'Munch Dragon',
+  };
+  const leaderDetailEN = {
+    prime: { name:'Prime Resonance', desc:'+18% damage for each prime bead (2, 3, 5, 7) in your chain.' },
+    odd:   { name:'Odd Strike', desc:'+12% damage for each odd bead in your chain.' },
+    even:  { name:'Even Link', desc:'+1 chain multiplier for every 2 even beads in your chain.' },
+    multi: { name:'Multiple Burst', desc:'Deal double damage when your chain length is a multiple of 3.' },
+  };
+  const activeDetailEN = {
+    plus1:  { name:'Add One', desc:'Tap a bead to increase it by 1.' },
+    minus1: { name:'Minus One', desc:'Tap a bead to decrease it by 1.' },
+    reroll: { name:'Reroll', desc:'Tap a bead to change it into a random new one.' },
+    split:  { name:'Split', desc:'Tap a bead to split it into two smaller beads.' },
+    swapUp: { name:'Swap', desc:'Tap a bead to swap it with the bead above.' },
+    purify: { name:'Clean', desc:'Tap a bead to remove it from the board.' },
+    lucky:  { name:'Luck', desc:'Make your next chain deal extra damage.' },
+    shield: { name:'Shield', desc:'Block the enemy’s next attack.' },
+  };
+
+  function renderMonsterDetail(spId) {
+    const sp = SP(spId);
+    if (!sp) return;
+    const level = Math.max(1, COLL[sp.id] || 1);
+    const leader = leaderDetailEN[sp.attr] || { name: CAPTAIN_DEFS[sp.attr]?.name || 'Leader Skill', desc: CAPTAIN_DEFS[sp.attr]?.desc || '' };
+    const active = activeDetailEN[sp.skill] || { name: SKILL_DEFS[sp.skill]?.name || 'Active Skill', desc: SKILL_DEFS[sp.skill]?.tip || '' };
+    const skillDef = SKILL_DEFS[sp.skill] || {};
+
+    $('monsterDetailName').textContent = monsterNameEN[sp.id] || sp.name;
+    $('monsterDetailAtk').textContent = `+${level * 2}`;
+    $('monsterDetailLeaderName').textContent = leader.name;
+    $('monsterDetailLeaderDesc').textContent = leader.desc;
+    $('monsterDetailActiveName').textContent = active.name;
+    $('monsterDetailActiveDesc').textContent = active.desc;
+    $('monsterDetailCooldown').textContent = `COOL DOWN: ${skillDef.cd || 0}`;
+    $('monsterDetailActivePanel').dataset.skill = sp.skill;
+    $('monsterDetailArt').innerHTML = charSVG(sp.id, EQUIP[0] === sp.id);
+
+    hide('teamOverlay');
+    show('monsterDetailOverlay');
   }
 
   // ---------- 匯出 ----------
@@ -2004,8 +2099,9 @@
   });
   $('gimBadge').addEventListener('click', () => {
     if (!enemy) return;
-    const detail = gimText();
-    if (detail) toast(detail, 3600);
+    const gim = gimMeta();
+    if (gim.kind && ATTRIBUTE_HELP[gim.kind]) showAttributeTeach(gim.kind, gim.num, true);
+    else if (gim.text) toast(gim.text, 3600);
   });
   $('startJrBtn').addEventListener('click', () => { audioInit(); applyMode('jr'); hide('startOverlay'); renderMap(); say('歡迎來到小小世界！'); });
   $('startStdBtn').addEventListener('click', () => { audioInit(); applyMode('std'); hide('startOverlay'); renderMap(); });
@@ -2037,6 +2133,7 @@
   $('teamMonsterTab').addEventListener('click', () => renderTeam());
   $('teamSummonTab').addEventListener('click', () => { hide('teamOverlay'); openGacha(); });
   $('teamEventsTab').addEventListener('click', () => { hide('teamOverlay'); startTower(); });
+  $('monsterDetailBack').addEventListener('click', () => { hide('monsterDetailOverlay'); renderTeam(); });
   $('teamCaptainSlot').addEventListener('click', () => { toast(EQUIP[0] ? '點下方卡片可更換隊長' : '點下方卡片選隊長'); });
   $('teamMemberSlot').addEventListener('click', () => { toast(EQUIP[1] ? '點下方卡片可更換隊員' : '點下方卡片選隊員'); });
   $('towerBtn').addEventListener('click', startTower);
@@ -2084,6 +2181,22 @@
     return { age: pick('svAge'), gender: pick('svGender'), math: pick('svMath'),
              nick: ($('svNick').value || '').trim(), ts: Date.now() };
   }
+  function previewParam() {
+    try {
+      const qs = new URLSearchParams(location.search);
+      const hash = new URLSearchParams((location.hash || '').replace(/^#/, ''));
+      return qs.get('preview') || hash.get('preview') || '';
+    } catch (e) {
+      return '';
+    }
+  }
+  function openPreview(name) {
+    if (name !== 'fail') return false;
+    ['startOverlay','surveyOverlay','selectOverlay','settingsOverlay','teamOverlay','gachaOverlay','captainPickOverlay','resultOverlay','towerResultOverlay','monsterDetailOverlay'].forEach(hide);
+    $('failStats').innerHTML = '<strong>ALMOST THERE!</strong><span>TRY A LONGER CHAIN</span>';
+    show('failOverlay');
+    return true;
+  }
   // 依年齡決定模式：5~6 歲 → 小小獵人；7 歲以上 → 數字獵人
   const modeByAge = age => (age === '5' || age === '6') ? 'jr' : 'std';
   function enterByAge(age) {
@@ -2112,8 +2225,11 @@
   buildSurvey();
 
   log('session_start', { version: 'v10' });
+  const preview = previewParam();
   // 已填問卷 → 依（記住的模式 or 年齡）直接進地圖；未填 → 先問卷
-  if (SURVEY) {
+  if (preview && openPreview(preview)) {
+    applyMode(MODE || 'std');
+  } else if (SURVEY) {
     applyMode(MODE || modeByAge(SURVEY.age));
     hide('surveyOverlay'); renderMap();
   } else if (MODE) {

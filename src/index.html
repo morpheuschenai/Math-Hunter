@@ -149,6 +149,40 @@
   <button class="btnGhost" id="teamBack">回地圖</button>
 </div>
 
+<div id="monsterDetailOverlay" class="overlay hidden">
+  <h1 id="monsterDetailTitle">MONSTER DETAILS</h1>
+  <div id="monsterDetailArt" aria-hidden="true"></div>
+  <div id="monsterDetailNameBadge"><span id="monsterDetailName">MONSTER</span></div>
+  <section id="monsterDetailInfo" aria-label="Monster details">
+    <div class="monsterDetailPanelSlice monsterDetailPanelSliceTop" aria-hidden="true"></div>
+    <div class="monsterDetailPanelSlice monsterDetailPanelSliceBottom" aria-hidden="true"></div>
+    <div class="monsterDetailPanelSlice monsterDetailPanelSliceMiddle" aria-hidden="true"></div>
+    <div id="monsterDetailAtkPanel" class="monsterDetailPanel">
+      <span class="monsterDetailAtkIcon" aria-hidden="true"></span>
+      <span class="monsterDetailAtkLabel">ATK</span>
+      <span id="monsterDetailAtk">+0</span>
+    </div>
+    <div id="monsterDetailLeaderPanel" class="monsterDetailPanel">
+      <span class="monsterDetailSkillIcon monsterDetailLeaderIcon" aria-hidden="true"></span>
+      <div class="monsterDetailSkillText">
+        <span class="monsterDetailSkillLabel">LEADER SKILL</span>
+        <span id="monsterDetailLeaderName" class="monsterDetailSkillName"></span>
+        <span id="monsterDetailLeaderDesc" class="monsterDetailSkillDesc"></span>
+      </div>
+    </div>
+    <div id="monsterDetailActivePanel" class="monsterDetailPanel">
+      <span class="monsterDetailSkillIcon monsterDetailActiveIcon" aria-hidden="true"></span>
+      <div class="monsterDetailSkillText">
+        <span class="monsterDetailSkillLabel">ACTIVE SKILL</span>
+        <span id="monsterDetailActiveName" class="monsterDetailSkillName"></span>
+        <span id="monsterDetailActiveDesc" class="monsterDetailSkillDesc"></span>
+        <span id="monsterDetailCooldown" class="monsterDetailCooldown"></span>
+      </div>
+    </div>
+  </section>
+  <button id="monsterDetailBack" type="button" aria-label="Back to monster list"></button>
+</div>
+
 <div id="splitOverlay" class="overlay center hidden">
   <h1>✂️ 怎麼拆？</h1>
   <p id="splitDesc"></p>
@@ -168,27 +202,48 @@
 </div>
 
 <div id="gachaOverlay" class="overlay center hidden">
-  <h1>🥚 數靈孵化所</h1>
-  <p id="gachaCount"></p>
-  <div id="gachaArt"></div>
-  <p id="gachaMsg" style="min-height:40px"></p>
-  <button class="btn" id="gachaDrawBtn" style="background:linear-gradient(135deg,#ffcf4d,#ff9d2e)">抽一次 🥚</button>
-  <button class="btnGhost" id="gachaBack">返回</button>
+  <div id="gachaInner">
+    <h1>Summon</h1>
+    <p id="gachaCount"></p>
+    <div id="gachaArt"></div>
+    <p id="gachaMsg"></p>
+    <button class="btn" id="gachaDrawBtn">孵化一次</button>
+    <button class="btnGhost" id="gachaBack" style="display:none"></button>
+    <nav id="gachaNav">
+      <button class="gNavBtn" id="gNavQuest" onclick="document.getElementById('gachaBack').click()">Quests</button>
+      <button class="gNavBtn" id="gNavMonster" onclick="(function(){['gachaOverlay','teamOverlay','eventsOverlay','selectOverlay'].forEach(function(id){var e=document.getElementById(id);if(e)e.classList.add('hidden');});document.getElementById('teamBtn').click();})()">Monster</button>
+      <button class="gNavBtn gNavActive" id="gNavSummon">Summon</button>
+      <button class="gNavBtn" id="gNavEvents" onclick="(function(){document.getElementById('gachaBack').click();var so=document.getElementById('selectOverlay');var eo=document.getElementById('eventsOverlay');if(so)so.classList.add('hidden');if(eo)eo.classList.remove('hidden');})()">Events</button>
+    </nav>
+  </div>
 </div>
 
 <div id="failOverlay" class="overlay center hidden">
-  <h1>💦 被打倒了…</h1>
-  <p id="failStats"></p>
-  <button class="btn" id="retryBtn">再試一次</button>
-  <button class="btnGhost" id="backBtn">回地圖</button>
+  <div id="failTitleRow" aria-hidden="true">
+    <span class="failTitleWing failTitleWingLeft"></span>
+    <h1>TRY AGAIN</h1>
+    <span class="failTitleWing failTitleWingRight"></span>
+  </div>
+  <div id="failHeroArt" aria-hidden="true"></div>
+  <div id="failStatusBanner"><span>BATTLE FAILED</span></div>
+  <p id="failStats"><strong>ALMOST THERE!</strong><span>TRY A LONGER CHAIN</span></p>
+  <div id="failActions">
+    <button class="btn" id="retryBtn">RETRY</button>
+    <button class="btnGhost" id="backBtn">BACK</button>
+  </div>
 </div>
 
 <div id="teachOverlay" class="overlay center hidden">
-  <h1 id="teachTitle"></h1>
-  <div id="teachArt" style="font-size:40px;margin:4px 0"></div>
-  <p id="teachBody"></p>
-  <button class="btnGhost" id="teachReplay" style="font-size:14px">🔊 再聽一次</button>
-  <button class="btn" id="teachOk">我知道了！</button>
+  <div id="teachDialog" class="instructionDialog" role="dialog" aria-modal="true" aria-labelledby="teachTitle">
+    <div id="teachHeroIcon" class="instructionHeroIcon" aria-hidden="true"></div>
+    <div class="instructionPanel" aria-hidden="true"></div>
+    <h1 id="teachTitle" class="instructionTitle"></h1>
+    <div id="teachArt" class="instructionIconRow" aria-hidden="true"></div>
+    <div id="teachBadge" class="instructionCondition"></div>
+    <p id="teachBody" class="instructionBody"></p>
+    <button class="instructionOk" id="teachOk" type="button">OK</button>
+    <button class="btnGhost hidden" id="teachReplay" type="button">🔊 再聽一次</button>
+  </div>
 </div>
 
 <div id="captainPickOverlay" class="overlay center hidden">
@@ -196,6 +251,38 @@
   <p style="font-size:12px;opacity:.7">隊長技整場常駐，選一隻最適合這關打法的！</p>
   <div id="captainPickGrid" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:8px 0"></div>
   <button class="btnGhost" id="captainPickCancel">回地圖</button>
+</div>
+
+<!-- ============ Events 頁（無限塔大廳）============ -->
+<div id="eventsOverlay" class="overlay hidden">
+  <div id="eventsInner">
+    <!-- 隱藏返回按鈕：供 mainNav 程式呼叫使用 -->
+    <button id="eventsBack" style="display:none"
+      onclick="document.getElementById('eventsOverlay').classList.add('hidden');document.getElementById('selectOverlay').classList.remove('hidden')"></button>
+    <!-- 塔橫幅 -->
+    <div id="eventsTitleBanner"></div>
+    <!-- 塔主視覺 -->
+    <div id="eventsTowerArt"></div>
+    <!-- 統計面板（三欄各用一張 events_reward_count_badge.png）-->
+    <div id="eventsPanel">
+      <div class="eventsStatCard">
+        <div class="eventsStatLabel">HIGHEST<br>FLOOR</div>
+        <div class="eventsStatVal" id="eventsHighFloor">0</div>
+      </div>
+      <div class="eventsStatCard">
+        <div class="eventsStatLabel">EGGS<br>EARNED</div>
+        <div id="eventsEggIcon"></div>
+        <div class="eventsEggCount">×<span id="eventsEggsEarned">0</span></div>
+      </div>
+      <div class="eventsStatCard">
+        <div class="eventsStatLabel">BEST<br>CHAIN</div>
+        <div class="eventsStatVal eventsStatChain" id="eventsBestChain">0</div>
+      </div>
+    </div>
+    <!-- 開始按鈕 -->
+    <button id="eventsStartBtn"
+      onclick="document.getElementById('eventsOverlay').classList.add('hidden');document.getElementById('towerBtn').click()"></button>
+  </div>
 </div>
 
 <!-- ============ 純邏輯（盤面大小由 values.length 決定；0 = 減法珠）============ -->
@@ -206,5 +293,17 @@
 
 <!-- ============ 遊戲本體 ============ -->
 <script src="game.main.js"></script>
+
+<!-- ============ 共用底部 Navbar（Quest / Monster / Summon / Events 共用）============ -->
+<nav id="mainNav">
+  <button class="mNavBtn" id="mNavQuests"
+    onclick="(function(){var g=function(id){var e=document.getElementById(id);if(e)e.click();};var d=document.getElementById('monsterDetailOverlay');if(d)d.classList.add('hidden');g('eventsBack');g('gachaBack');g('teamBack');g('backBtn');})()">Quests</button>
+  <button class="mNavBtn" id="mNavMonster"
+    onclick="(function(){var d=document.getElementById('monsterDetailOverlay');if(d)d.classList.add('hidden');['gachaOverlay','teamOverlay','eventsOverlay','selectOverlay'].forEach(function(id){var e=document.getElementById(id);if(e)e.classList.add('hidden');});document.getElementById('teamBtn').click();})()">Monster</button>
+  <button class="mNavBtn" id="mNavSummon"
+    onclick="(function(){var d=document.getElementById('monsterDetailOverlay');if(d)d.classList.add('hidden');['gachaOverlay','teamOverlay','eventsOverlay','selectOverlay'].forEach(function(id){var e=document.getElementById(id);if(e)e.classList.add('hidden');});document.getElementById('gachaBtn').click();})()">Summon</button>
+  <button class="mNavBtn" id="mNavEvents"
+    onclick="(function(){var g=function(id){var e=document.getElementById(id);if(e)e.click();};var d=document.getElementById('monsterDetailOverlay');if(d)d.classList.add('hidden');g('gachaBack');g('teamBack');g('backBtn');var eo=document.getElementById('eventsOverlay');var so=document.getElementById('selectOverlay');if(eo&&so){eo.classList.remove('hidden');so.classList.add('hidden');}})()">Events</button>
+</nav>
 </body>
 </html>
