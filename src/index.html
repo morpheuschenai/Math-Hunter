@@ -4,7 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>數字獵人 v10</title>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Math Hunter">
+<meta http-equiv="Cache-Control" content="no-cache">
+<title>Math Hunter</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Noto+Sans+TC:wght@500;700;900&display=swap">
@@ -15,11 +18,11 @@
 
 <div id="app" class="battleShell" data-layout="balanced">
   <section class="battleHeader">
-    <div id="topRow"><span id="stageName">–</span><span><button id="exitBtn">↩︎ 離開</button><button id="voiceBtn" class="hidden">🔊</button> <span id="foeProgress">–</span></span></div>
+    <div id="topRow"><span id="stageName">–</span><span><button id="exitBtn" data-i18n="hud.exit">↩︎ 離開</button><button id="voiceBtn" class="hidden">🔊</button> <span id="foeProgress">–</span></span></div>
   </section>
   <section class="enemyPanel">
     <div id="enemyZone">
-      <div id="countdown"><span id="cdLabel">行動</span> <b id="cdVal">4</b></div>
+      <div id="countdown"><span id="cdLabel" data-i18n="hud.action">行動</span> <b id="cdVal">4</b></div>
       <div id="enemyArt"></div>
       <div id="enemyName">–</div>
       <div id="gimBadge"></div>
@@ -28,8 +31,8 @@
   </section>
   <section class="mathHud">
     <div id="targetRow">
-      <span class="tLabel">目標</span><span id="targetVal">–</span>
-      <span class="tLabel">目前</span><span id="curSum">–</span>
+      <span class="tLabel" data-i18n="hud.target">目標</span><span id="targetVal">–</span>
+      <span class="tLabel" data-i18n="hud.current">目前</span><span id="curSum">–</span>
       <span id="chainInfo">鏈 ×0</span>
     </div>
     <div id="playerRow"><span class="hpHeart" aria-hidden="true"></span><span class="hpLabel">HP</span><div class="barWrap"><div id="playerHpFill" class="barFill"></div></div><span id="playerHpText">100</span><span id="shieldIc" aria-hidden="true"></span></div>
@@ -52,34 +55,34 @@
 <div id="bossBanner">⚠️ 亂數魔王 ⚠️<small>數界的混亂之源現身了！</small></div>
 
 <div id="surveyOverlay" class="overlay center">
-  <h1>👋 開始之前</h1>
-  <p style="font-size:13px;opacity:.85">幫我們一個小忙，回答幾個小問題（給大人填也行）。<br>這些資料只用來改進遊戲 😊</p>
+  <h1 data-i18n="survey.title">👋 開始之前</h1>
+  <p style="font-size:13px;opacity:.85" data-i18n="survey.intro">幫我們一個小忙，回答幾個小問題（給大人填也行）。<br>這些資料只用來改進遊戲 😊</p>
   <div class="svGroup">
-    <div class="svQ">小朋友幾歲？<span style="color:#ff8da3">＊必填</span></div>
+    <div class="svQ" data-i18n="survey.age.q">小朋友幾歲？<span style="color:#ff8da3" data-i18n="survey.age.required">＊必填</span></div>
     <div class="svOpts" id="svAge"></div>
   </div>
   <div class="svGroup">
-    <div class="svQ">性別</div>
+    <div class="svQ" data-i18n="survey.gender.q">性別</div>
     <div class="svOpts" id="svGender">
-      <button class="svOpt" data-v="男生">男生</button>
-      <button class="svOpt" data-v="女生">女生</button>
-      <button class="svOpt" data-v="不想說">不想說</button>
+      <button class="svOpt" data-v="m">男生</button>
+      <button class="svOpt" data-v="f">女生</button>
+      <button class="svOpt" data-v="x">不想說</button>
     </div>
   </div>
   <div class="svGroup">
-    <div class="svQ">數學程度（自己感覺就好）</div>
+    <div class="svQ" data-i18n="survey.math.q">數學程度（自己感覺就好）</div>
     <div class="svOpts" id="svMath">
-      <button class="svOpt" data-v="剛開始學">剛開始學加減</button>
-      <button class="svOpt" data-v="還可以">加減很OK</button>
-      <button class="svOpt" data-v="會乘除">會乘法/除法</button>
-      <button class="svOpt" data-v="很拿手">數學很拿手</button>
+      <button class="svOpt" data-v="beginner">剛開始學加減</button>
+      <button class="svOpt" data-v="ok">加減很OK</button>
+      <button class="svOpt" data-v="advanced">會乘法/除法</button>
+      <button class="svOpt" data-v="expert">數學很拿手</button>
     </div>
   </div>
   <div class="svGroup">
-    <div class="svQ">暱稱／代號（可留空）</div>
-    <input id="svNick" maxlength="12" placeholder="例如：小明、A1" style="font-size:16px;padding:8px 12px;border-radius:10px;background:#16203a;color:#fff;border:1px solid #2a3550;text-align:center">
+    <div class="svQ" data-i18n="survey.nick.q">暱稱／代號（可留空）</div>
+    <input id="svNick" maxlength="12" placeholder="例如：小明、A1" data-i18n="survey.nick.placeholder" data-i18n-mode="placeholder" style="font-size:16px;padding:8px 12px;border-radius:10px;background:#16203a;color:#fff;border:1px solid #2a3550;text-align:center">
   </div>
-  <button class="btn btnBig" id="surveyGo" style="margin-top:8px">開始遊戲 ▶</button>
+  <button class="btn btnBig" id="surveyGo" style="margin-top:8px" data-i18n="survey.submit">開始遊戲 ▶</button>
 </div>
 
 <div id="startOverlay" class="overlay center hidden">
@@ -109,8 +112,8 @@
 <div id="towerResultOverlay" class="overlay center hidden">
   <h1>🗼 無限塔結算</h1>
   <p style="font-size:15px">爬到第 <b style="color:#ffd84d" id="towerFloors">0</b> 層</p>
-  <p style="font-size:14px">最高單發攻擊力 <b style="color:#ff9d2e" id="towerPeak">0</b></p>
-  <p id="towerBonusMsg" style="font-size:13px"></p>
+  <p style="font-size:14px">Best single hit <b style="color:#ff9d2e" id="towerPeak">0</b></p>
+  <p class="towerBonusRow"><span id="towerBonusMsg" style="font-size:13px"></span><button id="towerBonusTip" class="tipBtn" type="button" aria-label="How bonus eggs work">?</button></p>
   <p style="font-size:15px">本次共獲得 🥚 <b style="color:#ffd84d" id="towerDraws">0</b> 次抽蛋機會！</p>
   <button class="btn" id="towerAgainBtn">再挑戰 🗼</button>
   <button class="btn" id="towerGachaBtn" style="background:linear-gradient(135deg,#ffcf4d,#ff9d2e)">🥚 去孵化所</button>
@@ -118,18 +121,22 @@
 </div>
 
 <div id="settingsOverlay" class="overlay center hidden">
-  <h1>⚙️ 設定</h1>
+  <h1 data-i18n="settings.title">⚙️ 設定</h1>
   <button class="btnGhost" id="modeBtn">🔁 切換模式</button>
   <button class="btnGhost" id="unlockBtn">🔓 全解鎖</button>
-  <button class="btnGhost" id="exportBtn">📤 匯出數據</button>
-  <button class="btnGhost" id="newTesterBtn">🧒 換一位小朋友（重填問卷）</button>
-  <button class="btnGhost" id="clearBtn" style="opacity:.7">🗑️ 刪除數據</button>
-  <button class="btn" id="settingsBack">返回</button>
+  <button class="btnGhost" id="exportBtn" data-i18n="settings.export">📤 匯出數據</button>
+  <button class="btnGhost" id="newTesterBtn" data-i18n="settings.new_tester">🧒 換一位小朋友（重填問卷）</button>
+  <button class="btnGhost" id="clearBtn" style="opacity:.7" data-i18n="settings.clear">🗑️ 刪除數據</button>
+  <div style="display:flex;gap:8px;margin-top:4px">
+    <button class="btnGhost" id="langZhBtn" onclick="setLang('zh')" style="flex:1">繁體中文</button>
+    <button class="btnGhost" id="langEnBtn" onclick="setLang('en')" style="flex:1">English</button>
+  </div>
+  <button class="btn" id="settingsBack" data-i18n="settings.back">返回</button>
 </div>
 
 <div id="teamOverlay" class="overlay hidden">
   <h1>MONSTER TEAM</h1>
-  <p style="font-size:12px;opacity:.7">點未出戰的可上場；點出戰中的可設為👑隊長；點👑隊長則卸下。最多 2 隻。</p>
+  <p style="font-size:12px;opacity:.7" data-i18n="team.desc">點未出戰的可上場；點出戰中的可設為👑隊長；點👑隊長則卸下。最多 2 隻。</p>
   <div id="teamCaptain" style="font-size:13px;margin:2px 0 6px;min-height:18px"></div>
   <div id="teamSlots">
     <button class="teamSlot captain" id="teamCaptainSlot" type="button"><span>CAPTAIN SLOT</span></button>
@@ -191,14 +198,24 @@
 </div>
 
 <div id="resultOverlay" class="overlay center hidden">
-  <h1 id="resultTitle">🎉 淨化成功！</h1>
-  <div id="resultStars">⭐⭐⭐</div>
+  <div id="resultHeader">
+    <div id="resultStageBadge">STAGE 12</div>
+    <div id="resultTitleRow" aria-hidden="true">
+      <span class="resultTitleStar resultTitleStarLeft"></span>
+      <h1 id="resultTitle">CLEAR</h1>
+      <span class="resultTitleStar resultTitleStarRight"></span>
+    </div>
+  </div>
   <div id="resultHero" aria-hidden="true"></div>
+  <div id="resultStars" aria-hidden="true"></div>
   <p id="resultStats"></p>
-  <p id="drawReward" style="min-height:20px"></p>
-  <button class="btn" id="gachaGoBtn" style="background:linear-gradient(135deg,#ffcf4d,#ff9d2e)">🥚 前往孵化所抽蛋</button>
-  <button class="btn" id="nextBtn">繼續</button>
-  <button class="btnGhost" id="replayBtn">重玩這關</button>
+  <p id="drawReward" class="hidden"></p>
+  <button class="btn hidden" id="gachaGoBtn">HATCH</button>
+  <div id="resultActions">
+    <button class="btn" id="nextBtn">NEXT</button>
+    <button class="btnGhost" id="resultBackBtn">BACK</button>
+  </div>
+  <button class="btnGhost hidden" id="replayBtn">重玩這關</button>
 </div>
 
 <div id="gachaOverlay" class="overlay center hidden">
@@ -286,6 +303,7 @@
 </div>
 
 <!-- ============ 純邏輯（盤面大小由 values.length 決定；0 = 減法珠）============ -->
+<script src="i18n.js"></script>
 <script id="logic" src="game.logic.js"></script>
 
 <!-- ============ 數靈圖鑑（SVG）============ -->

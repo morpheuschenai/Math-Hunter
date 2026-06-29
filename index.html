@@ -4,7 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>數字獵人 v10</title>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Math Hunter">
+<meta http-equiv="Cache-Control" content="no-cache">
+<title>Math Hunter</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Noto+Sans+TC:wght@500;700;900&display=swap">
@@ -1054,7 +1057,7 @@ body.jr #playerRow { display:none; }
   overflow:hidden;
   transform:translate(-50%,-50%);
   color:#fff;
-  background:#07121d url("assets/ui/game/result/fail_result_background.png") left top/100% 100% no-repeat;
+  background:#07121d url("assets/ui/game/result/fail_result_background.png") left top/100% 112.657% no-repeat;
   border:0;
   box-shadow:0 0 0 100vmax #07121d;
   container-type:inline-size;
@@ -1121,7 +1124,7 @@ body.jr #playerRow { display:none; }
 
 #failHeroArt {
   left:18.523%;
-  top:20.293%;
+  top:20.502%;
   width:63.182%;
   height:31.067%;
   background:url("assets/ui/game/result/fail_broken_math_shield.png") center/100% 100% no-repeat;
@@ -1129,7 +1132,7 @@ body.jr #playerRow { display:none; }
 
 #failStatusBanner {
   left:18.295%;
-  top:52.615%;
+  top:60.251%;
   width:63.636%;
   height:8.054%;
   display:grid;
@@ -1155,7 +1158,7 @@ body.jr #playerRow { display:none; }
 
 #failOverlay #failStats {
   left:4.545%;
-  top:61.088%;
+  top:70.711%;
   width:91.136%;
   height:14.958%;
   max-width:none;
@@ -1199,7 +1202,7 @@ body.jr #playerRow { display:none; }
 
 #failActions {
   left:4.545%;
-  top:76.464%;
+  top:86.088%;
   width:91.136%;
   height:7.95%;
   display:flex;
@@ -2866,6 +2869,258 @@ body.jr #playerRow { display:none; }
   border-radius:8px;
   line-height:1.2;
   text-shadow:0 1px 0 rgba(255,255,255,.45);
+}
+
+/* === Success result: Figma frame 440 x 956, node 19308:22280 === */
+#resultOverlay.overlay {
+  inset:auto;
+  top:50%;
+  left:50%;
+  width:min(100vw, calc(100dvh * 440 / 956), 440px);
+  height:min(100dvh, calc(100vw * 956 / 440), 956px);
+  max-height:none;
+  display:block;
+  padding:0 !important;
+  overflow:hidden;
+  transform:translate(-50%,-50%);
+  color:#fff;
+  background:#061d18 url("assets/ui/game/result/success_result_background.png") left top/100% 100% no-repeat;
+  border:0;
+  box-shadow:0 0 0 100vmax #061d18;
+  container-type:inline-size;
+  touch-action:manipulation;
+}
+
+#resultOverlay.hidden { display:none !important; }
+
+#resultOverlay > * {
+  position:absolute;
+  margin:0;
+}
+
+#resultHeader {
+  left:5.909%;
+  top:5.23%;
+  width:88.409%;
+  height:16.109%;
+}
+
+#resultStageBadge {
+  position:absolute;
+  left:32.005%;
+  top:0;
+  width:35.99%;
+  height:27.273%;
+  display:grid;
+  place-items:center;
+  padding:.9cqw 5.682cqw;
+  color:#000;
+  background:url("assets/ui/quest/badge_stage.png") center/100% 100% no-repeat;
+  font-family:"Baloo 2","Arial Rounded MT Bold","Noto Sans TC Black",sans-serif;
+  font-size:3.636cqw;
+  font-weight:800;
+  line-height:1;
+  text-align:center;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+
+#resultTitleRow {
+  position:absolute;
+  left:0;
+  top:16.883%;
+  width:100%;
+  height:83.117%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:0;
+}
+
+.resultTitleStar {
+  flex:0 0 15.938%;
+  height:46.094%;
+  background:url("assets/ui/game/result/star_filled.png") center/contain no-repeat;
+}
+
+#resultOverlay #resultTitle {
+  position:static;
+  width:66.067%;
+  max-width:none;
+  min-height:0;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  color:#f9c208;
+  background:transparent;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  font-family:"Baloo 2","Arial Rounded MT Bold","Noto Sans TC Black",sans-serif;
+  font-size:18.182cqw;
+  font-weight:700;
+  line-height:1;
+  letter-spacing:0;
+  text-align:center;
+  text-transform:uppercase;
+  white-space:nowrap;
+  -webkit-text-stroke:1.85cqw #563707;
+  paint-order:stroke fill;
+  text-shadow:0 .8cqw 0 rgba(0,0,0,.28);
+}
+
+#resultHero {
+  left:13.523%;
+  top:23.849%;
+  width:73.182%;
+  height:36.591%;
+  display:block;
+  margin:0;
+  overflow:visible;
+  background:url("assets/ui/game/result/success_result_foreground.png") center/100% 100% no-repeat;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+}
+
+#resultHero:before,
+#resultHero:after,
+#resultHero .art {
+  display:none !important;
+}
+
+#resultStars,
+#drawReward,
+#gachaGoBtn,
+#replayBtn {
+  display:none !important;
+}
+
+#resultOverlay #resultStats {
+  left:4.545%;
+  top:69.456%;
+  width:91.136%;
+  height:14.958%;
+  max-width:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:3.636%;
+  padding:0 5.227%;
+  color:#000;
+  background:url("assets/ui/game/result/fail_tip_panel.png") center/100% 100% no-repeat;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  font-family:"Baloo 2","Arial Rounded MT Bold","Noto Sans TC Black",sans-serif;
+  text-align:center;
+  text-transform:uppercase;
+}
+
+#resultOverlay #resultStats:before {
+  content:none;
+}
+
+.resultStat {
+  width:21.497%;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+
+#resultStats .resultStat b {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  height:4.289cqw;
+  padding:0;
+  color:#000 !important;
+  background:transparent;
+  border:0;
+  border-radius:0;
+  font-size:8.182cqw;
+  font-weight:700;
+  line-height:1;
+  text-shadow:none;
+}
+
+.resultStat em {
+  display:block;
+  width:100%;
+  margin-top:.9cqw;
+  color:#000;
+  font-size:4.545cqw;
+  font-style:normal;
+  font-weight:700;
+  line-height:1;
+  letter-spacing:-.182cqw;
+  text-align:center;
+}
+
+.resultDivider {
+  width:.455%;
+  height:47.552%;
+  flex:0 0 .455%;
+  background:#be824d;
+  border-radius:2px;
+}
+
+#resultActions {
+  left:4.545%;
+  top:86.088%;
+  width:91.136%;
+  height:7.95%;
+  display:flex;
+  align-items:stretch;
+  justify-content:space-between;
+  gap:.227%;
+}
+
+#resultActions #nextBtn,
+#resultActions #resultBackBtn {
+  position:relative;
+  width:49.875%;
+  max-width:none;
+  min-height:0;
+  height:100%;
+  display:grid;
+  place-items:center;
+  padding:0;
+  color:#fff;
+  background:center/100% 100% no-repeat !important;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  font-family:"Baloo 2","Arial Rounded MT Bold","Noto Sans TC Black",sans-serif;
+  font-size:6.364cqw;
+  font-weight:700;
+  line-height:1;
+  text-align:center;
+  text-transform:uppercase;
+  white-space:nowrap;
+  -webkit-text-stroke:.9cqw #1b0f09;
+  paint-order:stroke fill;
+}
+
+#resultActions #nextBtn {
+  background-image:url("assets/ui/game/result/fail_ok_button_normal.png") !important;
+}
+
+#resultActions #nextBtn:active {
+  background-image:url("assets/ui/game/result/fail_ok_button_pressed.png") !important;
+}
+
+#resultActions #resultBackBtn {
+  background-image:url("assets/ui/game/result/fail_back_button_normal.png") !important;
+}
+
+#resultActions #resultBackBtn:active {
+  background-image:url("assets/ui/game/result/fail_back_button_pressed.png") !important;
 }
 
 /* === Monster final Figma layout: 440 x 956 source frame === */
@@ -5139,7 +5394,6 @@ body:has(#selectOverlay:not(.hidden)) #mainNav,
 body:has(#gachaOverlay:not(.hidden)) #mainNav,
 body:has(#teamOverlay:not(.hidden)) #mainNav,
 body:has(#monsterDetailOverlay:not(.hidden)) #mainNav,
-body:has(#failOverlay:not(.hidden)) #mainNav,
 body:has(#eventsOverlay:not(.hidden)) #mainNav { display: block; }
 
 #mainNav::before {
@@ -5215,7 +5469,6 @@ body:has(#selectOverlay:not(.hidden)) #mNavQuests  { --tab-img: url("assets/ui/q
 body:has(#teamOverlay:not(.hidden))   #mNavMonster { --tab-img: url("assets/ui/quest/tab_monsters_selected.png"); }
 body:has(#monsterDetailOverlay:not(.hidden)) #mNavMonster { --tab-img: url("assets/ui/quest/tab_monsters_selected.png"); }
 body:has(#gachaOverlay:not(.hidden))  #mNavSummon  { --tab-img: url("assets/ui/quest/tab_summon_selected.png"); }
-body:has(#failOverlay:not(.hidden))   #mNavSummon  { --tab-img: url("assets/ui/quest/tab_summon_selected.png"); }
 body:has(#eventsOverlay:not(.hidden)) #mNavEvents  { --tab-img: url("assets/ui/quest/tab_events_selected.png"); }
 
 #mNavQuests:active  { --tab-img: url("assets/ui/quest/tab_quests_pressed.png"); }
@@ -5933,11 +6186,11 @@ body:has(#eventsOverlay:not(.hidden)) #mNavEvents  { --tab-img: url("assets/ui/q
 
 <div id="app" class="battleShell" data-layout="balanced">
   <section class="battleHeader">
-    <div id="topRow"><span id="stageName">–</span><span><button id="exitBtn">↩︎ 離開</button><button id="voiceBtn" class="hidden">🔊</button> <span id="foeProgress">–</span></span></div>
+    <div id="topRow"><span id="stageName">–</span><span><button id="exitBtn" data-i18n="hud.exit">↩︎ 離開</button><button id="voiceBtn" class="hidden">🔊</button> <span id="foeProgress">–</span></span></div>
   </section>
   <section class="enemyPanel">
     <div id="enemyZone">
-      <div id="countdown"><span id="cdLabel">行動</span> <b id="cdVal">4</b></div>
+      <div id="countdown"><span id="cdLabel" data-i18n="hud.action">行動</span> <b id="cdVal">4</b></div>
       <div id="enemyArt"></div>
       <div id="enemyName">–</div>
       <div id="gimBadge"></div>
@@ -5946,8 +6199,8 @@ body:has(#eventsOverlay:not(.hidden)) #mNavEvents  { --tab-img: url("assets/ui/q
   </section>
   <section class="mathHud">
     <div id="targetRow">
-      <span class="tLabel">目標</span><span id="targetVal">–</span>
-      <span class="tLabel">目前</span><span id="curSum">–</span>
+      <span class="tLabel" data-i18n="hud.target">目標</span><span id="targetVal">–</span>
+      <span class="tLabel" data-i18n="hud.current">目前</span><span id="curSum">–</span>
       <span id="chainInfo">鏈 ×0</span>
     </div>
     <div id="playerRow"><span class="hpHeart" aria-hidden="true"></span><span class="hpLabel">HP</span><div class="barWrap"><div id="playerHpFill" class="barFill"></div></div><span id="playerHpText">100</span><span id="shieldIc" aria-hidden="true"></span></div>
@@ -5970,34 +6223,34 @@ body:has(#eventsOverlay:not(.hidden)) #mNavEvents  { --tab-img: url("assets/ui/q
 <div id="bossBanner">⚠️ 亂數魔王 ⚠️<small>數界的混亂之源現身了！</small></div>
 
 <div id="surveyOverlay" class="overlay center">
-  <h1>👋 開始之前</h1>
-  <p style="font-size:13px;opacity:.85">幫我們一個小忙，回答幾個小問題（給大人填也行）。<br>這些資料只用來改進遊戲 😊</p>
+  <h1 data-i18n="survey.title">👋 開始之前</h1>
+  <p style="font-size:13px;opacity:.85" data-i18n="survey.intro">幫我們一個小忙，回答幾個小問題（給大人填也行）。<br>這些資料只用來改進遊戲 😊</p>
   <div class="svGroup">
-    <div class="svQ">小朋友幾歲？<span style="color:#ff8da3">＊必填</span></div>
+    <div class="svQ" data-i18n="survey.age.q">小朋友幾歲？<span style="color:#ff8da3" data-i18n="survey.age.required">＊必填</span></div>
     <div class="svOpts" id="svAge"></div>
   </div>
   <div class="svGroup">
-    <div class="svQ">性別</div>
+    <div class="svQ" data-i18n="survey.gender.q">性別</div>
     <div class="svOpts" id="svGender">
-      <button class="svOpt" data-v="男生">男生</button>
-      <button class="svOpt" data-v="女生">女生</button>
-      <button class="svOpt" data-v="不想說">不想說</button>
+      <button class="svOpt" data-v="m">男生</button>
+      <button class="svOpt" data-v="f">女生</button>
+      <button class="svOpt" data-v="x">不想說</button>
     </div>
   </div>
   <div class="svGroup">
-    <div class="svQ">數學程度（自己感覺就好）</div>
+    <div class="svQ" data-i18n="survey.math.q">數學程度（自己感覺就好）</div>
     <div class="svOpts" id="svMath">
-      <button class="svOpt" data-v="剛開始學">剛開始學加減</button>
-      <button class="svOpt" data-v="還可以">加減很OK</button>
-      <button class="svOpt" data-v="會乘除">會乘法/除法</button>
-      <button class="svOpt" data-v="很拿手">數學很拿手</button>
+      <button class="svOpt" data-v="beginner">剛開始學加減</button>
+      <button class="svOpt" data-v="ok">加減很OK</button>
+      <button class="svOpt" data-v="advanced">會乘法/除法</button>
+      <button class="svOpt" data-v="expert">數學很拿手</button>
     </div>
   </div>
   <div class="svGroup">
-    <div class="svQ">暱稱／代號（可留空）</div>
-    <input id="svNick" maxlength="12" placeholder="例如：小明、A1" style="font-size:16px;padding:8px 12px;border-radius:10px;background:#16203a;color:#fff;border:1px solid #2a3550;text-align:center">
+    <div class="svQ" data-i18n="survey.nick.q">暱稱／代號（可留空）</div>
+    <input id="svNick" maxlength="12" placeholder="例如：小明、A1" data-i18n="survey.nick.placeholder" data-i18n-mode="placeholder" style="font-size:16px;padding:8px 12px;border-radius:10px;background:#16203a;color:#fff;border:1px solid #2a3550;text-align:center">
   </div>
-  <button class="btn btnBig" id="surveyGo" style="margin-top:8px">開始遊戲 ▶</button>
+  <button class="btn btnBig" id="surveyGo" style="margin-top:8px" data-i18n="survey.submit">開始遊戲 ▶</button>
 </div>
 
 <div id="startOverlay" class="overlay center hidden">
@@ -6027,8 +6280,8 @@ body:has(#eventsOverlay:not(.hidden)) #mNavEvents  { --tab-img: url("assets/ui/q
 <div id="towerResultOverlay" class="overlay center hidden">
   <h1>🗼 無限塔結算</h1>
   <p style="font-size:15px">爬到第 <b style="color:#ffd84d" id="towerFloors">0</b> 層</p>
-  <p style="font-size:14px">最高單發攻擊力 <b style="color:#ff9d2e" id="towerPeak">0</b></p>
-  <p id="towerBonusMsg" style="font-size:13px"></p>
+  <p style="font-size:14px">Best single hit <b style="color:#ff9d2e" id="towerPeak">0</b></p>
+  <p class="towerBonusRow"><span id="towerBonusMsg" style="font-size:13px"></span><button id="towerBonusTip" class="tipBtn" type="button" aria-label="How bonus eggs work">?</button></p>
   <p style="font-size:15px">本次共獲得 🥚 <b style="color:#ffd84d" id="towerDraws">0</b> 次抽蛋機會！</p>
   <button class="btn" id="towerAgainBtn">再挑戰 🗼</button>
   <button class="btn" id="towerGachaBtn" style="background:linear-gradient(135deg,#ffcf4d,#ff9d2e)">🥚 去孵化所</button>
@@ -6036,18 +6289,22 @@ body:has(#eventsOverlay:not(.hidden)) #mNavEvents  { --tab-img: url("assets/ui/q
 </div>
 
 <div id="settingsOverlay" class="overlay center hidden">
-  <h1>⚙️ 設定</h1>
+  <h1 data-i18n="settings.title">⚙️ 設定</h1>
   <button class="btnGhost" id="modeBtn">🔁 切換模式</button>
   <button class="btnGhost" id="unlockBtn">🔓 全解鎖</button>
-  <button class="btnGhost" id="exportBtn">📤 匯出數據</button>
-  <button class="btnGhost" id="newTesterBtn">🧒 換一位小朋友（重填問卷）</button>
-  <button class="btnGhost" id="clearBtn" style="opacity:.7">🗑️ 刪除數據</button>
-  <button class="btn" id="settingsBack">返回</button>
+  <button class="btnGhost" id="exportBtn" data-i18n="settings.export">📤 匯出數據</button>
+  <button class="btnGhost" id="newTesterBtn" data-i18n="settings.new_tester">🧒 換一位小朋友（重填問卷）</button>
+  <button class="btnGhost" id="clearBtn" style="opacity:.7" data-i18n="settings.clear">🗑️ 刪除數據</button>
+  <div style="display:flex;gap:8px;margin-top:4px">
+    <button class="btnGhost" id="langZhBtn" onclick="setLang('zh')" style="flex:1">繁體中文</button>
+    <button class="btnGhost" id="langEnBtn" onclick="setLang('en')" style="flex:1">English</button>
+  </div>
+  <button class="btn" id="settingsBack" data-i18n="settings.back">返回</button>
 </div>
 
 <div id="teamOverlay" class="overlay hidden">
   <h1>MONSTER TEAM</h1>
-  <p style="font-size:12px;opacity:.7">點未出戰的可上場；點出戰中的可設為👑隊長；點👑隊長則卸下。最多 2 隻。</p>
+  <p style="font-size:12px;opacity:.7" data-i18n="team.desc">點未出戰的可上場；點出戰中的可設為👑隊長；點👑隊長則卸下。最多 2 隻。</p>
   <div id="teamCaptain" style="font-size:13px;margin:2px 0 6px;min-height:18px"></div>
   <div id="teamSlots">
     <button class="teamSlot captain" id="teamCaptainSlot" type="button"><span>CAPTAIN SLOT</span></button>
@@ -6109,14 +6366,24 @@ body:has(#eventsOverlay:not(.hidden)) #mNavEvents  { --tab-img: url("assets/ui/q
 </div>
 
 <div id="resultOverlay" class="overlay center hidden">
-  <h1 id="resultTitle">🎉 淨化成功！</h1>
-  <div id="resultStars">⭐⭐⭐</div>
+  <div id="resultHeader">
+    <div id="resultStageBadge">STAGE 12</div>
+    <div id="resultTitleRow" aria-hidden="true">
+      <span class="resultTitleStar resultTitleStarLeft"></span>
+      <h1 id="resultTitle">CLEAR</h1>
+      <span class="resultTitleStar resultTitleStarRight"></span>
+    </div>
+  </div>
   <div id="resultHero" aria-hidden="true"></div>
+  <div id="resultStars" aria-hidden="true"></div>
   <p id="resultStats"></p>
-  <p id="drawReward" style="min-height:20px"></p>
-  <button class="btn" id="gachaGoBtn" style="background:linear-gradient(135deg,#ffcf4d,#ff9d2e)">🥚 前往孵化所抽蛋</button>
-  <button class="btn" id="nextBtn">繼續</button>
-  <button class="btnGhost" id="replayBtn">重玩這關</button>
+  <p id="drawReward" class="hidden"></p>
+  <button class="btn hidden" id="gachaGoBtn">HATCH</button>
+  <div id="resultActions">
+    <button class="btn" id="nextBtn">NEXT</button>
+    <button class="btnGhost" id="resultBackBtn">BACK</button>
+  </div>
+  <button class="btnGhost hidden" id="replayBtn">重玩這關</button>
 </div>
 
 <div id="gachaOverlay" class="overlay center hidden">
@@ -6204,6 +6471,645 @@ body:has(#eventsOverlay:not(.hidden)) #mNavEvents  { --tab-img: url("assets/ui/q
 </div>
 
 <!-- ============ 純邏輯（盤面大小由 values.length 決定；0 = 減法珠）============ -->
+<script>
+// i18n.js — 雙語字典 + t() 翻譯函式 + 語言切換
+// 用法：t('key') 或 t('key', { n: 5, name: 'Kiki' })
+// 在 game.main.js 之前載入（build.cjs 會 inline）
+
+const I18N = {
+  zh: {
+    // ── 戰鬥 HUD ──────────────────────────────────────────────
+    'hud.target':  '目標',
+    'hud.current': '目前',
+    'hud.action':  '行動',
+    'hud.chain':   '鏈 ×{n}',
+    'hud.exit':    '↩︎ 離開',
+
+    // ── Boss 橫幅 ─────────────────────────────────────────────
+    'boss.chaos': '數界的混亂之源現身了！',
+    'boss.zone':  '這張地圖的霸主現身了！',
+
+    // ── 問卷 ──────────────────────────────────────────────────
+    'survey.title':            '👋 開始之前',
+    'survey.intro':            '幫我們一個小忙，回答幾個小問題（給大人填也行）。\n這些資料只用來改進遊戲 😊',
+    'survey.age.q':            '小朋友幾歲？',
+    'survey.age.required':     '＊必填',
+    'survey.gender.q':         '性別',
+    'survey.gender.m':         '男生',
+    'survey.gender.f':         '女生',
+    'survey.gender.x':         '不想說',
+    'survey.math.q':           '數學程度（自己感覺就好）',
+    'survey.math.beginner':    '剛開始學加減',
+    'survey.math.ok':          '加減很OK',
+    'survey.math.advanced':    '會乘法/除法',
+    'survey.math.expert':      '數學很拿手',
+    'survey.nick.q':           '暱稱／代號（可留空）',
+    'survey.nick.placeholder': '例如：小明、A1',
+    'survey.submit':           '開始遊戲 ▶',
+
+    // ── 開始畫面 ──────────────────────────────────────────────
+    'start.title':    '🔢 數字獵人',
+    'start.story':    '數界 Numeria 被「亂數魔王」攪亂了，可愛的<b>數靈</b>全都暗化成怪物！',
+    'start.rules':    '拖曳相鄰數字，加總等於目標數就能淨化牠們。<b>數字越多顆，傷害倍率越高！</b>',
+    'start.jr.label': '小小獵人',
+    'start.jr.desc':  '5–6 歲・小盤面・只有加法・不會輸・有語音',
+    'start.std.label':'數字獵人',
+    'start.std.desc': '7 歲以上・完整冒險・減法珠與技能',
+
+    // ── 地圖 ──────────────────────────────────────────────────
+    'map.title.std':   '🗺️ 數界地圖',
+    'map.title.jr':    '🐣 小小世界',
+    'map.star.hint':   '⭐ 過關　⭐⭐ 平均鏈長 ≥ {avg}　⭐⭐⭐ 再打出一次 {max} 鏈\n每拿到一顆「新星星」就抽一次蛋 🥚 (3★ 共 3 顆;進步到更高星會補發)',
+
+    // ── 地圖操作按鈕 ─────────────────────────────────────────
+    'map.tower':       '🗼 無限塔',
+    'map.gacha':       '🥚 孵化所',
+    'map.gacha.draws': '🥚 孵化所 ({n})',
+    'map.team':        '👥 我的數靈',
+    'map.settings':    '⚙️ 設定',
+
+    // ── 設定 ──────────────────────────────────────────────────
+    'settings.title':        '⚙️ 設定',
+    'settings.mode.to.std':  '🔁 切換到 數字獵人',
+    'settings.mode.to.jr':   '🔁 切換到 小小獵人',
+    'settings.unlock.on':    '🔓 全解鎖：開',
+    'settings.unlock.off':   '🔒 全解鎖：關',
+    'settings.export':       '📤 匯出數據',
+    'settings.new_tester':   '🧒 換一位小朋友（重填問卷）',
+    'settings.clear':        '🗑️ 刪除數據',
+    'settings.back':         '返回',
+    'settings.lang':         '🌐 語言 / Language',
+
+    // ── 無限塔結算 ────────────────────────────────────────────
+    'tower.result.title':  '🗼 無限塔結算',
+    'tower.result.died':   '🗼 被擊倒了…',
+    'tower.result.bonus':  '最高單發攻擊力 <b style="color:#ff9d2e">{peak}</b> → 額外 <b style="color:#ffd84d">{bonus}</b> 券',
+    'tower.result.draws':  '本次共獲得 🥚 <b style="color:#ffd84d">{n}</b> 次抽蛋機會！',
+    'tower.result.again':  '再挑戰 🗼',
+    'tower.result.gacha':  '🥚 去孵化所',
+    'tower.result.back':   '回地圖',
+
+    // ── 孵化所 ────────────────────────────────────────────────
+    'gacha.count':       '抽蛋機會 <span class="sCountBadge">{n}</span> 次',
+    'gacha.draw.btn':    '孵化一次',
+    'gacha.draw.empty':  '沒有機會了',
+    'gacha.msg.ready':   '點「孵化一次」召喚數靈！',
+    'gacha.msg.empty':   '去過關拿星星，換更多孵化機會吧！',
+
+    // ── Toast 訊息 ────────────────────────────────────────────
+    'toast.skill.cd':        '還要 {n} 條鏈才能再用',
+    'toast.hint.cd':         '再打 {n} 條鏈就能再提示',
+    'toast.hint.no_chain':   '咦，先打一條鏈看看吧！',
+    'toast.no_sol':          '找不到解，盤面洗牌！',
+    'toast.op_plus1':        '運算珠不能加一',
+    'toast.wrap_9to1':       '9 轉了一圈變回 1！',
+    'toast.op_minus1':       '運算珠不能減一',
+    'toast.wrap_1to9':       '1 轉了一圈變成 9！',
+    'toast.swap_top':        '最上排沒有上面可以換！',
+    'toast.op_split':        '運算珠不能分裂',
+    'toast.split_1':         '1 沒辦法再拆了！',
+    'toast.split_top':       '最上排不能分裂（上面沒有位置）',
+    'toast.draw_err':        '⚠️ 繪製錯誤：{msg}',
+    'toast.div_not_clean':   '÷ 珠要整除才能用！(這個數除不盡)',
+    'toast.chain_end_op':    '鏈不能以運算珠（−／×）結尾！',
+    'toast.divisor_miss':    '要湊出 {n} 的倍數！{sum} 不是（{n}、{n2}、{n3}…）',
+    'toast.equal_split_bad': '等分盾！要連剛好 {divN} 顆「{val}」（{target}÷{divN}={val}）➗',
+    'toast.odd_shield':      '奇數盾！鏈裡要有 {n} 顆以上奇數 🔆',
+    'toast.resonance_shield':'共鳴盾！要連 {n} 顆相同數字 🔢',
+    'toast.chain_short':     '鏈太短了！這隻怪需要 {n} 顆以上 🛡️',
+    'toast.no_draws':        '沒有抽蛋機會了，去過關拿星星！',
+    'toast.unlock.on':       '🔓 已解鎖所有關卡',
+    'toast.unlock.off':      '🔒 恢復循序解鎖',
+    'toast.cleared':         '已清除',
+    'toast.survey.age':      '請先選小朋友的年齡（必填）🙂',
+    'toast.captain.change':  '點下方卡片可更換隊長',
+    'toast.captain.pick':    '點下方卡片選隊長',
+    'toast.member.change':   '點下方卡片可更換隊員',
+    'toast.member.pick':     '點下方卡片選隊員',
+    'toast.exported':        '已匯出 {n} 筆事件（檔案＋剪貼簿）',
+    'toast.purified':        '淨化成功！✨',
+
+    // ── Confirm 對話框 ────────────────────────────────────────
+    'confirm.tower.retreat': '要從無限塔撤退嗎？\n已拿到的抽蛋券會保留，並依最高攻擊力加碼送券。',
+    'confirm.stage.exit':    '要離開這一關回地圖嗎？（這關的進度不會保留）',
+    'confirm.new_tester':    '換一位小朋友？\n會清除「目前這位」的遊玩數據與進度並重填問卷。\n（記得先按「匯出數據」把上一位的 JSON 存下來！）',
+    'confirm.clear':         '清除所有測試數據、星星與收集進度？',
+
+    // ── 浮字特效 ──────────────────────────────────────────────
+    'floater.lucky':          '🍀 下一鏈 ×1.5！',
+    'floater.shield':         '🛡️ 護盾展開！',
+    'floater.resonance':      '🔢 {v}×{n} 共鳴！',
+    'floater.tower_pass':     '🗼 {n}F 通過！🥚+1',
+    'floater.shuffled':       '搗蛋！打亂了珠珠 🌀',
+    'floater.blocked':        '🛡️ 擋下了！',
+    'floater.damage':         '受到 {n} 傷害！',
+    'floater.chaos_target':   '亂數！目標 → {n}',
+    'floater.ban_changed':    '封印亂換！🚫 {d}',
+    'floater.praise.legendary':'傳說拆解！！！',
+    'floater.praise.ultra':   '超絕拆解！！',
+    'floater.praise.great':   '厲害！',
+    'floater.praise.nice':    '精彩！',
+    'floater.minus':          '減法！',
+
+    // ── 狂暴訊息 ──────────────────────────────────────────────
+    'enrage.default':    '⚠️ 狂暴化！攻擊變強、行動變快！',
+    'enrage.shell':      '⚠️ 狂暴化！硬殼變更硬：需要 {n} 顆以上的鏈！',
+    'enrage.ban':        '⚠️ 狂暴化！封印會一直亂換！',
+    'enrage.resonance':  '⚠️ 狂暴化！共鳴盾變強：要連 {n} 顆相同數字！',
+    'enrage.equal':      '⚠️ 狂暴化！等分盾變強：要分成 {n} 等份！',
+    'enrage.divisor':    '⚠️ 狂暴化！整除盾變強：要湊出 {n} 的倍數！',
+    'enrage.chaos':      '⚠️ 魔王狂暴化！攻擊變強、目標會一直亂變！',
+    'enrage.jr':         '⚠️ 大王生氣了！搗蛋會變快！',
+
+    // ── 語音（Jr 模式）────────────────────────────────────────
+    'voice.hint':         '找找看，亮亮的珠珠',
+    'voice.combo':        '連擊！',
+    'voice.great':        '太棒了！',
+    'voice.enrage.jr':    '大王生氣了！加油！',
+    'voice.enrage.std':   '魔王生氣了！小心！',
+    'voice.shuffle':      '哎呀，怪物搗蛋了！',
+    'voice.welcome.jr':   '歡迎來到小小世界！',
+    'voice.welcome.std':  '出發吧，數字獵人！',
+    'voice.tower_end':    '無限塔結束了！',
+    'voice.win':          '過關！太厲害了！',
+    'voice.chaos_target': '目標變成 {n}',
+    'voice.ban_changed':  '封印變成 {d}',
+    'voice.levelup':      '{name}升級了！',
+    'voice.new_char':     '新夥伴{name}！',
+
+    // ── 教學 ──────────────────────────────────────────────────
+    'teach.resonance.title': '✖️ 同數共鳴 = 乘法！',
+    'teach.resonance.cond':  '你剛剛打出了 {v}×{n}',
+    'teach.resonance.body':  '你剛剛把<b>幾顆一樣的數字</b>連在一起——這就是<b>乘法</b>！<br><b style="color:#ffae3d">{v}+{v}+…（{n} 個）= {v}×{n}</b><br>連越多顆相同數字，<b>共鳴傷害越高</b>！',
+    'teach.tower.title':     '🗼 無限塔！',
+    'teach.tower.body':      '一層一層往上爬，怪物會越來越強！<br><b>每過一層 = 🥚 +1 次抽蛋機會</b>。<br>撐不住或想收手時按「↩︎ 離開」撤退，<b>已拿到的券都會保留</b>，還會依你打出的<b>最高一發攻擊力</b>再加碼送券！',
+    'teach.minus.title':     '🆕 減法珠登場！',
+    'teach.minus.body':      '鏈穿過紫色 <b style="color:#c5a3ff">−</b> 珠後，<b>後面那一顆會變成減法</b>。<br>可以「先超過再減回來」：<b>8 + 7 − 3 = 12</b>！<br><span style="font-size:12px;opacity:.7">規則：不能用 − 開頭或結尾。</span>',
+    'teach.mul.title':       '🆕 倍率珠 ×2 登場！',
+    'teach.mul.body':        '鏈穿過金色 <b style="color:#ffd36b">×2</b> 珠後，<b>後面那一顆數字會變兩倍</b>！<br>例如 <b>4 + ×2 + 3 = 4 + 6 = 10</b>。<br><span style="font-size:12px;opacity:.7">規則：不能用 ×2 開頭或結尾，也不能緊接著另一顆運算珠。</span>',
+    'teach.divbead.title':   '🆕 除法珠 ÷ 登場！',
+    'teach.divbead.body':    '鏈穿過藍色 <b style="color:#6fe3ff">÷</b> 珠時，<b>把「目前累積的總和」除下去</b>！<br>例如 <b>8 + 4 → ÷2 = 6</b>。<br><span style="font-size:12px;opacity:.7">只有<b>除得盡</b>才連得上（11 不能 ÷3）。先堆出一個大數，再除到目標！</span>',
+    'teach.captain.cond':    '{ic} 隊長技：{name}',
+    'teach.captain.body':    '出戰的<b>第一隻數靈是隊長</b>，牠的隊長技<b>整場常駐</b>：<br><b style="color:{c}">{desc}</b><br><span style="font-size:12px;opacity:.7">換不同隊長 = 換一種數學打法，試試看誰最適合你！</span>',
+
+    // ── 過關畫面 ──────────────────────────────────────────────
+    'result.title.win':        '🎉 淨化成功！',
+    'result.feedback.1star':   '<span style="color:#9ecbff">提示：用更多顆小數字湊出目標，傷害更高、星星更多！</span>',
+    'result.feedback.2star':   '<span style="color:#d8b4ff">差一步！打出一次 {max} 鏈就能拿 3 星 💥</span>',
+    'result.feedback.3star':   '<span style="color:#5dff9d">完美拆解！你是數字獵人大師 👑</span>',
+    'result.draws.earned':     '⭐×{stars} → 🥚 獲得 <b style="color:#ffd84d">{earned}</b> 次抽蛋機會！（共 {total} 次）',
+    'result.draws.3star_hint': '<br><span style="font-size:12px;opacity:.75">拿到 3★（平均鏈長≥{avg} 且打出一次 {max} 鏈）= 一次拿 3 券！</span>',
+    'result.draws.already':    '<span style="opacity:.7">這關的 {prev}★ 已經領過抽蛋券了 🥚<br><span style="font-size:12px">打出比 {prev}★ 更高的星，才會有新券！</span></span>',
+    'result.gacha_btn':        '🥚 前往孵化所抽蛋（{n}）',
+
+    // ── 隊伍 ──────────────────────────────────────────────────
+    'team.desc':           '點未出戰的可上場；點出戰中的可設為👑隊長；點👑隊長則卸下。最多 2 隻。',
+    'team.captain.label':  '👑 隊長 <b>{name}</b>：<span style="color:{c}">{ic} {capName} — {desc}</span>',
+    'team.locked':         '{name} 尚未解鎖',
+    'team.go_gacha':       '🥚 去孵化所',
+    'team.go_gacha.draws': '🥚 去孵化所（{n} 次）',
+    'team.back':           '回地圖',
+
+    // ── 孵化結果 ──────────────────────────────────────────────
+    'gacha.result.levelup': '<b>{name}</b> 升級了！Lv{lv}（傷害提升）',
+    'gacha.result.new':     '🎉 新夥伴 <b>{name}</b>（{attr}）！<br><span style="font-size:12px;opacity:.7">{skillIc}{skillName}　{capIc}{capName}</span>',
+
+    // ── 分裂 dialog ───────────────────────────────────────────
+    'split.desc':    '把 <b style="color:#ffd84d">{v}</b> 拆成哪兩個數？<br><span style="font-size:12px;opacity:.7">第一個數會放在原位，第二個數會蓋掉上面那顆珠</span>',
+
+    // ── 技能按鈕（提示）─────────────────────────────────────
+    'skill.hint.label': '<span class="skillIcon" aria-hidden="true"></span><span class="lbl"><b>提示</b>找找看</span>',
+
+    // ── 屬性名稱 ──────────────────────────────────────────────
+    'attr.odd':   '奇數系',
+    'attr.even':  '偶數系',
+    'attr.prime': '質數系',
+    'attr.multi': '倍數系',
+
+    // ── 技能名稱 & 說明 ────────────────────────────────────────
+    'skill.plus1.name':  '加一',
+    'skill.plus1.tip':   '點一顆珠，讓它 +1（9 會變回 1）',
+    'skill.minus1.name': '減一',
+    'skill.minus1.tip':  '點一顆珠，讓它 −1（1 會變成 9）',
+    'skill.reroll.name': '重擲',
+    'skill.reroll.tip':  '點一顆珠，把它變成隨機新珠',
+    'skill.split.name':  '分裂',
+    'skill.split.tip':   '點一顆珠，把它拆成兩顆（上面那顆會被蓋掉）',
+    'skill.swapUp.name': '上下換',
+    'skill.swapUp.tip':  '點一顆珠，和上面那顆交換位置',
+    'skill.purify.name': '淨化',
+    'skill.purify.tip':  '點一顆珠，直接消除它',
+    'skill.lucky.name':  '幸運',
+    'skill.lucky.tip':   '下一條鏈傷害 ×1.5！',
+    'skill.shield.name': '護盾',
+    'skill.shield.tip':  '擋下敵人的下一次攻擊！',
+
+    // ── 隊長技 ────────────────────────────────────────────────
+    'captain.prime.name': '質數共鳴',
+    'captain.prime.desc': '路徑每串 1 顆質數珠（2·3·5·7），傷害 +18%',
+    'captain.prime.tag':  '質×{n}',
+    'captain.odd.name':   '奇襲',
+    'captain.odd.desc':   '路徑每串 1 顆奇數珠，傷害 +12%',
+    'captain.odd.tag':    '奇×{n}',
+    'captain.even.name':  '偶數連動',
+    'captain.even.desc':  '路徑每 2 顆偶數珠，鏈長倍率 +1',
+    'captain.even.tag':   '偶+{n}',
+    'captain.multi.name': '倍數爆擊',
+    'captain.multi.desc': '鏈長是 3 的倍數時，傷害 ×2',
+    'captain.multi.tag':  '倍數爆擊',
+
+    // ── 角色名稱 ──────────────────────────────────────────────
+    'char.kiki.name':        '奇奇',
+    'char.oo.name':          '偶偶',
+    'char.prima.name':       '質寶',
+    'char.swapy.name':       '換換',
+    'char.starle.name':      '星星靈',
+    'char.guardy.name':      '守護靈',
+    'char.dubdragon.name':   '倍倍龍',
+    'char.munchdragon.name': '大胃龍',
+
+    // ── 區域名稱 ──────────────────────────────────────────────
+    'zone.0':    '🌿 湊十草原',
+    'zone.1':    '🌲 進位森林',
+    'zone.2':    '🕳️ 封印洞窟',
+    'zone.3':    '🌋 烈焰火山',
+    'zone.4':    '✖️ 乘法谷',
+    'zone.5':    '➗ 除法谷',
+    'zone.jr.a': '🐣 小小世界・上',
+    'zone.jr.b': '🐥 小小世界・下',
+
+    // ── 關卡名稱 ──────────────────────────────────────────────
+    'stage.1':  '草原・一',
+    'stage.2':  '草原・二',
+    'stage.3':  '森林・一',
+    'stage.4':  '森林・二',
+    'stage.5':  '洞窟・一',
+    'stage.6':  '洞窟・二',
+    'stage.7':  '火山・一',
+    'stage.8':  '火山・二',
+    'stage.m1': '乘法谷・一',
+    'stage.m2': '乘法谷・二',
+    'stage.m3': '乘法谷・霸主',
+    'stage.e1': '除法谷・一',
+    'stage.e2': '除法谷・二',
+    'stage.e3': '除法谷・霸主',
+    'stage.j1': '小小草原',
+    'stage.j2': '小小花園',
+    'stage.j3': '小小森林',
+    'stage.j4': '小小山丘',
+  },
+
+  en: {
+    // ── 戰鬥 HUD ──────────────────────────────────────────────
+    'hud.target':  'Target',
+    'hud.current': 'Sum',
+    'hud.action':  'Moves',
+    'hud.chain':   'Chain ×{n}',
+    'hud.exit':    '↩︎ Retreat',
+
+    // ── Boss 橫幅 ─────────────────────────────────────────────
+    'boss.chaos': "The source of Numeria's chaos appears!",
+    'boss.zone':  'The zone boss appears!',
+
+    // ── 問卷 ──────────────────────────────────────────────────
+    'survey.title':            '👋 Before We Start',
+    'survey.intro':            'Help us improve the game with a few quick questions (parents welcome).',
+    'survey.age.q':            "How old is the player?",
+    'survey.age.required':     '* Required',
+    'survey.gender.q':         'Gender',
+    'survey.gender.m':         'Boy',
+    'survey.gender.f':         'Girl',
+    'survey.gender.x':         'Prefer not to say',
+    'survey.math.q':           'Math level (how does it feel?)',
+    'survey.math.beginner':    'Just starting addition',
+    'survey.math.ok':          'Addition is easy',
+    'survey.math.advanced':    'Can do multiplication / division',
+    'survey.math.expert':      'Math is my superpower',
+    'survey.nick.q':           'Nickname (optional)',
+    'survey.nick.placeholder': 'e.g. Alex, A1',
+    'survey.submit':           'Start Game ▶',
+
+    // ── 開始畫面 ──────────────────────────────────────────────
+    'start.title':    '🔢 Math Hunter',
+    'start.story':    'The Chaos Lord has thrown Numeria into chaos! All the cute <b>Numlings</b> have been corrupted into monsters!',
+    'start.rules':    'Drag adjacent numbers to chain them — match the target to purify monsters. <b>Longer chains deal more damage!</b>',
+    'start.jr.label': 'Little Hunter',
+    'start.jr.desc':  'Ages 5–6 · Small board · Addition only · No game over · Voice',
+    'start.std.label':'Math Hunter',
+    'start.std.desc': 'Ages 7+ · Full adventure · Subtraction beads & skills',
+
+    // ── 地圖 ──────────────────────────────────────────────────
+    'map.title.std':   '🗺️ Numeria Map',
+    'map.title.jr':    '🐣 Little World',
+    'map.star.hint':   '⭐ Clear  ⭐⭐ Avg chain ≥ {avg}  ⭐⭐⭐ Land a {max}-chain\nEach new star = 1 egg hatch 🥚 (3★ = 3 total; retroactive on improvement)',
+
+    // ── 地圖操作按鈕 ─────────────────────────────────────────
+    'map.tower':       '🗼 Infinite Tower',
+    'map.gacha':       '🥚 Hatchery',
+    'map.gacha.draws': '🥚 Hatchery ({n})',
+    'map.team':        '👥 My Team',
+    'map.settings':    '⚙️ Settings',
+
+    // ── 設定 ──────────────────────────────────────────────────
+    'settings.title':        '⚙️ Settings',
+    'settings.mode.to.std':  '🔁 Switch to Math Hunter',
+    'settings.mode.to.jr':   '🔁 Switch to Little Hunter',
+    'settings.unlock.on':    '🔓 Unlock All: ON',
+    'settings.unlock.off':   '🔒 Unlock All: OFF',
+    'settings.export':       '📤 Export Data',
+    'settings.new_tester':   '🧒 New Player (re-take survey)',
+    'settings.clear':        '🗑️ Delete Data',
+    'settings.back':         'Back',
+    'settings.lang':         '🌐 語言 / Language',
+
+    // ── 無限塔結算 ────────────────────────────────────────────
+    'tower.result.title':  '🗼 Infinite Tower Results',
+    'tower.result.died':   '🗼 Defeated…',
+    'tower.result.bonus':  'Highest hit <b style="color:#ff9d2e">{peak}</b> → bonus <b style="color:#ffd84d">{bonus}</b> hatches',
+    'tower.result.draws':  'Total earned: 🥚 <b style="color:#ffd84d">{n}</b> hatch chance(s)!',
+    'tower.result.again':  'Try Again 🗼',
+    'tower.result.gacha':  '🥚 Go to Hatchery',
+    'tower.result.back':   'Back to Map',
+
+    // ── 孵化所 ────────────────────────────────────────────────
+    'gacha.count':       'Hatch chances: <span class="sCountBadge">{n}</span>',
+    'gacha.draw.btn':    'Hatch Once',
+    'gacha.draw.empty':  'No chances left',
+    'gacha.msg.ready':   'Tap "Hatch Once" to summon a Numling!',
+    'gacha.msg.empty':   'Clear stages to earn stars and more hatch chances!',
+
+    // ── Toast 訊息 ────────────────────────────────────────────
+    'toast.skill.cd':        '{n} more chain(s) until skill ready',
+    'toast.hint.cd':         '{n} more chain(s) until next hint',
+    'toast.hint.no_chain':   'Make a chain first!',
+    'toast.no_sol':          'No solution — shuffling board!',
+    'toast.op_plus1':        "Can't +1 an operator bead",
+    'toast.wrap_9to1':       '9 wrapped back to 1!',
+    'toast.op_minus1':       "Can't −1 an operator bead",
+    'toast.wrap_1to9':       '1 wrapped up to 9!',
+    'toast.swap_top':        'Nothing above the top row to swap!',
+    'toast.op_split':        "Can't split an operator bead",
+    'toast.split_1':         "1 can't be split further!",
+    'toast.split_top':       "Can't split the top row (no space above)",
+    'toast.draw_err':        '⚠️ Draw error: {msg}',
+    'toast.div_not_clean':   "÷ bead needs a clean division! (doesn't divide evenly)",
+    'toast.chain_end_op':    'Chain must end with a number, not an operator!',
+    'toast.divisor_miss':    'Need a multiple of {n}! {sum} is not one ({n}, {n2}, {n3}…)',
+    'toast.equal_split_bad': 'Equal split shield! Need exactly {divN} beads of "{val}" ({target}÷{divN}={val}) ➗',
+    'toast.odd_shield':      'Odd shield! Need {n}+ odd numbers in your chain 🔆',
+    'toast.resonance_shield':'Echo shield! Need {n} of the same number in a row 🔢',
+    'toast.chain_short':     'Chain too short! This enemy needs {n}+ beads 🛡️',
+    'toast.no_draws':        'No hatches left — clear stages to earn more!',
+    'toast.unlock.on':       '🔓 All stages unlocked',
+    'toast.unlock.off':      '🔒 Sequential unlock restored',
+    'toast.cleared':         'Cleared',
+    'toast.survey.age':      'Please select the player age (required) 🙂',
+    'toast.captain.change':  'Tap a card below to change captain',
+    'toast.captain.pick':    'Tap a card below to pick a captain',
+    'toast.member.change':   'Tap a card below to change member',
+    'toast.member.pick':     'Tap a card below to pick a member',
+    'toast.exported':        'Exported {n} events (file + clipboard)',
+    'toast.purified':        'Purified! ✨',
+
+    // ── Confirm 對話框 ────────────────────────────────────────
+    'confirm.tower.retreat': 'Retreat from the Infinite Tower?\nAll hatches earned so far are kept, plus a bonus based on your highest hit.',
+    'confirm.stage.exit':    "Leave this stage and return to map? (Progress won't be saved)",
+    'confirm.new_tester':    "Switch to a new player?\nThis clears the current player's data and restarts the survey.\n(Export data first to save it!)",
+    'confirm.clear':         'Delete all test data, stars, and collection progress?',
+
+    // ── 浮字特效 ──────────────────────────────────────────────
+    'floater.lucky':           '🍀 Next chain ×1.5!',
+    'floater.shield':          '🛡️ Shield up!',
+    'floater.resonance':       '🔢 {v}×{n} Echo!',
+    'floater.tower_pass':      '🗼 Floor {n} cleared! 🥚+1',
+    'floater.shuffled':        'Mischief! Board scrambled 🌀',
+    'floater.blocked':         '🛡️ Blocked!',
+    'floater.damage':          '{n} damage!',
+    'floater.chaos_target':    'Chaos! Target → {n}',
+    'floater.ban_changed':     'Ban switched! 🚫 {d}',
+    'floater.praise.legendary':'LEGENDARY!!!',
+    'floater.praise.ultra':    'AMAZING!!',
+    'floater.praise.great':    'GREAT!',
+    'floater.praise.nice':     'NICE!',
+    'floater.minus':           'Minus!',
+
+    // ── 狂暴訊息 ──────────────────────────────────────────────
+    'enrage.default':    '⚠️ ENRAGED! Stronger attacks & faster!',
+    'enrage.shell':      '⚠️ ENRAGED! Shell hardened: need {n}+ bead chain!',
+    'enrage.ban':        '⚠️ ENRAGED! Banned number keeps changing!',
+    'enrage.resonance':  '⚠️ ENRAGED! Echo shield stronger: need {n} matching beads!',
+    'enrage.equal':      '⚠️ ENRAGED! Split shield stronger: need {n} equal parts!',
+    'enrage.divisor':    '⚠️ ENRAGED! Divisor shield stronger: need a multiple of {n}!',
+    'enrage.chaos':      '⚠️ CHAOS LORD ENRAGED! Stronger attacks, target keeps changing!',
+    'enrage.jr':         '⚠️ Boss is angry! Mischief gets faster!',
+
+    // ── 語音（Jr 模式）────────────────────────────────────────
+    'voice.hint':         'Look for the glowing beads!',
+    'voice.combo':        'Combo!',
+    'voice.great':        'Amazing!',
+    'voice.enrage.jr':    'Boss is angry! Keep going!',
+    'voice.enrage.std':   'Boss enraged! Watch out!',
+    'voice.shuffle':      'Oops, the monster messed things up!',
+    'voice.welcome.jr':   'Welcome to Little World!',
+    'voice.welcome.std':  "Let's go, Math Hunter!",
+    'voice.tower_end':    'Tower run complete!',
+    'voice.win':          'Stage clear! Amazing!',
+    'voice.chaos_target': 'Target changed to {n}',
+    'voice.ban_changed':  'Ban changed to {d}',
+    'voice.levelup':      '{name} leveled up!',
+    'voice.new_char':     'New partner {name}!',
+
+    // ── 教學 ──────────────────────────────────────────────────
+    'teach.resonance.title': '✖️ Echo = Multiplication!',
+    'teach.resonance.cond':  'You just hit {v}×{n}',
+    'teach.resonance.body':  'You chained <b>multiple of the same number</b> — that\'s <b>multiplication</b>!<br><b style="color:#ffae3d">{v}+{v}+… ({n} times) = {v}×{n}</b><br>More matching beads = <b>higher echo damage</b>!',
+    'teach.tower.title':     '🗼 Infinite Tower!',
+    'teach.tower.body':      'Climb floor by floor — enemies get stronger!<br><b>Each floor cleared = 🥚 +1 hatch chance</b>.<br>Tap "↩︎ Retreat" to bail — <b>all hatches earned are kept</b>, plus a bonus based on your <b>highest single hit</b>!',
+    'teach.minus.title':     '🆕 Minus Bead!',
+    'teach.minus.body':      'Chain through a purple <b style="color:#c5a3ff">−</b> bead to make the <b>next bead subtract</b>.<br>Go over then subtract back: <b>8 + 7 − 3 = 12</b>!<br><span style="font-size:12px;opacity:.7">Rules: chain can\'t start or end with −.</span>',
+    'teach.mul.title':       '🆕 ×2 Multiplier Bead!',
+    'teach.mul.body':        'Chain through a gold <b style="color:#ffd36b">×2</b> bead to <b>double the next number</b>!<br>Example: <b>4 + ×2 + 3 = 4 + 6 = 10</b>.<br><span style="font-size:12px;opacity:.7">Rules: can\'t start or end with ×2, can\'t follow another operator.</span>',
+    'teach.divbead.title':   '🆕 ÷ Division Bead!',
+    'teach.divbead.body':    'Chain through a blue <b style="color:#6fe3ff">÷</b> bead to <b>divide your running sum</b>!<br>Example: <b>8 + 4 → ÷2 = 6</b>.<br><span style="font-size:12px;opacity:.7">Only works if it divides evenly. Build a big sum, then divide down to the target!</span>',
+    'teach.captain.cond':    '{ic} Captain Skill: {name}',
+    'teach.captain.body':    'The <b>first Numling on your team is the captain</b> — their skill <b>stays active all battle</b>:<br><b style="color:{c}">{desc}</b><br><span style="font-size:12px;opacity:.7">Swap captains to try different math strategies!</span>',
+
+    // ── 過關畫面 ──────────────────────────────────────────────
+    'result.title.win':        '🎉 Purified!',
+    'result.feedback.1star':   '<span style="color:#9ecbff">Tip: use more small numbers in your chain — more damage, more stars!</span>',
+    'result.feedback.2star':   '<span style="color:#d8b4ff">So close! Land a {max}-bead chain for 3 stars 💥</span>',
+    'result.feedback.3star':   '<span style="color:#5dff9d">Perfect run! You\'re a true Math Hunter 👑</span>',
+    'result.draws.earned':     '⭐×{stars} → 🥚 Earned <b style="color:#ffd84d">{earned}</b> hatch chance(s)! (Total: {total})',
+    'result.draws.3star_hint': '<br><span style="font-size:12px;opacity:.75">Get 3★ (avg chain ≥{avg} + land a {max}-chain) = 3 hatches at once!</span>',
+    'result.draws.already':    '<span style="opacity:.7">Hatches for {prev}★ already claimed on this stage 🥚<br><span style="font-size:12px">Beat your current star count to earn more!</span></span>',
+    'result.gacha_btn':        '🥚 Go Hatch ({n})',
+
+    // ── 隊伍 ──────────────────────────────────────────────────
+    'team.desc':           'Tap a benched card to field it; tap an active card to set as 👑 Captain; tap 👑 Captain to demote. Max 2.',
+    'team.captain.label':  '👑 Captain <b>{name}</b>: <span style="color:{c}">{ic} {capName} — {desc}</span>',
+    'team.locked':         '{name} not yet unlocked',
+    'team.go_gacha':       '🥚 Go to Hatchery',
+    'team.go_gacha.draws': '🥚 Go to Hatchery ({n})',
+    'team.back':           'Back to Map',
+
+    // ── 孵化結果 ──────────────────────────────────────────────
+    'gacha.result.levelup': '<b>{name}</b> leveled up! Lv{lv} (damage boost)',
+    'gacha.result.new':     '🎉 New partner <b>{name}</b> ({attr})!<br><span style="font-size:12px;opacity:.7">{skillIc}{skillName}　{capIc}{capName}</span>',
+
+    // ── 分裂 dialog ───────────────────────────────────────────
+    'split.desc':    'Split <b style="color:#ffd84d">{v}</b> into two numbers?<br><span style="font-size:12px;opacity:.7">First number stays in place, second replaces the bead above</span>',
+
+    // ── 技能按鈕（提示）─────────────────────────────────────
+    'skill.hint.label': '<span class="skillIcon" aria-hidden="true"></span><span class="lbl"><b>Hint</b> Find a path</span>',
+
+    // ── 屬性名稱 ──────────────────────────────────────────────
+    'attr.odd':   'Odd',
+    'attr.even':  'Even',
+    'attr.prime': 'Prime',
+    'attr.multi': 'Multiple',
+
+    // ── 技能名稱 & 說明 ────────────────────────────────────────
+    'skill.plus1.name':  '+1',
+    'skill.plus1.tip':   'Tap a bead to add 1 (9 wraps to 1)',
+    'skill.minus1.name': '−1',
+    'skill.minus1.tip':  'Tap a bead to subtract 1 (1 wraps to 9)',
+    'skill.reroll.name': 'Reroll',
+    'skill.reroll.tip':  'Tap a bead to replace it with a random one',
+    'skill.split.name':  'Split',
+    'skill.split.tip':   'Tap a bead to split it in two (bead above gets replaced)',
+    'skill.swapUp.name': 'Swap Up',
+    'skill.swapUp.tip':  'Tap a bead to swap it with the one above',
+    'skill.purify.name': 'Purify',
+    'skill.purify.tip':  'Tap a bead to remove it instantly',
+    'skill.lucky.name':  'Lucky',
+    'skill.lucky.tip':   'Next chain deals ×1.5 damage!',
+    'skill.shield.name': 'Shield',
+    'skill.shield.tip':  "Block the enemy's next attack!",
+
+    // ── 隊長技 ────────────────────────────────────────────────
+    'captain.prime.name': 'Prime Resonance',
+    'captain.prime.desc': '+18% damage per prime bead (2·3·5·7) in chain',
+    'captain.prime.tag':  'Prime×{n}',
+    'captain.odd.name':   'Odd Strike',
+    'captain.odd.desc':   '+12% damage per odd bead in chain',
+    'captain.odd.tag':    'Odd×{n}',
+    'captain.even.name':  'Even Link',
+    'captain.even.desc':  '+1 chain length bonus per 2 even beads',
+    'captain.even.tag':   'Even+{n}',
+    'captain.multi.name': 'Multi Crit',
+    'captain.multi.desc': '×2 damage when chain length is a multiple of 3',
+    'captain.multi.tag':  'Multi Crit',
+
+    // ── 角色名稱 ──────────────────────────────────────────────
+    'char.kiki.name':        'Kiki',
+    'char.oo.name':          'Oo',
+    'char.prima.name':       'Prima',
+    'char.swapy.name':       'Swapy',
+    'char.starle.name':      'Starle',
+    'char.guardy.name':      'Guardy',
+    'char.dubdragon.name':   'Dubdragon',
+    'char.munchdragon.name': 'Munchdragon',
+
+    // ── 區域名稱 ──────────────────────────────────────────────
+    'zone.0':    '🌿 Ten Plains',
+    'zone.1':    '🌲 Carry Forest',
+    'zone.2':    '🕳️ Sealed Cave',
+    'zone.3':    '🌋 Lava Volcano',
+    'zone.4':    '✖️ Multiply Valley',
+    'zone.5':    '➗ Divide Valley',
+    'zone.jr.a': '🐣 Little World · Part 1',
+    'zone.jr.b': '🐥 Little World · Part 2',
+
+    // ── 關卡名稱 ──────────────────────────────────────────────
+    'stage.1':  'Plains · I',
+    'stage.2':  'Plains · II',
+    'stage.3':  'Forest · I',
+    'stage.4':  'Forest · II',
+    'stage.5':  'Cave · I',
+    'stage.6':  'Cave · II',
+    'stage.7':  'Volcano · I',
+    'stage.8':  'Volcano · II',
+    'stage.m1': 'Multiply Valley · I',
+    'stage.m2': 'Multiply Valley · II',
+    'stage.m3': 'Multiply Valley · Boss',
+    'stage.e1': 'Divide Valley · I',
+    'stage.e2': 'Divide Valley · II',
+    'stage.e3': 'Divide Valley · Boss',
+    'stage.j1': 'Little Plains',
+    'stage.j2': 'Little Garden',
+    'stage.j3': 'Little Forest',
+    'stage.j4': 'Little Hill',
+  }
+};
+
+// ── 語言狀態 ─────────────────────────────────────────────────────
+let LANG = (function() {
+  try { return localStorage.getItem('nh5_lang') || 'zh'; } catch (_) { return 'zh'; }
+})();
+
+// ── 翻譯函式 ──────────────────────────────────────────────────────
+// t('toast.skill.cd', { n: 3 }) → '還要 3 條鏈才能再用'  (zh)
+//                               → '3 more chain(s) until skill ready'  (en)
+function t(key, vars) {
+  const dict = I18N[LANG] || I18N.zh;
+  let str = dict[key];
+  if (str === undefined) {
+    str = I18N.zh[key];                     // fallback 到中文
+    if (str === undefined) return key;      // 最後 fallback：顯示 key 名稱
+  }
+  if (vars) {
+    str = str.replace(/\{(\w+)\}/g, (_, k) => (vars[k] !== undefined ? vars[k] : '{' + k + '}'));
+  }
+  return str;
+}
+
+// ── 舊存檔遷移（中文 data-v → 中性 code）─────────────────────────
+// 僅在讀取時執行一次；不寫回，讓 readSurvey() 存新格式
+function migrateSurvey(s) {
+  if (!s) return s;
+  const gMap = { '男生': 'm', '女生': 'f', '不想說': 'x' };
+  const mMap = { '剛開始學': 'beginner', '還可以': 'ok', '會乘除': 'advanced', '很拿手': 'expert' };
+  if (s.gender && gMap[s.gender]) s.gender = gMap[s.gender];
+  if (s.math   && mMap[s.math])   s.math   = mMap[s.math];
+  return s;
+}
+
+// ── 靜態 HTML 套用翻譯 ───────────────────────────────────────────
+// 對 [data-i18n] 元素依 LANG 更新文字
+// mode="html" → innerHTML；mode="placeholder" → placeholder；預設 → textContent
+function applyI18nToStaticHtml() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key  = el.dataset.i18n;
+    const mode = el.dataset.i18nMode || 'text';
+    if      (mode === 'html')        el.innerHTML   = t(key);
+    else if (mode === 'placeholder') el.placeholder = t(key);
+    else                             el.textContent  = t(key);
+  });
+  // 更新問卷選項按鈕文字
+  const surveyBtnMap = {
+    svGender: ['survey.gender.m', 'survey.gender.f', 'survey.gender.x'],
+    svMath:   ['survey.math.beginner', 'survey.math.ok', 'survey.math.advanced', 'survey.math.expert'],
+  };
+  Object.entries(surveyBtnMap).forEach(([groupId, keys]) => {
+    const group = document.getElementById(groupId);
+    if (!group) return;
+    [...group.querySelectorAll('.svOpt')].forEach((btn, i) => {
+      if (keys[i]) btn.textContent = t(keys[i]);
+    });
+  });
+}
+
+// ── 切換語言 ──────────────────────────────────────────────────────
+// 儲存後更新靜態 HTML，再 re-render 目前可見的 overlay
+function setLang(lang) {
+  if (!I18N[lang]) return;
+  LANG = lang;
+  try { localStorage.setItem('nh5_lang', lang); } catch (_) {}
+  applyI18nToStaticHtml();
+  // 通知 game.main.js 重新 render 目前畫面（函式由 game.main.js 提供）
+  if (typeof renderCurrentView === 'function') renderCurrentView();
+}
+</script>
 <script id="logic">
 const rnd = n => Math.floor(Math.random() * n);
 const randDigit = (max = 9) => 1 + rnd(max);
@@ -6438,7 +7344,15 @@ const ASSET_BASE = (() => {
 })();
 const assetPath = p => `${ASSET_BASE}/${p}`;
 const HAS_PNG = {};
-const SPRITE_OF = { kiki: 'ch01', oo: 'ch02', prima: 'ch03', munchdragon: 'ch08' };   // 數靈 → 多表情圖角色
+const SPRITE_OF = {
+  kiki: 'ch01',
+  oo: 'ch02',
+  prima: 'ch03',
+  munchdragon: 'ch08',
+  crystalAdd: 'ch14',
+  crystalSub: 'ch15',
+  crystalChaos: 'ch16',
+};   // 數靈 → 多表情圖角色
 function charSVG(id, crowned = false) {
   if (SPRITE_OF[id]) return charSprite(SPRITE_OF[id], 'idle', crowned);
   if (HAS_PNG[id]) {
@@ -6458,12 +7372,21 @@ const CHARACTER_ASSETS = {
   ch02: { name: '02 藍色偶數數靈', expressions: buildExpr('ch02') },
   ch03: { name: '03 紫色星形質數靈', expressions: buildExpr('ch03') },
   ch08: { name: '08 綠色大胃龍', expressions: buildExpr('ch08') },
+  ch14: { name: '14 樂晶獸', expressions: buildExpr('ch14'), avatar: assetPath('characters/ch14/avatar.png') },
+  ch15: { name: '15 憂晶獸', expressions: buildExpr('ch15'), avatar: assetPath('characters/ch15/avatar.png') },
+  ch16: { name: '16 裂晶獸', expressions: buildExpr('ch16'), avatar: assetPath('characters/ch16/avatar.png') },
 };
 function charSprite(id, expression = 'idle', crowned = false) {
   const asset = CHARACTER_ASSETS[id];
   if (!asset) return charSVG(id, crowned);
   const src = asset.expressions[expression] || asset.expressions.idle;
   return `<span class="spriteChar motion-${expression}"><img src="${src}" alt="" draggable="false">${crowned ? '<span class="crown">👑</span>' : ''}</span>`;
+}
+function charAvatar(id, crowned = false) {
+  const spriteId = SPRITE_OF[id];
+  const asset = spriteId ? CHARACTER_ASSETS[spriteId] : CHARACTER_ASSETS[id];
+  if (!asset?.avatar) return charSVG(id, crowned);
+  return `<span class="spriteChar avatarChar"><img src="${asset.avatar}" alt="" draggable="false">${crowned ? '<span class="crown">👑</span>' : ''}</span>`;
 }
 function eggSVG(attrColor) {
   return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -6499,6 +7422,9 @@ function eggSVG(attrColor) {
     { id:'guardy',      name:'守護靈', attr:'even',  skill:'shield', pool:2 },
     { id:'dubdragon',   name:'倍倍龍', attr:'multi', skill:'split',  pool:3 },
     { id:'munchdragon', name:'大胃龍', attr:'multi', skill:'lucky',  pool:3 },
+    { id:'crystalAdd',  name:'樂晶獸', attr:'even',  skill:'plus1',  pool:0 },
+    { id:'crystalSub',  name:'憂晶獸', attr:'odd',   skill:'minus1', pool:0 },
+    { id:'crystalChaos',name:'裂晶獸', attr:'multi', skill:'shield', pool:3 },
   ];
   const SP = id => SPECIES.find(s => s.id === id);
 
@@ -6613,8 +7539,11 @@ function eggSVG(attrColor) {
     save('nh5_mastery', MASTERY);
   }
   let STARS = store('nh5_stars', {});
-  let COLL = store('nh5_coll', { kiki: 1, prima: 1 });
+  let COLL = store('nh5_coll', { kiki: 1, prima: 1, crystalAdd: 1, crystalSub: 1, crystalChaos: 1 });
   let EQUIP = store('nh5_equip', ['kiki', 'prima']);
+  ['crystalAdd', 'crystalSub', 'crystalChaos'].forEach(id => {
+    if (!COLL[id]) COLL[id] = 1;
+  });
   let MODE = store('nh5_mode', null);          // 'jr' | 'std'
   let voiceOn = store('nh5_voice', true);
 
@@ -6921,7 +7850,7 @@ function eggSVG(attrColor) {
     TAUGHT[id] = 1; save('nh5_taught', TAUGHT);
     teachQueue.push({ id, title, art, body, meta });
     if (teachQueue.length === 1) showNextTeach();
-    return true;
+    return false;
   }
   function showAttributeTeach(kind, num, force = false) {
     const cfg = ATTRIBUTE_HELP[kind];
@@ -8188,7 +9117,7 @@ function eggSVG(attrColor) {
     $('towerResultOverlay').querySelector('h1').textContent = died ? '🗼 被擊倒了…' : '🗼 無限塔結算';
     $('towerFloors').textContent = floors;
     $('towerPeak').textContent = towerPeak;
-    $('towerBonusMsg').innerHTML = `最高單發攻擊力 <b style="color:#ff9d2e">${towerPeak}</b> → 額外 <b style="color:#ffd84d">${bonus}</b> 券`;
+    $('towerBonusMsg').innerHTML = `→ <b style="color:#ffd84d">+${bonus}</b> bonus egg${bonus === 1 ? '' : 's'} from your best hit`;
     $('towerDraws').textContent = towerDrawsRun + bonus;
     hide('teachOverlay');
     show('towerResultOverlay');
@@ -8256,27 +9185,30 @@ function eggSVG(attrColor) {
       avg_chain: +avg.toFixed(2), max_chain: stageStat.maxChain, max_combo: stageStat.maxCombo || 0,
       chains: stageStat.chains, minus_chains: stageStat.minusChains });
 
-    $('resultStars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
-    $('resultHero').innerHTML = `<div class="art pop">${charSVG(EQUIP[0] || 'kiki', true)}</div>`;
+    $('resultStageBadge').textContent = `STAGE ${stageIdx + 1}`;
+    $('resultStars').textContent = String(stars);
+    $('resultHero').innerHTML = '';
     const clearFeedbackText = stars < 2 ? '<span style="color:#9ecbff">提示：用更多顆小數字湊出目標，傷害更高、星星更多！</span>'
        : stars < 3 ? `<span style="color:#d8b4ff">差一步！打出一次 ${th.max} 鏈就能拿 3 星 💥</span>`
        : '<span style="color:#5dff9d">完美拆解！你是數字獵人大師 👑</span>';
-    $('resultStats').innerHTML =
-      `平均鏈長 <b style="color:#ffd84d">${avg.toFixed(2)}</b>　最長鏈 <b>${stageStat.maxChain}</b>` +
-      (stageStat.minusChains ? `　減法 <b style="color:#c5a3ff">${stageStat.minusChains}</b> 次` : '') +
-      (SHOW_RESULT_FEEDBACK_TEXT ? `<br>${clearFeedbackText}` : '');
     // 星星 → 抽蛋機會（券），累積到 DRAWS，去「孵化所」抽
     const earned = drawsEarned(prevStars, stars);
     DRAWS += earned; save('nh5_draws', DRAWS);
     log('draws_earned', { stage: key, earned, total: DRAWS, stars, prev_stars: prevStars });
+    $('resultStats').innerHTML = `
+      <span class="resultStat"><b>${stageStat.maxChain}</b><em>MAX<br>CHAIN</em></span>
+      <span class="resultDivider" aria-hidden="true"></span>
+      <span class="resultStat"><b>×${earned}</b><em>EGG<br>EARNED</em></span>
+      <span class="resultDivider" aria-hidden="true"></span>
+      <span class="resultStat"><b>${avg.toFixed(1)}</b><em>AVG<br>CHAIN</em></span>`;
     $('drawReward').innerHTML = earned > 0
       ? `⭐×${stars} → 🥚 獲得 <b style="color:#ffd84d">${earned}</b> 次抽蛋機會！（共 ${DRAWS} 次）`
         + (stars < 3 ? `<br><span style="font-size:12px;opacity:.75">拿到 3★（平均鏈長≥${th.avg} 且打出一次 ${th.max} 鏈）= 一次拿 3 券！</span>` : '')
       : `<span style="opacity:.7">這關的 ${prevStars}★ 已經領過抽蛋券了 🥚<br><span style="font-size:12px">打出比 ${prevStars}★ 更高的星，才會有新券！</span></span>`;
     $('gachaGoBtn').textContent = `🥚 前往孵化所抽蛋（${DRAWS}）`;
-    $('gachaGoBtn').classList.toggle('hidden', DRAWS <= 0);
-    $('nextBtn').textContent = stageIdx + 1 < STAGES.length ? '下一關' : '回地圖';
-    show('nextBtn'); show('replayBtn');
+    hide('gachaGoBtn');
+    $('nextBtn').textContent = stageIdx + 1 < STAGES.length ? 'NEXT' : 'BACK';
+    show('nextBtn'); hide('replayBtn');
     say('過關！太厲害了！');
     show('resultOverlay');
   }
@@ -8448,7 +9380,7 @@ function eggSVG(attrColor) {
       card.className = `sCard mCard color-${cardColor(sp, i)}` + (equipped ? ' equipped' : '') + (isCap ? ' captain' : equipped ? ' member' : '');
       card.innerHTML = `
         ${isCap ? '<span class="teamBadge cap">CAPTAIN</span>' : equipped ? '<span class="teamBadge mem">MEMBER</span>' : ''}
-        <div class="art">${charSVG(sp.id, isCap)}</div>
+        <div class="art">${charAvatar(sp.id, isCap)}</div>
         <div class="cardOverlay" aria-hidden="true"></div>
         <div class="lv">LV. ${COLL[sp.id]}</div>
         <div class="atkBadge" aria-hidden="true"></div>
@@ -8498,6 +9430,9 @@ function eggSVG(attrColor) {
     guardy:'Guardy',
     dubdragon:'Dub Dragon',
     munchdragon:'Munch Dragon',
+    crystalAdd:'Luma Cub',
+    crystalSub:'Mope Cub',
+    crystalChaos:'Rift Cub',
   };
   const leaderDetailEN = {
     prime: { name:'Prime Resonance', desc:'+18% damage for each prime bead (2, 3, 5, 7) in your chain.' },
@@ -8595,6 +9530,7 @@ function eggSVG(attrColor) {
   $('gachaBtn').addEventListener('click', openGacha);
   $('gachaDrawBtn').addEventListener('click', drawOne);
   $('gachaBack').addEventListener('click', () => { hide('gachaOverlay'); renderMap(); });
+  $('resultBackBtn').addEventListener('click', () => { hide('resultOverlay'); renderMap(); });
   $('retryBtn').addEventListener('click', () => { hide('failOverlay'); startStage(stageIdx); });
   $('backBtn').addEventListener('click', () => { hide('failOverlay'); renderMap(); });
   $('teachOk').addEventListener('click', closeTeach);
@@ -8623,7 +9559,7 @@ function eggSVG(attrColor) {
   $('exportBtn').addEventListener('click', exportData);
   $('clearBtn').addEventListener('click', () => {
     if (!confirm('清除所有測試數據、星星與收集進度？')) return;
-    EV = []; STARS = {}; COLL = { kiki: 1, prima: 1 }; EQUIP = ['kiki', 'prima']; DDA = { std: 0, jr: 0 }; TAUGHT = {}; DRAWS = 0;
+    EV = []; STARS = {}; COLL = { kiki: 1, prima: 1, crystalAdd: 1, crystalSub: 1, crystalChaos: 1 }; EQUIP = ['kiki', 'prima']; DDA = { std: 0, jr: 0 }; TAUGHT = {}; DRAWS = 0;
     MASTERY = {}; save('nh5_mastery', MASTERY);
     RESON = false;
     ['nh5_events','nh5_stars','nh5_coll','nh5_equip','nh5_dda','nh5_taught','nh5_draws','nh5_reson'].forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
@@ -8669,10 +9605,26 @@ function eggSVG(attrColor) {
     }
   }
   function openPreview(name) {
-    if (name !== 'fail') return false;
-    ['startOverlay','surveyOverlay','selectOverlay','settingsOverlay','teamOverlay','gachaOverlay','captainPickOverlay','resultOverlay','towerResultOverlay','monsterDetailOverlay'].forEach(hide);
-    $('failStats').innerHTML = '<strong>ALMOST THERE!</strong><span>TRY A LONGER CHAIN</span>';
-    show('failOverlay');
+    if (name === 'fail') {
+      ['startOverlay','surveyOverlay','selectOverlay','settingsOverlay','teamOverlay','gachaOverlay','captainPickOverlay','resultOverlay','towerResultOverlay','monsterDetailOverlay'].forEach(hide);
+      $('failStats').innerHTML = '<strong>ALMOST THERE!</strong><span>TRY A LONGER CHAIN</span>';
+      show('failOverlay');
+      return true;
+    }
+    if (name === 'success') {
+      ['startOverlay','surveyOverlay','selectOverlay','settingsOverlay','teamOverlay','gachaOverlay','captainPickOverlay','resultOverlay','towerResultOverlay','monsterDetailOverlay'].forEach(hide);
+      hide('failOverlay');
+      $('resultStageBadge').textContent = 'STAGE 12';
+      $('resultStats').innerHTML = `
+        <span class="resultStat"><b>6</b><em>MAX<br>CHAIN</em></span>
+        <span class="resultDivider" aria-hidden="true"></span>
+        <span class="resultStat"><b>×12</b><em>EGG<br>EARNED</em></span>
+        <span class="resultDivider" aria-hidden="true"></span>
+        <span class="resultStat"><b>218</b><em>AVG<br>CHAIN</em></span>`;
+      $('nextBtn').textContent = 'NEXT';
+      show('resultOverlay');
+      return true;
+    }
     return true;
   }
   // 依年齡決定模式：5~6 歲 → 小小獵人；7 歲以上 → 數字獵人
@@ -8693,7 +9645,7 @@ function eggSVG(attrColor) {
   });
   $('newTesterBtn').addEventListener('click', () => {
     if (!confirm('換一位小朋友？\n會清除「目前這位」的遊玩數據與進度並重填問卷。\n（記得先按「匯出數據」把上一位的 JSON 存下來！）')) return;
-    EV = []; STARS = {}; COLL = { kiki: 1, prima: 1 }; EQUIP = ['kiki', 'prima'];
+    EV = []; STARS = {}; COLL = { kiki: 1, prima: 1, crystalAdd: 1, crystalSub: 1, crystalChaos: 1 }; EQUIP = ['kiki', 'prima'];
     DDA = { std: 0, jr: 0 }; TAUGHT = {}; DRAWS = 0; SURVEY = null; RESON = false; MASTERY = {};
     ['nh5_events','nh5_stars','nh5_coll','nh5_equip','nh5_dda','nh5_taught','nh5_draws','nh5_survey','nh5_reson','nh5_mastery']
       .forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
