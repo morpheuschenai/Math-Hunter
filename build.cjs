@@ -11,12 +11,14 @@ let h = read('index.html');
 const fixUrls = s => s.replace(/url\((['"]?)\.\.\/assets\//g, 'url($1assets/');   // 同時處理 "、'、無引號三種寫法
 const css = fixUrls(read('game.css')),
       uikit = fixUrls(read('ui-kit.generated.css')),
+      i18n  = read('i18n.js'),
       logic = read('game.logic.js'),
       art = read('game.art.js'), main = read('game.main.js');
 
 const subs = [
   ['<link rel="stylesheet" href="game.css">',          '<style>\n' + css + '</style>'],
   ['<link rel="stylesheet" href="ui-kit.generated.css">', '<style>\n' + uikit + '</style>'],
+  ['<script src="i18n.js"></script>',                  '<script>\n' + i18n + '</script>'],
   ['<script id="logic" src="game.logic.js"></script>', '<script id="logic">\n' + logic + '</script>'],
   ['<script id="art" src="game.art.js"></script>',     '<script id="art">\n' + art + '</script>'],
   ['<script src="game.main.js"></script>',             '<script>\n' + main + '</script>'],

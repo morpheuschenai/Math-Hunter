@@ -21,6 +21,9 @@
     { id:'guardy',      name:'守護靈', attr:'even',  skill:'shield', pool:2 },
     { id:'dubdragon',   name:'倍倍龍', attr:'multi', skill:'split',  pool:3 },
     { id:'munchdragon', name:'大胃龍', attr:'multi', skill:'lucky',  pool:3 },
+    { id:'crystalAdd',  name:'樂晶獸', attr:'even',  skill:'plus1',  pool:0 },
+    { id:'crystalSub',  name:'憂晶獸', attr:'odd',   skill:'minus1', pool:0 },
+    { id:'crystalChaos',name:'裂晶獸', attr:'multi', skill:'shield', pool:3 },
   ];
   const SP = id => SPECIES.find(s => s.id === id);
 
@@ -135,8 +138,11 @@
     save('nh5_mastery', MASTERY);
   }
   let STARS = store('nh5_stars', {});
-  let COLL = store('nh5_coll', { kiki: 1, prima: 1 });
+  let COLL = store('nh5_coll', { kiki: 1, prima: 1, crystalAdd: 1, crystalSub: 1, crystalChaos: 1 });
   let EQUIP = store('nh5_equip', ['kiki', 'prima']);
+  ['crystalAdd', 'crystalSub', 'crystalChaos'].forEach(id => {
+    if (!COLL[id]) COLL[id] = 1;
+  });
   let MODE = store('nh5_mode', null);          // 'jr' | 'std'
   let voiceOn = store('nh5_voice', true);
 
@@ -443,7 +449,7 @@
     TAUGHT[id] = 1; save('nh5_taught', TAUGHT);
     teachQueue.push({ id, title, art, body, meta });
     if (teachQueue.length === 1) showNextTeach();
-    return true;
+    return false;
   }
   function showAttributeTeach(kind, num, force = false) {
     const cfg = ATTRIBUTE_HELP[kind];
@@ -1710,7 +1716,7 @@
     $('towerResultOverlay').querySelector('h1').textContent = died ? '🗼 被擊倒了…' : '🗼 無限塔結算';
     $('towerFloors').textContent = floors;
     $('towerPeak').textContent = towerPeak;
-    $('towerBonusMsg').innerHTML = `最高單發攻擊力 <b style="color:#ff9d2e">${towerPeak}</b> → 額外 <b style="color:#ffd84d">${bonus}</b> 券`;
+    $('towerBonusMsg').innerHTML = `→ <b style="color:#ffd84d">+${bonus}</b> bonus egg${bonus === 1 ? '' : 's'} from your best hit`;
     $('towerDraws').textContent = towerDrawsRun + bonus;
     hide('teachOverlay');
     show('towerResultOverlay');
@@ -1778,27 +1784,30 @@
       avg_chain: +avg.toFixed(2), max_chain: stageStat.maxChain, max_combo: stageStat.maxCombo || 0,
       chains: stageStat.chains, minus_chains: stageStat.minusChains });
 
-    $('resultStars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
-    $('resultHero').innerHTML = `<div class="art pop">${charSVG(EQUIP[0] || 'kiki', true)}</div>`;
+    $('resultStageBadge').textContent = `STAGE ${stageIdx + 1}`;
+    $('resultStars').textContent = String(stars);
+    $('resultHero').innerHTML = '';
     const clearFeedbackText = stars < 2 ? '<span style="color:#9ecbff">提示：用更多顆小數字湊出目標，傷害更高、星星更多！</span>'
        : stars < 3 ? `<span style="color:#d8b4ff">差一步！打出一次 ${th.max} 鏈就能拿 3 星 💥</span>`
        : '<span style="color:#5dff9d">完美拆解！你是數字獵人大師 👑</span>';
-    $('resultStats').innerHTML =
-      `平均鏈長 <b style="color:#ffd84d">${avg.toFixed(2)}</b>　最長鏈 <b>${stageStat.maxChain}</b>` +
-      (stageStat.minusChains ? `　減法 <b style="color:#c5a3ff">${stageStat.minusChains}</b> 次` : '') +
-      (SHOW_RESULT_FEEDBACK_TEXT ? `<br>${clearFeedbackText}` : '');
     // 星星 → 抽蛋機會（券），累積到 DRAWS，去「孵化所」抽
     const earned = drawsEarned(prevStars, stars);
     DRAWS += earned; save('nh5_draws', DRAWS);
     log('draws_earned', { stage: key, earned, total: DRAWS, stars, prev_stars: prevStars });
+    $('resultStats').innerHTML = `
+      <span class="resultStat"><b>${stageStat.maxChain}</b><em>MAX<br>CHAIN</em></span>
+      <span class="resultDivider" aria-hidden="true"></span>
+      <span class="resultStat"><b>×${earned}</b><em>EGG<br>EARNED</em></span>
+      <span class="resultDivider" aria-hidden="true"></span>
+      <span class="resultStat"><b>${avg.toFixed(1)}</b><em>AVG<br>CHAIN</em></span>`;
     $('drawReward').innerHTML = earned > 0
       ? `⭐×${stars} → 🥚 獲得 <b style="color:#ffd84d">${earned}</b> 次抽蛋機會！（共 ${DRAWS} 次）`
         + (stars < 3 ? `<br><span style="font-size:12px;opacity:.75">拿到 3★（平均鏈長≥${th.avg} 且打出一次 ${th.max} 鏈）= 一次拿 3 券！</span>` : '')
       : `<span style="opacity:.7">這關的 ${prevStars}★ 已經領過抽蛋券了 🥚<br><span style="font-size:12px">打出比 ${prevStars}★ 更高的星，才會有新券！</span></span>`;
     $('gachaGoBtn').textContent = `🥚 前往孵化所抽蛋（${DRAWS}）`;
-    $('gachaGoBtn').classList.toggle('hidden', DRAWS <= 0);
-    $('nextBtn').textContent = stageIdx + 1 < STAGES.length ? '下一關' : '回地圖';
-    show('nextBtn'); show('replayBtn');
+    hide('gachaGoBtn');
+    $('nextBtn').textContent = stageIdx + 1 < STAGES.length ? 'NEXT' : 'BACK';
+    show('nextBtn'); hide('replayBtn');
     say('過關！太厲害了！');
     show('resultOverlay');
   }
@@ -1970,7 +1979,7 @@
       card.className = `sCard mCard color-${cardColor(sp, i)}` + (equipped ? ' equipped' : '') + (isCap ? ' captain' : equipped ? ' member' : '');
       card.innerHTML = `
         ${isCap ? '<span class="teamBadge cap">CAPTAIN</span>' : equipped ? '<span class="teamBadge mem">MEMBER</span>' : ''}
-        <div class="art">${charSVG(sp.id, isCap)}</div>
+        <div class="art">${charAvatar(sp.id, isCap)}</div>
         <div class="cardOverlay" aria-hidden="true"></div>
         <div class="lv">LV. ${COLL[sp.id]}</div>
         <div class="atkBadge" aria-hidden="true"></div>
@@ -2020,6 +2029,9 @@
     guardy:'Guardy',
     dubdragon:'Dub Dragon',
     munchdragon:'Munch Dragon',
+    crystalAdd:'Luma Cub',
+    crystalSub:'Mope Cub',
+    crystalChaos:'Rift Cub',
   };
   const leaderDetailEN = {
     prime: { name:'Prime Resonance', desc:'+18% damage for each prime bead (2, 3, 5, 7) in your chain.' },
@@ -2117,6 +2129,7 @@
   $('gachaBtn').addEventListener('click', openGacha);
   $('gachaDrawBtn').addEventListener('click', drawOne);
   $('gachaBack').addEventListener('click', () => { hide('gachaOverlay'); renderMap(); });
+  $('resultBackBtn').addEventListener('click', () => { hide('resultOverlay'); renderMap(); });
   $('retryBtn').addEventListener('click', () => { hide('failOverlay'); startStage(stageIdx); });
   $('backBtn').addEventListener('click', () => { hide('failOverlay'); renderMap(); });
   $('teachOk').addEventListener('click', closeTeach);
@@ -2145,7 +2158,7 @@
   $('exportBtn').addEventListener('click', exportData);
   $('clearBtn').addEventListener('click', () => {
     if (!confirm('清除所有測試數據、星星與收集進度？')) return;
-    EV = []; STARS = {}; COLL = { kiki: 1, prima: 1 }; EQUIP = ['kiki', 'prima']; DDA = { std: 0, jr: 0 }; TAUGHT = {}; DRAWS = 0;
+    EV = []; STARS = {}; COLL = { kiki: 1, prima: 1, crystalAdd: 1, crystalSub: 1, crystalChaos: 1 }; EQUIP = ['kiki', 'prima']; DDA = { std: 0, jr: 0 }; TAUGHT = {}; DRAWS = 0;
     MASTERY = {}; save('nh5_mastery', MASTERY);
     RESON = false;
     ['nh5_events','nh5_stars','nh5_coll','nh5_equip','nh5_dda','nh5_taught','nh5_draws','nh5_reson'].forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
@@ -2191,10 +2204,26 @@
     }
   }
   function openPreview(name) {
-    if (name !== 'fail') return false;
-    ['startOverlay','surveyOverlay','selectOverlay','settingsOverlay','teamOverlay','gachaOverlay','captainPickOverlay','resultOverlay','towerResultOverlay','monsterDetailOverlay'].forEach(hide);
-    $('failStats').innerHTML = '<strong>ALMOST THERE!</strong><span>TRY A LONGER CHAIN</span>';
-    show('failOverlay');
+    if (name === 'fail') {
+      ['startOverlay','surveyOverlay','selectOverlay','settingsOverlay','teamOverlay','gachaOverlay','captainPickOverlay','resultOverlay','towerResultOverlay','monsterDetailOverlay'].forEach(hide);
+      $('failStats').innerHTML = '<strong>ALMOST THERE!</strong><span>TRY A LONGER CHAIN</span>';
+      show('failOverlay');
+      return true;
+    }
+    if (name === 'success') {
+      ['startOverlay','surveyOverlay','selectOverlay','settingsOverlay','teamOverlay','gachaOverlay','captainPickOverlay','resultOverlay','towerResultOverlay','monsterDetailOverlay'].forEach(hide);
+      hide('failOverlay');
+      $('resultStageBadge').textContent = 'STAGE 12';
+      $('resultStats').innerHTML = `
+        <span class="resultStat"><b>6</b><em>MAX<br>CHAIN</em></span>
+        <span class="resultDivider" aria-hidden="true"></span>
+        <span class="resultStat"><b>×12</b><em>EGG<br>EARNED</em></span>
+        <span class="resultDivider" aria-hidden="true"></span>
+        <span class="resultStat"><b>218</b><em>AVG<br>CHAIN</em></span>`;
+      $('nextBtn').textContent = 'NEXT';
+      show('resultOverlay');
+      return true;
+    }
     return true;
   }
   // 依年齡決定模式：5~6 歲 → 小小獵人；7 歲以上 → 數字獵人
@@ -2215,7 +2244,7 @@
   });
   $('newTesterBtn').addEventListener('click', () => {
     if (!confirm('換一位小朋友？\n會清除「目前這位」的遊玩數據與進度並重填問卷。\n（記得先按「匯出數據」把上一位的 JSON 存下來！）')) return;
-    EV = []; STARS = {}; COLL = { kiki: 1, prima: 1 }; EQUIP = ['kiki', 'prima'];
+    EV = []; STARS = {}; COLL = { kiki: 1, prima: 1, crystalAdd: 1, crystalSub: 1, crystalChaos: 1 }; EQUIP = ['kiki', 'prima'];
     DDA = { std: 0, jr: 0 }; TAUGHT = {}; DRAWS = 0; SURVEY = null; RESON = false; MASTERY = {};
     ['nh5_events','nh5_stars','nh5_coll','nh5_equip','nh5_dda','nh5_taught','nh5_draws','nh5_survey','nh5_reson','nh5_mastery']
       .forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });

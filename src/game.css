@@ -125,6 +125,8 @@ html, body { height:100%; overscroll-behavior:none; overflow:hidden; }
 .hudHpNum   { font-family:var(--font-display); font-weight:800; font-size:var(--type-hpnum); line-height:1.6; letter-spacing:0; color:#fff; }
 .hudLabel-cjk { font-family:var(--font-cjk); font-weight:700; font-size:var(--type-label); line-height:1.6; color:#fff; }
 
+html { background: #151321; }
+
 body {
   min-height:100dvh;
   color:var(--white);
@@ -1043,7 +1045,7 @@ body.jr #playerRow { display:none; }
   overflow:hidden;
   transform:translate(-50%,-50%);
   color:#fff;
-  background:#07121d url("../assets/ui/game/result/fail_result_background.png") left top/100% 100% no-repeat;
+  background:#07121d url("../assets/ui/game/result/fail_result_background.png") left top/100% 112.657% no-repeat;
   border:0;
   box-shadow:0 0 0 100vmax #07121d;
   container-type:inline-size;
@@ -1110,7 +1112,7 @@ body.jr #playerRow { display:none; }
 
 #failHeroArt {
   left:18.523%;
-  top:20.293%;
+  top:20.502%;
   width:63.182%;
   height:31.067%;
   background:url("../assets/ui/game/result/fail_broken_math_shield.png") center/100% 100% no-repeat;
@@ -1118,7 +1120,7 @@ body.jr #playerRow { display:none; }
 
 #failStatusBanner {
   left:18.295%;
-  top:52.615%;
+  top:60.251%;
   width:63.636%;
   height:8.054%;
   display:grid;
@@ -1144,7 +1146,7 @@ body.jr #playerRow { display:none; }
 
 #failOverlay #failStats {
   left:4.545%;
-  top:61.088%;
+  top:70.711%;
   width:91.136%;
   height:14.958%;
   max-width:none;
@@ -1188,7 +1190,7 @@ body.jr #playerRow { display:none; }
 
 #failActions {
   left:4.545%;
-  top:76.464%;
+  top:86.088%;
   width:91.136%;
   height:7.95%;
   display:flex;
@@ -2855,6 +2857,258 @@ body.jr #playerRow { display:none; }
   border-radius:8px;
   line-height:1.2;
   text-shadow:0 1px 0 rgba(255,255,255,.45);
+}
+
+/* === Success result: Figma frame 440 x 956, node 19308:22280 === */
+#resultOverlay.overlay {
+  inset:auto;
+  top:50%;
+  left:50%;
+  width:min(100vw, calc(100dvh * 440 / 956), 440px);
+  height:min(100dvh, calc(100vw * 956 / 440), 956px);
+  max-height:none;
+  display:block;
+  padding:0 !important;
+  overflow:hidden;
+  transform:translate(-50%,-50%);
+  color:#fff;
+  background:#061d18 url("../assets/ui/game/result/success_result_background.png") left top/100% 100% no-repeat;
+  border:0;
+  box-shadow:0 0 0 100vmax #061d18;
+  container-type:inline-size;
+  touch-action:manipulation;
+}
+
+#resultOverlay.hidden { display:none !important; }
+
+#resultOverlay > * {
+  position:absolute;
+  margin:0;
+}
+
+#resultHeader {
+  left:5.909%;
+  top:5.23%;
+  width:88.409%;
+  height:16.109%;
+}
+
+#resultStageBadge {
+  position:absolute;
+  left:32.005%;
+  top:0;
+  width:35.99%;
+  height:27.273%;
+  display:grid;
+  place-items:center;
+  padding:.9cqw 5.682cqw;
+  color:#000;
+  background:url("../assets/ui/quest/badge_stage.png") center/100% 100% no-repeat;
+  font-family:"Baloo 2","Arial Rounded MT Bold","Noto Sans TC Black",sans-serif;
+  font-size:3.636cqw;
+  font-weight:800;
+  line-height:1;
+  text-align:center;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+
+#resultTitleRow {
+  position:absolute;
+  left:0;
+  top:16.883%;
+  width:100%;
+  height:83.117%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:0;
+}
+
+.resultTitleStar {
+  flex:0 0 15.938%;
+  height:46.094%;
+  background:url("../assets/ui/game/result/star_filled.png") center/contain no-repeat;
+}
+
+#resultOverlay #resultTitle {
+  position:static;
+  width:66.067%;
+  max-width:none;
+  min-height:0;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  color:#f9c208;
+  background:transparent;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  font-family:"Baloo 2","Arial Rounded MT Bold","Noto Sans TC Black",sans-serif;
+  font-size:18.182cqw;
+  font-weight:700;
+  line-height:1;
+  letter-spacing:0;
+  text-align:center;
+  text-transform:uppercase;
+  white-space:nowrap;
+  -webkit-text-stroke:1.85cqw #563707;
+  paint-order:stroke fill;
+  text-shadow:0 .8cqw 0 rgba(0,0,0,.28);
+}
+
+#resultHero {
+  left:13.523%;
+  top:23.849%;
+  width:73.182%;
+  height:36.591%;
+  display:block;
+  margin:0;
+  overflow:visible;
+  background:url("../assets/ui/game/result/success_result_foreground.png") center/100% 100% no-repeat;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+}
+
+#resultHero:before,
+#resultHero:after,
+#resultHero .art {
+  display:none !important;
+}
+
+#resultStars,
+#drawReward,
+#gachaGoBtn,
+#replayBtn {
+  display:none !important;
+}
+
+#resultOverlay #resultStats {
+  left:4.545%;
+  top:69.456%;
+  width:91.136%;
+  height:14.958%;
+  max-width:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:3.636%;
+  padding:0 5.227%;
+  color:#000;
+  background:url("../assets/ui/game/result/fail_tip_panel.png") center/100% 100% no-repeat;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  font-family:"Baloo 2","Arial Rounded MT Bold","Noto Sans TC Black",sans-serif;
+  text-align:center;
+  text-transform:uppercase;
+}
+
+#resultOverlay #resultStats:before {
+  content:none;
+}
+
+.resultStat {
+  width:21.497%;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+
+#resultStats .resultStat b {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  height:4.289cqw;
+  padding:0;
+  color:#000 !important;
+  background:transparent;
+  border:0;
+  border-radius:0;
+  font-size:8.182cqw;
+  font-weight:700;
+  line-height:1;
+  text-shadow:none;
+}
+
+.resultStat em {
+  display:block;
+  width:100%;
+  margin-top:.9cqw;
+  color:#000;
+  font-size:4.545cqw;
+  font-style:normal;
+  font-weight:700;
+  line-height:1;
+  letter-spacing:-.182cqw;
+  text-align:center;
+}
+
+.resultDivider {
+  width:.455%;
+  height:47.552%;
+  flex:0 0 .455%;
+  background:#be824d;
+  border-radius:2px;
+}
+
+#resultActions {
+  left:4.545%;
+  top:86.088%;
+  width:91.136%;
+  height:7.95%;
+  display:flex;
+  align-items:stretch;
+  justify-content:space-between;
+  gap:.227%;
+}
+
+#resultActions #nextBtn,
+#resultActions #resultBackBtn {
+  position:relative;
+  width:49.875%;
+  max-width:none;
+  min-height:0;
+  height:100%;
+  display:grid;
+  place-items:center;
+  padding:0;
+  color:#fff;
+  background:center/100% 100% no-repeat !important;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  font-family:"Baloo 2","Arial Rounded MT Bold","Noto Sans TC Black",sans-serif;
+  font-size:6.364cqw;
+  font-weight:700;
+  line-height:1;
+  text-align:center;
+  text-transform:uppercase;
+  white-space:nowrap;
+  -webkit-text-stroke:.9cqw #1b0f09;
+  paint-order:stroke fill;
+}
+
+#resultActions #nextBtn {
+  background-image:url("../assets/ui/game/result/fail_ok_button_normal.png") !important;
+}
+
+#resultActions #nextBtn:active {
+  background-image:url("../assets/ui/game/result/fail_ok_button_pressed.png") !important;
+}
+
+#resultActions #resultBackBtn {
+  background-image:url("../assets/ui/game/result/fail_back_button_normal.png") !important;
+}
+
+#resultActions #resultBackBtn:active {
+  background-image:url("../assets/ui/game/result/fail_back_button_pressed.png") !important;
 }
 
 /* === Monster final Figma layout: 440 x 956 source frame === */
@@ -5118,6 +5372,7 @@ body:not(.jr) #comboMeter .comboBurstFrame.f8 { background-image:url("../assets/
   height: auto;
   display: none;
   padding: 0;
+  background: #061727;
   transform: translateX(-50%);
   z-index: 12;
   pointer-events: auto;
@@ -5128,7 +5383,6 @@ body:has(#selectOverlay:not(.hidden)) #mainNav,
 body:has(#gachaOverlay:not(.hidden)) #mainNav,
 body:has(#teamOverlay:not(.hidden)) #mainNav,
 body:has(#monsterDetailOverlay:not(.hidden)) #mainNav,
-body:has(#failOverlay:not(.hidden)) #mainNav,
 body:has(#eventsOverlay:not(.hidden)) #mainNav { display: block; }
 
 #mainNav::before {
@@ -5204,7 +5458,6 @@ body:has(#selectOverlay:not(.hidden)) #mNavQuests  { --tab-img: url("../assets/u
 body:has(#teamOverlay:not(.hidden))   #mNavMonster { --tab-img: url("../assets/ui/quest/tab_monsters_selected.png"); }
 body:has(#monsterDetailOverlay:not(.hidden)) #mNavMonster { --tab-img: url("../assets/ui/quest/tab_monsters_selected.png"); }
 body:has(#gachaOverlay:not(.hidden))  #mNavSummon  { --tab-img: url("../assets/ui/quest/tab_summon_selected.png"); }
-body:has(#failOverlay:not(.hidden))   #mNavSummon  { --tab-img: url("../assets/ui/quest/tab_summon_selected.png"); }
 body:has(#eventsOverlay:not(.hidden)) #mNavEvents  { --tab-img: url("../assets/ui/quest/tab_events_selected.png"); }
 
 #mNavQuests:active  { --tab-img: url("../assets/ui/quest/tab_quests_pressed.png"); }

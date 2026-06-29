@@ -1,0 +1,25 @@
+<frame id="19294:22969" name="monster_detail" x="80379" y="23885" width="440" height="956">
+  <rounded-rectangle id="19294:22970" name="events_tower_background 1" x="0" y="0" width="440" height="956" />
+  <rounded-rectangle id="19294:23133" name="enraged 1" x="67" y="64" width="316" height="316" />
+  <frame id="19294:22974" name="navbar" x="0" y="817" width="440" height="139" />
+  <text id="19294:23002" name="monster details" x="46" y="25" width="348" height="67" text="monster details" />
+  <frame id="19294:23130" name="info_area" x="16" y="368" width="409" height="440">
+    <frame id="19294:23006" name="detail_info_panel" x="0" y="20" width="409" height="420">
+      <rounded-rectangle id="19294:23007" name="rewards 1" x="0" y="20" width="409" height="224" />
+      <rounded-rectangle id="19294:23008" name="rewards 2" x="0" y="242" width="409" height="198" />
+      <rounded-rectangle id="19294:23031" name="rewards 2" x="0" y="138" width="409" height="151" />
+    </frame>
+    <frame id="19294:23129" name="content_column" x="26" y="66" width="357" height="346">
+      <frame id="19294:23093" name="atk_panel" x="0" y="0" width="357" height="81" />
+      <frame id="19294:23109" name="leader_panel" x="0" y="89" width="357" height="116">
+        <rounded-rectangle id="19294:23029" name="leader_icon" x="20" y="30" width="56" height="56" />
+        <frame id="19294:23106" name="leader_text" x="91" y="19" width="246" height="78" />
+      </frame>
+      <frame id="19294:23110" name="active_panel" x="0" y="213" width="357" height="133">
+        <rounded-rectangle id="19294:23125" name="active_icon" x="20" y="38.5" width="56" height="56" />
+        <frame id="19294:23120" name="active_text" x="91" y="15.5" width="246" height="102" />
+      </frame>
+    </frame>
+  </frame>
+  <frame id="19294:23145" name="name_badge" x="57.8515625" y="349" width="321.29998779296875" height="77.4000015258789" text="Primer" />
+</frame>

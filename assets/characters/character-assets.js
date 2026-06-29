@@ -97,5 +97,53 @@ window.CharacterAssets = {
       surprise: "assets/characters/ch13/surprise.png",
       enraged: "assets/characters/ch13/enraged.png"
     }
+  },
+  ch14: {
+    id: "ch14",
+    name: "14 樂晶獸",
+    avatar: "assets/characters/ch14/avatar.png",
+    avatar_256: "assets/characters/ch14/avatar_256.png",
+    expressions: {
+      idle: "assets/characters/ch14/idle.png",
+      think: "assets/characters/ch14/think.png",
+      happy: "assets/characters/ch14/happy.png",
+      attack: "assets/characters/ch14/attack.png",
+      hurt: "assets/characters/ch14/hurt.png",
+      miss: "assets/characters/ch14/miss.png",
+      surprise: "assets/characters/ch14/surprise.png",
+      enraged: "assets/characters/ch14/enraged.png"
+    }
+  },
+  ch15: {
+    id: "ch15",
+    name: "15 憂晶獸",
+    avatar: "assets/characters/ch15/avatar.png",
+    avatar_256: "assets/characters/ch15/avatar_256.png",
+    expressions: {
+      idle: "assets/characters/ch15/idle.png",
+      think: "assets/characters/ch15/think.png",
+      happy: "assets/characters/ch15/happy.png",
+      attack: "assets/characters/ch15/attack.png",
+      hurt: "assets/characters/ch15/hurt.png",
+      miss: "assets/characters/ch15/miss.png",
+      surprise: "assets/characters/ch15/surprise.png",
+      enraged: "assets/characters/ch15/enraged.png"
+    }
+  },
+  ch16: {
+    id: "ch16",
+    name: "16 裂晶獸",
+    avatar: "assets/characters/ch16/avatar.png",
+    avatar_256: "assets/characters/ch16/avatar_256.png",
+    expressions: {
+      idle: "assets/characters/ch16/idle.png",
+      think: "assets/characters/ch16/think.png",
+      happy: "assets/characters/ch16/happy.png",
+      attack: "assets/characters/ch16/attack.png",
+      hurt: "assets/characters/ch16/hurt.png",
+      miss: "assets/characters/ch16/miss.png",
+      surprise: "assets/characters/ch16/surprise.png",
+      enraged: "assets/characters/ch16/enraged.png"
+    }
   }
 };

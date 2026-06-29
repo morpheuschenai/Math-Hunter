@@ -57,7 +57,15 @@ const ASSET_BASE = (() => {
 })();
 const assetPath = p => `${ASSET_BASE}/${p}`;
 const HAS_PNG = {};
-const SPRITE_OF = { kiki: 'ch01', oo: 'ch02', prima: 'ch03', munchdragon: 'ch08' };   // 數靈 → 多表情圖角色
+const SPRITE_OF = {
+  kiki: 'ch01',
+  oo: 'ch02',
+  prima: 'ch03',
+  munchdragon: 'ch08',
+  crystalAdd: 'ch14',
+  crystalSub: 'ch15',
+  crystalChaos: 'ch16',
+};   // 數靈 → 多表情圖角色
 function charSVG(id, crowned = false) {
   if (SPRITE_OF[id]) return charSprite(SPRITE_OF[id], 'idle', crowned);
   if (HAS_PNG[id]) {
@@ -77,12 +85,21 @@ const CHARACTER_ASSETS = {
   ch02: { name: '02 藍色偶數數靈', expressions: buildExpr('ch02') },
   ch03: { name: '03 紫色星形質數靈', expressions: buildExpr('ch03') },
   ch08: { name: '08 綠色大胃龍', expressions: buildExpr('ch08') },
+  ch14: { name: '14 樂晶獸', expressions: buildExpr('ch14'), avatar: assetPath('characters/ch14/avatar.png') },
+  ch15: { name: '15 憂晶獸', expressions: buildExpr('ch15'), avatar: assetPath('characters/ch15/avatar.png') },
+  ch16: { name: '16 裂晶獸', expressions: buildExpr('ch16'), avatar: assetPath('characters/ch16/avatar.png') },
 };
 function charSprite(id, expression = 'idle', crowned = false) {
   const asset = CHARACTER_ASSETS[id];
   if (!asset) return charSVG(id, crowned);
   const src = asset.expressions[expression] || asset.expressions.idle;
   return `<span class="spriteChar motion-${expression}"><img src="${src}" alt="" draggable="false">${crowned ? '<span class="crown">👑</span>' : ''}</span>`;
+}
+function charAvatar(id, crowned = false) {
+  const spriteId = SPRITE_OF[id];
+  const asset = spriteId ? CHARACTER_ASSETS[spriteId] : CHARACTER_ASSETS[id];
+  if (!asset?.avatar) return charSVG(id, crowned);
+  return `<span class="spriteChar avatarChar"><img src="${asset.avatar}" alt="" draggable="false">${crowned ? '<span class="crown">👑</span>' : ''}</span>`;
 }
 function eggSVG(attrColor) {
   return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
